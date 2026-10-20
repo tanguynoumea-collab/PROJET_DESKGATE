@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "projet": "deskgate",
+  "profil": {
+    "type": "web_saas",
+    "gate": [],
+    "dir_audits": "audits/",
+    "fichiers_version": ["pyproject.toml"],
+    "roadmap_projet": "docs/passation/04-FEUILLE-DE-ROUTE.md"
+  },
+  "route": "full",
+  "phase": "CADRAGE",
+  "phase_status": "en_cours",
+  "cycle": {
+    "numero": 1,
+    "demarre_le": "2026-10-20",
+    "version_cible": "0.1.0",
+    "impact_ui": false,
+    "mode_design": null,
+    "branche": null
+  },
+  "gsd": {
+    "planning_dir": ".planning",
+    "milestone": null,
+    "phases": [],
+    "quick_ids": [],
+    "config_attendue": {
+      "commit_docs": true,
+      "ui_phase": false,
+      "branching_strategy": "none",
+      "auto_advance": false
+    }
+  },
+  "iterations": { "cadrage_tours": 1, "design_review": 0, "audit_council": 0, "max": 3 },
+  "checkpoints": {
+    "cadrage": { "valide": false, "le": null, "commit": null, "preuve": null, "differe": false },
+    "plan_design": { "valide": false, "le": null, "commit": null, "preuve": null, "differe": false },
+    "triage": { "valide": false, "le": null, "commit": null, "preuve": null, "differe": false },
+    "go_publication": { "valide": false, "le": null, "commit": null, "preuve": null, "differe": false },
+    "roadmap": { "valide": false, "le": null, "commit": null, "preuve": null, "differe": false }
+  },
+  "items_ouverts": [
+    {
+      "id": "v00-existant",
+      "type": "decision",
+      "titre": "Recherche de l'existant (06 §1) : construire, contribuer ou reutiliser une brique",
+      "gravite": "bloquant",
+      "statut": "ouvert",
+      "proprietaire": "ia",
+      "ouvert_le": "2026-10-20",
+      "source": "docs/passation/06-POINTS-OUVERTS.md",
+      "ref": null,
+      "condition_levee": "rapport .arthemis/reports/ + decision utilisateur"
+    },
+    {
+      "id": "v00-verifs",
+      "type": "decision",
+      "titre": "Verifications techniques 06 §2 (attente noeud n8n, host.docker.internal, uv, arret arbre)",
+      "gravite": "bloquant",
+      "statut": "ouvert",
+      "proprietaire": "ia",
+      "ouvert_le": "2026-10-20",
+      "source": "docs/passation/06-POINTS-OUVERTS.md",
+      "ref": null,
+      "condition_levee": "rapport .arthemis/reports/"
+    },
+    {
+      "id": "v00-questions",
+      "type": "decision",
+      "titre": "Questions 06 §3 : ODM, licence MIT/Apache, Hermes, source des depots, tableau de bord",
+      "gravite": "majeur",
+      "statut": "en_attente_decision",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-20",
+      "source": "docs/passation/06-POINTS-OUVERTS.md",
+      "ref": null,
+      "condition_levee": "reponses utilisateur"
+    },
+    {
+      "id": "v00-docs",
+      "type": "decision",
+      "titre": "Rediger ARCHITECTURE.md, ROADMAP.md, AGENTS.md, CLAUDE.md puis validation avant code",
+      "gravite": "bloquant",
+      "statut": "ouvert",
+      "proprietaire": "ia",
+      "ouvert_le": "2026-10-20",
+      "source": "docs/passation/00-LISEZ-MOI.md",
+      "ref": null,
+      "condition_levee": "checkpoints.cadrage date"
+    }
+  ],
+  "livraisons": [],
+  "dod": null,
+  "phases_sautees": [
+    { "phase": "ROADMAP", "motif": "feuille de route fournie par la passation ; project-coding-prep saute (choix utilisateur)", "le": "2026-10-20", "cycle": 1 }
+  ],
+  "horizon": null,
+  "pending_bloquant": null,
+  "extension": {
+    "web_saas": {
+      "contexte_saas": {
+        "tenancy": "mono-tenant : un runner par PC, pas de multi-utilisateurs (D7, D9)",
+        "authentification": "jetons Bearer par client, haches, droits par plugin (D9)",
+        "donnees_personnelles": "aucune collectee ; chemins et parametres de taches dans l'audit local",
+        "facturation": "sans objet (open source)",
+        "stade": "nouveau projet, aucun utilisateur",
+        "source": "docs/passation/02-DECISIONS.md"
+      },
+      "impact_donnees": { "migration": false, "destructive": false, "reversible_structure": null, "reversible_donnees": null, "utilisateurs_reels_concernes": false },
+      "environnements": [],
+      "exploitation": {
+        "dernier_deploiement": null,
+        "plan_retour_arriere": { "annulation_code": null, "code_avant_compatible_base_apres": null, "sort_des_donnees_ecrites": null, "signal_de_declenchement": null },
+        "migrations_appliquees": [],
+        "verification_11a": { "le": null, "resultat": null },
+        "collecte_due": false
+      }
+    }
+  },
+  "maj": { "le": "2026-10-20", "commit": null }
+}
