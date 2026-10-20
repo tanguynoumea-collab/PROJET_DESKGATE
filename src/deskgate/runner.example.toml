@@ -1,0 +1,35 @@
+# Gabarit de configuration du runner Deskgate (runner.toml).
+# Toute clé inconnue est refusée au démarrage, avec le chemin complet de la clé.
+
+# Adresse d'écoute : 127.0.0.1 par défaut. Toute autre adresse exige
+# allow_non_loopback = true et déclenche un avertissement.
+host = "127.0.0.1"
+port = 8765
+allow_non_loopback = false
+
+# Empreinte SHA-256 du jeton Bearer (64 caractères hexadécimaux minuscules).
+# À remplacer par la ligne affichée par `deskgate dev-token`. Aucun jeton ne correspond à
+# cette valeur : le runner refuse donc tout appel tant qu'elle n'est pas remplacée.
+token_sha256 = "0000000000000000000000000000000000000000000000000000000000000000"
+
+# Noms d'hôtes autorisés pour les rappels (utilisé en phase 3).
+callback_allowed_hosts = ["localhost"]
+
+[paths]
+# Racines autorisées. Utilisez des "/" ou des apostrophes : "C:\BIM" entre guillemets
+# est une erreur TOML (échappement invalide) ; écrivez 'C:\BIM' ou 'C:/BIM'.
+allowed_roots = ['C:/BIM']
+
+# Correspondance entre un chemin vu par n8n (conteneur) et le dossier de l'hôte.
+# L'hôte doit se trouver sous une racine autorisée.
+[[paths.mapping]]
+container = "/data"
+host = 'C:/BIM'
+
+# Capacités : une section par identifiant (exemple générique, à adapter).
+# [capabilities.exemple]
+# kind = "python"
+# python = 'C:/chemin/vers/venv/Scripts/python.exe'
+# entry = "paquet.module"
+# timeout_max = 600
+# resource = "default"
