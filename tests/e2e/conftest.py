@@ -7,20 +7,34 @@ import os
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import pytest
+from tests._support.jobs import FAKE_PLUGINS
 
 from deskgate.core.tokens import hash_token
 
 TOKEN = "jeton-de-test-e2e"  # noqa: S105 (jeton factice de test)
+CALLBACK_URL = "http://localhost:5678/webhook-waiting/42?signature=E2E-SECRET-SIG"
+FAKE_CAPS: dict[str, dict[str, object]] = {
+    "demo.sleep": {"entry": "deskgate_fakes:sleep", "timeout_max": 600},
+    "demo.spawn_orphan": {"entry": "deskgate_fakes:spawn_orphan", "timeout_max": 600},
+    "demo.artifact_ok": {"entry": "deskgate_fakes:artifact_ok", "timeout_max": 600},
+}
 
 
-def write_config(home: Path, port: int, **overrides: object) -> Path:
+def write_config(
+    home: Path,
+    port: int,
+    *,
+    capabilities: Mapping[str, Mapping[str, object]] | None = None,
+    **overrides: object,
+) -> Path:
     """Écrit `runner.toml` ; `overrides` remplace des clés de premier niveau (TOML brut)."""
     root = home.parent / "bim"
     root.mkdir(exist_ok=True)
@@ -42,6 +56,16 @@ def write_config(home: Path, port: int, **overrides: object) -> Path:
         f"host = '{posix}'",
         "",
     ]
+    for cap_id, options in (capabilities or {}).items():
+        lines += [
+            f'[capabilities."{cap_id}"]',
+            'kind = "python"',
+            f"python = '{Path(sys.executable).as_posix()}'",
+            f"entry = '{options['entry']}'",
+            f"timeout_max = {options['timeout_max']}",
+            f"pythonpath = ['{FAKE_PLUGINS.as_posix()}']",
+            "",
+        ]
     home.mkdir(parents=True, exist_ok=True)
     path = home / "runner.toml"
     path.write_text("\n".join(lines), encoding="utf-8")
@@ -106,6 +130,51 @@ class Runner:
 @pytest.fixture
 def runner(data_home: Path, instance_name: str, free_port: int) -> Iterator[Runner]:
     write_config(data_home, free_port)
+    env = runner_env(data_home, instance_name)
+    proc = start_runner(env)
+    r = Runner(proc, free_port, data_home, env)
+    try:
+        wait_health(free_port, proc)
+        yield r
+    finally:
+        kill_tree(r.proc)
+        for stream in (proc.stdout, proc.stderr):
+            if stream is not None:
+                stream.close()
+
+
+def api(
+    port: int, method: str, path: str, body: object | None = None, token: str | None = TOKEN
+) -> tuple[int, dict[str, Any]]:
+    data = json.dumps(body).encode("utf-8") if body is not None else None
+    req = urllib.request.Request(f"http://127.0.0.1:{port}{path}", data=data, method=method)
+    if token:
+        req.add_header("Authorization", f"Bearer {token}")
+    if data is not None:
+        req.add_header("Content-Type", "application/json")
+    try:
+        with urllib.request.urlopen(req, timeout=10) as r:  # noqa: S310 (http local)
+            return r.status, json.loads(r.read())
+    except urllib.error.HTTPError as exc:
+        return exc.code, json.loads(exc.read())
+
+
+def wait_status(
+    port: int, job_id: str, statuses: set[str], timeout: float = 30.0
+) -> dict[str, Any]:
+    deadline = time.monotonic() + timeout
+    last: dict[str, Any] = {}
+    while time.monotonic() < deadline:
+        _, last = api(port, "GET", f"/jobs/{job_id}")
+        if last.get("status") in statuses:
+            return last
+        time.sleep(0.1)
+    pytest.fail(f"Tâche {job_id} : statut {last.get('status')!r}, attendu {statuses}")
+
+
+@pytest.fixture
+def jobs_runner(data_home: Path, instance_name: str, free_port: int) -> Iterator[Runner]:
+    write_config(data_home, free_port, capabilities=FAKE_CAPS)
     env = runner_env(data_home, instance_name)
     proc = start_runner(env)
     r = Runner(proc, free_port, data_home, env)
