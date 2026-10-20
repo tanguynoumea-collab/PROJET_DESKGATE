@@ -88,6 +88,10 @@ def test_subprocess_seulement_dans_jobobject() -> None:
     assert _importeurs("subprocess") <= {"jobobject.py"}
 
 
+def test_httpx2_seulement_dans_sender() -> None:
+    assert _importeurs("httpx2") <= {"sender.py"}
+
+
 SDK = SRC.parent / "deskgate_sdk"
 
 

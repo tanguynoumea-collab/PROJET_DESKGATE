@@ -12,8 +12,9 @@ allow_non_loopback = false
 # cette valeur : le runner refuse donc tout appel tant qu'elle n'est pas remplacée.
 token_sha256 = "0000000000000000000000000000000000000000000000000000000000000000"
 
-# Noms d'hôtes autorisés pour les rappels (utilisé en phase 3).
-callback_allowed_hosts = ["localhost"]
+# Hôtes autorisés pour le rappel vers n8n (resumeUrl), n'importe quel port. Comparaison exacte
+# du nom, sans joker : ajoutez explicitement tout autre hôte (ex. "host.docker.internal").
+callback_allowed_hosts = ["localhost", "127.0.0.1"]
 
 [paths]
 # Racines autorisées. Utilisez des "/" ou des apostrophes : "C:\BIM" entre guillemets
@@ -30,6 +31,12 @@ host = 'C:/BIM'
 # job.log n'est pas plafonné). Doit être sous une racine autorisée.
 # Défaut : <première racine>/travail.
 # work_root = 'C:/BIM/travail'
+
+# Rappel vers n8n : réessais avec délai croissant (2 s, 4 s, 8 s…) plafonné à max_backoff_s,
+# abandon tracé dans l'audit au-delà de max_window_s secondes après la fin de la tâche.
+[callback]
+max_window_s = 86400
+max_backoff_s = 300
 
 # Capacités : une section par identifiant (exemple générique, à adapter).
 # [capabilities.exemple]

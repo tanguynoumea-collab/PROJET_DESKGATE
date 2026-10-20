@@ -37,4 +37,6 @@ def test_example_template_is_valid() -> None:
     assert cfg.host == "127.0.0.1"
     assert cfg.port == 8765
     assert cfg.paths.allowed_roots
+    assert cfg.callback.max_window_s == 86400
+    assert cfg.callback_allowed_hosts == ["localhost", "127.0.0.1"]
     assert any(m.container == "/data" and m.host == "C:/BIM" for m in cfg.mappings())

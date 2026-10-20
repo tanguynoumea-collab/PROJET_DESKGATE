@@ -3,7 +3,7 @@ name = "deskgate"
 version = "0.1.0.dev0"
 requires-python = ">=3.11"
 license = "MIT"
-dependencies = ["fastapi>=0.151,<0.152", "uvicorn>=0.54,<0.55", "pydantic>=2.14,<3", "platformdirs>=4.13", "typer>=0.27,<0.28"]
+dependencies = ["fastapi>=0.151,<0.152", "uvicorn>=0.54,<0.55", "pydantic>=2.14,<3", "platformdirs>=4.13", "typer>=0.27,<0.28", "httpx2>=2.15,<3"]
 
 [project.scripts]
 deskgate = "deskgate.cli:app"
@@ -22,7 +22,7 @@ default-groups = ["dev"]
 members = []                       # "plugins/bim", "plugins/bim/bcf" ajoutés quand les répertoires existent
 
 [dependency-groups]
-dev = ["pytest>=9.1,<10", "pytest-timeout>=2.4", "httpx2>=2.15,<3", "psutil>=7.2", "ruff>=0.17,<0.18", "pyright>=1.1.414"]
+dev = ["pytest>=9.1,<10", "pytest-timeout>=2.4", "psutil>=7.2", "ruff>=0.17,<0.18", "pyright>=1.1.414"]
 
 [tool.ruff]
 line-length = 100

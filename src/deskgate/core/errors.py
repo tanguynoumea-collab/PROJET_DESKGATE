@@ -13,6 +13,7 @@ CAPABILITY_NOT_FOUND = "capability_not_found"
 JOB_NOT_FOUND = "job_not_found"
 IDEMPOTENCY_CONFLICT = "idempotency_conflict"
 TIMEOUT_TOO_LARGE = "timeout_too_large"
+CALLBACK_HOST_NOT_ALLOWED = "callback_host_not_allowed"
 
 HTTP_MESSAGES_FR: dict[int, str] = {
     400: "Requête invalide.",

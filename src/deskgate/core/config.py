@@ -48,6 +48,17 @@ def _host_root(value: str) -> str:
         raise PydanticCustomError("path_invalid", "{msg}", {"msg": exc.message}) from None
 
 
+def _lower(v: str) -> str:
+    return v.lower()
+
+
+HostName = Annotated[
+    str,
+    StringConstraints(min_length=1, max_length=253, pattern=r"^[A-Za-z0-9._-]+$"),
+    AfterValidator(_lower),
+]
+
+
 class Strict(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -108,13 +119,19 @@ class Capability(Strict):
     resource: str = "default"
 
 
+class CallbackConfig(Strict):
+    max_window_s: int = Field(86400, ge=60, le=2_592_000)
+    max_backoff_s: int = Field(300, ge=1, le=3600)
+
+
 class RunnerConfig(Strict):
     allow_non_loopback: bool = False
     host: str = "127.0.0.1"
     port: int = Field(8765, ge=1, le=65535)
     token_sha256: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
     paths: Paths
-    callback_allowed_hosts: list[str] = []
+    callback_allowed_hosts: list[HostName] = ["localhost", "127.0.0.1"]
+    callback: CallbackConfig = CallbackConfig()
     capabilities: dict[str, Capability] = {}
     work_root: Annotated[str, AfterValidator(_host_root)] | None = None
 

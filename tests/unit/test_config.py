@@ -207,3 +207,42 @@ def test_work_root_outside_roots() -> None:
     msg = _err(f"work_root = 'D:/ailleurs'\n{BASE}")
     assert "work_root" in msg
     assert "racine" in msg
+
+
+def _with_top(line: str) -> str:
+    return line + "\n" + BASE
+
+
+def test_callback_defaults() -> None:
+    cfg = parse_config(BASE, "test.toml")
+    assert cfg.callback_allowed_hosts == ["localhost", "127.0.0.1"]
+    assert cfg.callback.max_window_s == 86400
+    assert cfg.callback.max_backoff_s == 300
+
+
+def test_callback_hosts_lowercased() -> None:
+    cfg = parse_config(_with_top('callback_allowed_hosts = ["LOCALHOST"]'), "test.toml")
+    assert cfg.callback_allowed_hosts == ["localhost"]
+
+
+@pytest.mark.parametrize("valeur", ['"evil.com/x"', '""'])
+def test_callback_hosts_invalid(valeur: str) -> None:
+    msg = _err(_with_top(f"callback_allowed_hosts = [{valeur}]"))
+    assert "callback_allowed_hosts" in msg
+
+
+def test_callback_backoff_too_small() -> None:
+    msg = _err(BASE + "[callback]\nmax_backoff_s = 0\n")
+    assert "callback.max_backoff_s" in msg
+    assert "valeur trop petite" in msg
+
+
+def test_callback_window_too_small() -> None:
+    msg = _err(BASE + "[callback]\nmax_window_s = 30\n")
+    assert "callback.max_window_s" in msg
+
+
+def test_callback_unknown_key() -> None:
+    msg = _err(BASE + "[callback]\nfoo = 1\n")
+    assert "callback.foo" in msg
+    assert "clé inconnue" in msg
