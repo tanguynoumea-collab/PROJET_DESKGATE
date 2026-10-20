@@ -8,6 +8,7 @@ import logging
 import os
 import re
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +18,9 @@ import ifcopenshell.util.selector as sel
 from ifcclash import ifcclash
 from lark.exceptions import LarkError
 
+from .bcfdoc import build_doc
+from .bcfjob import write_bcf
+from .context import context_guids
 from .grouping import build_groups, prepare
 from .params import ClashError, ClashParams, parse_params
 
@@ -160,6 +164,46 @@ def _warning(name: str, selector: str, found: int, geom: int) -> tuple[str, dict
     return code, {"code": code, "message": msg}
 
 
+def _write_bcf(
+    p: ClashParams,
+    ctx: Any,
+    clasher: DeskgateClasher,
+    groups: list[dict[str, Any]],
+    warnings: list[str],
+    details: list[dict[str, Any]],
+    progress: _Progress,
+) -> int:
+    progress(92, "contexte", force=True)
+
+    def warn(code: str, message: str) -> None:
+        warnings.append(code)
+        details.append({"code": code, "message": message})
+        ctx.log(message)
+
+    context = context_guids(
+        list(clasher.opened.values()),
+        groups,
+        radius=p.context_radius,
+        max_context=p.max_context,
+        threads=clasher.num_threads,
+        warn=warn,
+    )
+    names = [Path(f).stem for f in dict.fromkeys(f for f in (p.ifc_a, p.ifc_b) if f)]
+    doc = build_doc(
+        groups,
+        project=p.bcf_project or " ".join(["ifc.clash", *names]),
+        author=p.bcf_author,
+        created_at=p.created_at or datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        context=context,
+        mode=p.mode,
+        threshold=p.threshold,
+    )
+    progress(96, "écriture du BCF", force=True)
+    dst = write_bcf(ctx.settings, doc, ctx.work_dir)
+    ctx.artifact(dst, "bcf")
+    return len(doc["topics"])
+
+
 def _run(p: ClashParams, ctx: Any) -> dict[str, Any]:
     progress = _Progress(ctx)
     progress(0, "ouverture des fichiers", force=True)
@@ -219,6 +263,15 @@ def _run(p: ClashParams, ctx: Any) -> dict[str, Any]:
     out = Path(ctx.work_dir) / "clashes.json"
     out.write_text(json.dumps(data, ensure_ascii=False, sort_keys=True, indent=1), encoding="utf-8")
     ctx.artifact(str(out), "clashes")
+    bcf_topics = 0
+    if p.bcf:
+        if not groups:
+            warnings.append("bcf_skipped_no_clash")
+            msg = "Aucun conflit : BCF non produit."
+            details.append({"code": "bcf_skipped_no_clash", "message": msg})
+            ctx.log(msg)
+        else:
+            bcf_topics = _write_bcf(p, ctx, clasher, groups, warnings, details, progress)
     limit = int(ctx.settings.get("data_max_bytes", DATA_MAX_BYTES))
     if len(json.dumps(data, ensure_ascii=False)) > limit:
         for g in data["groups"]:
@@ -236,6 +289,8 @@ def _run(p: ClashParams, ctx: Any) -> dict[str, Any]:
         "mode": p.mode,
         "unit": "m",
         "ifcopenshell": ifcopenshell.version,
+        "bcf": bcf_topics > 0,
+        "bcf_topics": bcf_topics,
     }
     summary["tolerance" if p.mode == "hard" else "clearance"] = p.threshold
     return {"summary": summary, "data": data}
