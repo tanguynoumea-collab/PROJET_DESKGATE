@@ -473,3 +473,162 @@ def record_refusal(
     """Audit d'une soumission refusée (sans création de tâche)."""
     with tx(conn):
         _audit(conn, "job.refused", job_id, {"code": code, "capability": capability}, _now(now))
+
+
+@dataclass(frozen=True)
+class CallbackClaim:
+    """Rappel réclamé : l'essai est déjà inscrit en base (écriture préalable)."""
+
+    job_id: str
+    attempt: int
+    last_status: int | None
+    maybe_delivered_before: bool
+    deadline: datetime
+    capability: str
+    status: str
+    started_at: str | None
+    finished_at: str | None
+    result_json: str | None
+    error_code: str | None
+    error_message: str | None
+    callback_url: str = field(repr=False)
+
+
+def _close_callback(
+    conn: sqlite3.Connection,
+    job_id: str,
+    state: str,
+    reason: str | None,
+    attempts: int,
+    now: datetime,
+) -> None:
+    """État final du rappel : purge de la resumeUrl et audit. Dans une transaction ouverte."""
+    conn.execute("UPDATE callbacks SET state=? WHERE job_id=?", (state, job_id))
+    conn.execute("UPDATE jobs SET callback_url='' WHERE id=?", (job_id,))
+    if state.startswith("delivered"):
+        _audit(conn, "callback.delivered", job_id, {"attempts": attempts, "state": state}, now)
+    else:
+        _audit(conn, "callback.abandoned", job_id, {"reason": reason, "attempts": attempts}, now)
+
+
+def claim_due_callback(
+    conn: sqlite3.Connection, now: datetime, *, max_window_s: int
+) -> CallbackClaim | None:
+    """Réclame le rappel échu le plus ancien ; écrit attempts+1 et maybe_delivered=1 avant l'envoi.
+
+    Un rappel au-delà de finished_at + max_window_s est abandonné sans envoi.
+    """
+    stamp = iso(now)
+    with tx(conn):
+        while True:
+            row = conn.execute(
+                "SELECT c.job_id, c.attempts, c.last_status, c.maybe_delivered, j.capability, "
+                "j.status, j.started_at, j.finished_at, j.result_json, j.error_code, "
+                "j.error_message, j.callback_url, c.not_before "
+                "FROM callbacks c JOIN jobs j ON j.id = c.job_id "
+                "WHERE c.state = 'pending' AND c.next_attempt_at <= :now AND c.not_before <= :now "
+                "ORDER BY c.next_attempt_at, c.rowid LIMIT 1",
+                {"now": stamp},
+            ).fetchone()
+            if row is None:
+                return None
+            deadline = datetime.fromisoformat(row["finished_at"] or row["not_before"]) + timedelta(
+                seconds=max_window_s
+            )
+            if now >= deadline:
+                _close_callback(
+                    conn, row["job_id"], "abandoned_exhausted", "exhausted", row["attempts"], now
+                )
+                continue
+            conn.execute(
+                "UPDATE callbacks SET attempts = attempts + 1, maybe_delivered = 1 "
+                "WHERE job_id = ?",
+                (row["job_id"],),
+            )
+            return CallbackClaim(
+                job_id=row["job_id"],
+                attempt=row["attempts"] + 1,
+                last_status=row["last_status"],
+                maybe_delivered_before=bool(row["maybe_delivered"]),
+                deadline=deadline,
+                capability=row["capability"],
+                status=row["status"],
+                started_at=row["started_at"],
+                finished_at=row["finished_at"],
+                result_json=row["result_json"],
+                error_code=row["error_code"],
+                error_message=row["error_message"],
+                callback_url=row["callback_url"],
+            )
+
+
+def record_callback_result(
+    conn: sqlite3.Connection,
+    claim: CallbackClaim,
+    *,
+    state: str,
+    decision: str,
+    http_status: int | None,
+    error: str | None,
+    next_attempt_at: datetime | None,
+    now: datetime,
+    reason: str | None = None,
+) -> None:
+    """Enregistre l'issue d'un essai ; une réponse 4xx restaure le bit maybe_delivered."""
+    restore = http_status is not None and 400 <= http_status < 500
+    maybe_delivered = int(claim.maybe_delivered_before) if restore else 1
+    if error:
+        err: str | None = redact_signature(error)
+    elif http_status is not None and not 200 <= http_status < 300:
+        err = f"http_{http_status}"
+    else:
+        err = None
+    with tx(conn):
+        cur = conn.execute(
+            "UPDATE callbacks SET state=?, last_status=?, last_error_redacted=?, "
+            "maybe_delivered=?, next_attempt_at=COALESCE(?, next_attempt_at) "
+            "WHERE job_id=? AND state='pending'",
+            (
+                state,
+                http_status,
+                err,
+                maybe_delivered,
+                iso(next_attempt_at) if next_attempt_at is not None else None,
+                claim.job_id,
+            ),
+        )
+        if cur.rowcount != 1:
+            raise StaleTransition(claim.job_id)
+        _audit(
+            conn,
+            "callback.attempt",
+            claim.job_id,
+            {
+                "attempt": claim.attempt,
+                "http_status": http_status,
+                "error": err if error else None,
+                "decision": decision,
+            },
+            now,
+        )
+        if state in CALLBACK_FINAL_STATES:
+            _close_callback(
+                conn,
+                claim.job_id,
+                state,
+                reason or ABANDON_REASONS.get(state),
+                claim.attempt,
+                now,
+            )
+
+
+def abandon_callback(
+    conn: sqlite3.Connection, job_id: str, *, state: str, reason: str, now: datetime
+) -> None:
+    """Abandon sans envoi (hôte refusé, etc.) : sans effet si le rappel n'est plus pending."""
+    with tx(conn):
+        row = conn.execute(
+            "SELECT attempts FROM callbacks WHERE job_id=? AND state='pending'", (job_id,)
+        ).fetchone()
+        if row is not None:
+            _close_callback(conn, job_id, state, reason, row["attempts"], now)

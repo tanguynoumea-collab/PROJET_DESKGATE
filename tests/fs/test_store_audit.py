@@ -8,8 +8,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
-from _support.store_helpers import CALLBACK_URL, make_db, submit
 
+from _support.store_helpers import CALLBACK_URL, make_db, submit
 from deskgate import store
 
 pytestmark = pytest.mark.fs
