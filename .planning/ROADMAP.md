@@ -14,7 +14,8 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
  (completed 2026-10-20)
 - [x] **Phase 2: Cœur d'exécution** - File SQLite, exécution en Job Object, API des tâches, délai, annulation, reprise après redémarrage
  (completed 2026-10-20)
-- [x] **Phase 3: Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit (completed 2026-10-20)
+- [x] **Phase 3: Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit
+ (completed 2026-10-20)
 - [ ] **Phase 4: Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call`
 - [ ] **Phase 5: Installation et intégration n8n** - `deskgate init`, tâche planifiée, docker-compose n8n, workflow d'exemple, acceptation
 
@@ -91,7 +92,17 @@ Plans:
   2. Sur demande, `ifc.clash` produit un BCF 2.1 ouvrable, avec deux points de vue par sujet (objets seuls ; contexte gris transparent), couleurs ARGB, sans sélection enregistrée
   3. `mcp.call` appelle un outil d'un serveur MCP stdio déclaré, sans LLM, dans le Job Object de la tâche, et renvoie son résultat ; l'arrêt de la tâche tue le serveur MCP
   4. `deskgate-bcf` (GPL-3) écrit le BCF depuis un JSON versionné en sous-processus ; un test CI échoue si un autre paquet importe `bcf-client` ou `deskgate-bcf`
-**Plans**: TBD
+**Plans**: 7 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Workspace uv, squelettes deskgate-bim / deskgate-bcf, contrat bcf-write-v1, garde-fous GPL (AST, licences, sdist)
+- [ ] 04-02-PLAN.md — Cœur générique : settings, path_params, kind mcp et mcp_servers, ctx.settings, codes d'erreur des plugins
+- [ ] 04-03-PLAN.md — deskgate-bcf (GPL-3) : écriture BCF 2.1 à deux vues depuis le JSON du contrat, codes 0/2/3
+- [ ] 04-04-PLAN.md — ifc.clash : DeskgateClasher, modes hard/clearance, regroupement déterministe, sélection vide, erreurs classées
+- [ ] 04-05-PLAN.md — mcp.call : worker MCP stdio dans le Job Object, mini-serveur de test, arrêt de l'arbre, secrets hors disque
+- [ ] 04-06-PLAN.md — Classement memory_limit par le pic mémoire du Job Object
+- [ ] 04-07-PLAN.md — Sortie BCF d'ifc.clash (contexte gris, appel de deskgate-bcf), bout en bout, documentation
+
 **Note de recherche**: spikes nécessaires : SDK `mcp` 2.x dans un Job Object ; API bas niveau de `bcf-client` ; multiprocessing de `ifcclash` sous Windows.
 
 ### Phase 5: Installation et intégration n8n
