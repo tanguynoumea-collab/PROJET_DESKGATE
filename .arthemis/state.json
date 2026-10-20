@@ -102,18 +102,6 @@
       "condition_levee": "checkpoints.cadrage date"
     },
     {
-      "id": "perim-mcp-serveur",
-      "type": "decision",
-      "titre": "Exposer Deskgate comme serveur MCP (appel direct par un agent, sans n8n) : hors perimetre ?",
-      "gravite": "majeur",
-      "statut": "en_attente_decision",
-      "proprietaire": "humain",
-      "ouvert_le": "2026-10-20",
-      "source": "echange utilisateur 2026-10-20",
-      "ref": null,
-      "condition_levee": "reponse utilisateur"
-    },
-    {
       "id": "verif-hdi-machine",
       "type": "porte_non_couverte",
       "titre": "Tester host.docker.internal -> runner sur 127.0.0.1 sur ce PC (test 2 min du rapport)",
