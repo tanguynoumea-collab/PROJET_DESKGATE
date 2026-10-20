@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import pathlib
+import sys
 from collections.abc import Iterator
 
 import pytest
@@ -85,3 +86,11 @@ def test_sqlite3_seulement_dans_store() -> None:
 
 def test_subprocess_seulement_dans_jobobject() -> None:
     assert _importeurs("subprocess") <= {"jobobject.py"}
+
+
+SDK = SRC.parent / "deskgate_sdk"
+
+
+@pytest.mark.parametrize("py", sorted(SDK.glob("*.py")), ids=lambda p: p.name)
+def test_sdk_stdlib_seulement(py: pathlib.Path) -> None:
+    assert set(_imports(py)) <= set(sys.stdlib_module_names) | {"__future__"}
