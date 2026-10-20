@@ -3,7 +3,15 @@
   "projet": "deskgate",
   "profil": {
     "type": "web_saas",
-    "gate": [],
+    "gate": [
+      "uv sync --locked",
+      "uv run ruff check",
+      "uv run ruff format --check",
+      "uv run pyright",
+      "uv run pytest -m \"not e2e\"",
+      "uv build --all-packages",
+      "uv run pytest -m e2e"
+    ],
     "dir_audits": "audits/",
     "fichiers_version": [
       "pyproject.toml"
@@ -11,7 +19,7 @@
     "roadmap_projet": "docs/passation/04-FEUILLE-DE-ROUTE.md"
   },
   "route": "full",
-  "phase": "COUNCIL_APPROCHE",
+  "phase": "IMPLEMENTATION",
   "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
@@ -108,36 +116,30 @@
       "condition_levee": "cycle ulterieur"
     },
     {
-      "id": "council-capacites-toml",
-      "type": "decision",
-      "titre": "Capacites v0.1 declarees dans runner.toml [capabilities.*] plutot que codees en dur dans le coeur ?",
-      "gravite": "majeur",
-      "statut": "en_attente_decision",
-      "proprietaire": "humain",
-      "ouvert_le": "2026-10-20",
-      "source": ".arthemis/reports/llm-council-1.md",
-      "ref": null,
-      "condition_levee": "reponse utilisateur avant plan de la phase 2"
-    },
-    {
-      "id": "council-une-fois",
-      "type": "decision",
-      "titre": "Reformuler le critere phase 3 une fois et une seule en au moins une fois + dedoublonnage n8n (409)",
+      "id": "gate-portes-na",
+      "type": "porte_non_couverte",
+      "titre": "Portes migrations (base neuve, migration 1) et budgets (sans objet pour un runner local) a declarer au GATE",
       "gravite": "mineur",
-      "statut": "en_attente_decision",
-      "proprietaire": "humain",
+      "statut": "ouvert",
+      "proprietaire": "ia",
       "ouvert_le": "2026-10-20",
-      "source": ".arthemis/reports/llm-council-1.md",
+      "source": ".arthemis/dod/cycle-1.md",
       "ref": null,
-      "condition_levee": "reponse utilisateur avant plan de la phase 3"
+      "condition_levee": "motif ecrit dans le journal de gate"
     }
   ],
   "livraisons": [],
-  "dod": null,
+  "dod": ".arthemis/dod/cycle-1.md",
   "phases_sautees": [
     {
       "phase": "ROADMAP",
       "motif": "feuille de route fournie par la passation ; project-coding-prep saute (choix utilisateur)",
+      "le": "2026-10-20",
+      "cycle": 1
+    },
+    {
+      "phase": "UX_DESIGN",
+      "motif": "cycle sans impact UI",
       "le": "2026-10-20",
       "cycle": 1
     }
@@ -181,6 +183,6 @@
   },
   "maj": {
     "le": "2026-10-20",
-    "commit": "ed26bcd"
+    "commit": "408b5c4"
   }
 }
