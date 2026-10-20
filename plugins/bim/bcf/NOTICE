@@ -1,0 +1,10 @@
+deskgate-bcf est distribué sous GPL-3.0-or-later car il utilise bcf-client 0.9.0
+(IfcOpenShell, classé GPLv3 sur PyPI au 2026-10-20). Il est appelé par deskgate-bim
+uniquement en sous-processus, avec des fichiers JSON (contrat docs/contrats/bcf-write-v1.json) ;
+aucun autre paquet du dépôt ne l'importe.
+
+Dépendances :
+- bcf-client 0.9.0 (GPL-3)
+- ifcopenshell 0.9.0.post1 (LGPL-3)
+- xsdata (MIT)
+- jsonschema (MIT)

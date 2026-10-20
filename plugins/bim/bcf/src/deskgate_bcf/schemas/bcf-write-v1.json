@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/deskgate/deskgate/docs/contrats/bcf-write-v1.json",
+  "title": "Entrée de deskgate-bcf write, version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "project", "author", "created_at", "colors", "topics"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "project": {"type": "string", "minLength": 1, "maxLength": 256},
+    "author": {"type": "string", "minLength": 1, "maxLength": 256},
+    "created_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"},
+    "colors": {
+      "type": "object", "additionalProperties": false, "required": ["a", "b", "context"],
+      "properties": {"a": {"$ref": "#/$defs/argb"}, "b": {"$ref": "#/$defs/argb"}, "context": {"$ref": "#/$defs/argb"}}
+    },
+    "topics": {"type": "array", "minItems": 1, "maxItems": 10000, "items": {"$ref": "#/$defs/topic"}}
+  },
+  "$defs": {
+    "argb": {"type": "string", "pattern": "^[0-9A-Fa-f]{8}$"},
+    "uuid": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+    "ifc_guid": {"type": "string", "pattern": "^[0-9A-Za-z_$]{22}$"},
+    "point": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3},
+    "topic": {
+      "type": "object", "additionalProperties": false,
+      "required": ["guid", "title", "guids_a", "guids_b", "camera"],
+      "properties": {
+        "guid": {"$ref": "#/$defs/uuid"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 512},
+        "description": {"type": "string", "maxLength": 4000},
+        "type": {"type": "string", "maxLength": 64},
+        "status": {"type": "string", "maxLength": 64},
+        "guids_a": {"type": "array", "minItems": 1, "maxItems": 10000, "items": {"$ref": "#/$defs/ifc_guid"}},
+        "guids_b": {"type": "array", "minItems": 1, "maxItems": 10000, "items": {"$ref": "#/$defs/ifc_guid"}},
+        "context_guids": {"type": "array", "maxItems": 5000, "items": {"$ref": "#/$defs/ifc_guid"}},
+        "camera": {
+          "type": "object", "additionalProperties": false, "required": ["target", "radius"],
+          "properties": {
+            "type": {"enum": ["perspective", "orthogonal"]},
+            "target": {"$ref": "#/$defs/point"},
+            "radius": {"type": "number", "exclusiveMinimum": 0},
+            "direction": {"$ref": "#/$defs/point"}
+          }
+        }
+      }
+    }
+  }
+}

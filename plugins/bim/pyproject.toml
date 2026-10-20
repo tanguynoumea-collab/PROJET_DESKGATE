@@ -1,0 +1,18 @@
+[project]
+name = "deskgate-bim"
+version = "0.1.0.dev0"
+description = "Capacités BIM de Deskgate (ifc.clash)"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = ["ifcopenshell==0.9.0.post1", "ifcclash==0.9.0", "pydantic>=2.14,<3"]
+
+[build-system]
+requires = ["hatchling>=1.32"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/deskgate_bim"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["bcf"]          # sous-dossier GPL : jamais dans le sdist MIT (Pitfall 10)
