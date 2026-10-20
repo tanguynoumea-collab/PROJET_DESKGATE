@@ -9,19 +9,19 @@ import logging
 import sys
 from pathlib import Path
 
-import deskgate_sdk.run
 import uvicorn
 
+import deskgate_sdk.run
 from deskgate import __version__
 from deskgate.api import create_app
 from deskgate.core.config import ConfigError, load_config
+from deskgate.engine import Engine
 from deskgate.instance import (
     acquire_mutex,
     bind_exclusive,
     describe_bind_error,
     instance_name_from_env,
 )
-from deskgate.engine import Engine
 from deskgate.jobs import JobsService
 from deskgate.locations import config_path, db_path, resolve_home
 from deskgate.store import SchemaTooNew, open_db, recover_interrupted
