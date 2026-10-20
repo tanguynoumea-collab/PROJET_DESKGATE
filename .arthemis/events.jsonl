@@ -4,3 +4,4 @@
 {"ts":"2026-10-20T12:30:00","type":"rapport","ref":".arthemis/reports/verifs-techniques-cycle-1.md","commit":null,"note":"6 verifs, attente noeud communautaire faisable"}
 {"ts":"2026-10-20T12:30:00","type":"fermeture","ref":"v00-existant,v00-verifs","commit":null,"note":"verdict construire ; verifs faites"}
 {"ts":"2026-10-20T12:45:00","type":"fermeture","ref":"perim-mcp-serveur","commit":null,"note":"Deskgate serveur MCP hors perimetre (decision utilisateur)"}
+{"ts":"2026-10-20T13:30:00","type":"rapport","ref":".arthemis/reports/cadrage-1.md","commit":null,"note":"note de cadrage, documents soumis a validation"}

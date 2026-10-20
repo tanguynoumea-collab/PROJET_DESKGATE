@@ -78,24 +78,12 @@
   },
   "items_ouverts": [
     {
-      "id": "v00-questions",
-      "type": "decision",
-      "titre": "Questions restantes : ODM (CLI/API, MCP stdio ou HTTP), licence MIT/Apache, emplacement de PROJET MCP",
-      "gravite": "majeur",
-      "statut": "en_attente_decision",
-      "proprietaire": "humain",
-      "ouvert_le": "2026-10-20",
-      "source": "docs/passation/06-POINTS-OUVERTS.md",
-      "ref": null,
-      "condition_levee": "reponses utilisateur"
-    },
-    {
       "id": "v00-docs",
       "type": "decision",
-      "titre": "Rediger ARCHITECTURE.md, ROADMAP.md, AGENTS.md, CLAUDE.md puis validation avant code",
+      "titre": "Valider ARCHITECTURE.md, ROADMAP.md, AGENTS.md, CLAUDE.md et la note de cadrage",
       "gravite": "bloquant",
-      "statut": "ouvert",
-      "proprietaire": "ia",
+      "statut": "en_attente_decision",
+      "proprietaire": "humain",
       "ouvert_le": "2026-10-20",
       "source": "docs/passation/00-LISEZ-MOI.md",
       "ref": null,
@@ -112,6 +100,30 @@
       "source": ".arthemis/reports/verifs-techniques-cycle-1.md",
       "ref": null,
       "condition_levee": "test reussi en debut de v0.1"
+    },
+    {
+      "id": "moteur-clash",
+      "type": "decision",
+      "titre": "bim-assistant absent de ce PC : ecrire ifc.clash sur IfcOpenShell (ifcclash) ou recuperer PROJET MCP ?",
+      "gravite": "bloquant",
+      "statut": "en_attente_decision",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-20",
+      "source": ".arthemis/reports/cadrage-1.md",
+      "ref": null,
+      "condition_levee": "choix utilisateur avant planification v0.1"
+    },
+    {
+      "id": "odm-backlog",
+      "type": "roadmap",
+      "titre": "odm.audit_loi : identifier ODM et son interface, apres une version fonctionnelle",
+      "gravite": "mineur",
+      "statut": "ouvert",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-20",
+      "source": "echange utilisateur 2026-10-20",
+      "ref": "ROADMAP.md",
+      "condition_levee": "cycle ulterieur"
     }
   ],
   "livraisons": [],
