@@ -9,6 +9,10 @@ PATH_INVALID = "path_invalid"
 INVALID_CONFIG = "invalid_config"
 INVALID_REQUEST = "invalid_request"
 INTERNAL_ERROR = "internal_error"
+CAPABILITY_NOT_FOUND = "capability_not_found"
+JOB_NOT_FOUND = "job_not_found"
+IDEMPOTENCY_CONFLICT = "idempotency_conflict"
+TIMEOUT_TOO_LARGE = "timeout_too_large"
 
 HTTP_MESSAGES_FR: dict[int, str] = {
     400: "Requête invalide.",
@@ -16,14 +20,15 @@ HTTP_MESSAGES_FR: dict[int, str] = {
     403: "Accès refusé.",
     404: "Ressource introuvable.",
     405: "Méthode non autorisée.",
+    409: "Conflit.",
     422: "Requête invalide.",
     500: "Erreur interne du runner.",
 }
 
 
-def error_body(code: str, message: str) -> dict[str, dict[str, str]]:
-    """Corps JSON d'erreur : `{"error": {"code": ..., "message": ...}}`."""
-    return {"error": {"code": code, "message": message}}
+def error_body(code: str, message: str, **extra: str) -> dict[str, dict[str, str]]:
+    """Corps JSON d'erreur : `{"error": {"code": ..., "message": ...}}` (+ clés `extra`)."""
+    return {"error": {"code": code, "message": message, **extra}}
 
 
 def http_code(status: int) -> str:
