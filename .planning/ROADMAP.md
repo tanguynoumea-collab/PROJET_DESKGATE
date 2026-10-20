@@ -32,7 +32,7 @@ Plans:
 - [x] 01-01-PLAN.md — Outillage uv/CI, tests AST de frontière, mutex et socket exclusif, spike Job Object (vague 1)
 - [x] 01-02-PLAN.md — Chemins : conversion /data ↔ C:/BIM et table d'attaques (vague 2)
 - [x] 01-03-PLAN.md — Jeton, contrôle Host, erreurs D-08, /health (vague 2)
-- [ ] 01-04-PLAN.md — Configuration runner.toml typée, emplacement des données, gabarit (vague 3)
+- [x] 01-04-PLAN.md — Configuration runner.toml typée, emplacement des données, gabarit (vague 3)
 - [ ] 01-05-PLAN.md — deskgate serve (ordre D-04), dev-token, tests e2e, gate complet (vague 4)
 **Note de recherche**: prérequis à vérifier tôt : `host.docker.internal` joint bien le loopback ; type de boucle Uvicorn (`asyncio`).
 

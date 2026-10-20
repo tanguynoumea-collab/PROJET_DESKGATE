@@ -16,7 +16,7 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 
 ### Sécurité
 
-- [ ] **SEC-01**: Toute route sauf `/health` refuse une requête sans jeton Bearer valide (401) ; le jeton est stocké haché
+- [x] **SEC-01**: Toute route sauf `/health` refuse une requête sans jeton Bearer valide (401) ; le jeton est stocké haché
 - [x] **SEC-02**: Le runner refuse une requête dont l'en-tête `Host` n'est pas `127.0.0.1`, `localhost` ou `host.docker.internal`
 - [x] **SEC-03**: Un chemin `/data/...` est converti en `C:/BIM/...` (et inversement pour les artefacts renvoyés)
 - [x] **SEC-04**: Un chemin hors des racines autorisées est refusé, y compris via `..`, lien symbolique, jonction, chemin UNC, préfixe de segment (`C:/BIM2`), nom réservé ou flux alternatif
@@ -127,7 +127,7 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | RUN-02 | Phase 1 | Pending |
 | RUN-03 | Phase 1 | Complete |
 | RUN-04 | Phase 1 | Complete |
-| SEC-01 | Phase 1 | Pending |
+| SEC-01 | Phase 1 | Complete |
 | SEC-02 | Phase 1 | Complete |
 | SEC-03 | Phase 1 | Complete |
 | SEC-04 | Phase 1 | Complete |
