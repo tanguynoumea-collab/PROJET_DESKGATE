@@ -17,14 +17,13 @@ soit le résultat (succès, échec, délai dépassé, annulation, redémarrage d
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Runner sur 127.0.0.1, configuration typée `runner.toml`, jeton Bearer haché, contrôle Host, instance unique, `/health`, chemins `/data` ↔ `C:/BIM` avec refus hors racines — Validated in Phase 1: Fondations testables
 
 ### Active
 
-- [ ] Runner FastAPI sur 127.0.0.1, jeton obligatoire, file SQLite persistante
+- [ ] File SQLite persistante (runner FastAPI sur 127.0.0.1 et jeton : faits en phase 1)
 - [ ] Soumission asynchrone (`POST /jobs` → 202) et rappel vers la `resumeUrl` n8n avec réessais
 - [ ] Délai maximum et arrêt de tout l'arbre de processus (Job Object Windows)
-- [ ] Correspondance des chemins `/data` ↔ `C:/BIM` et refus hors racines
 - [ ] Tâches `running` passées `interrupted` au redémarrage, avec rappel
 - [ ] Capacités v0.1 : `ifc.clash` et `mcp.call` (outil d'un serveur MCP stdio)
 - [ ] Paquet `deskgate-bcf` (GPL-3, sur `bcf-client`) appelé en sous-processus pour écrire le BCF 2.1
@@ -112,4 +111,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-20 after initialization*
+*Last updated: 2026-10-20 after Phase 1*
