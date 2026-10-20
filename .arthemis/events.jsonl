@@ -6,3 +6,5 @@
 {"ts":"2026-10-20T12:45:00","type":"fermeture","ref":"perim-mcp-serveur","commit":null,"note":"Deskgate serveur MCP hors perimetre (decision utilisateur)"}
 {"ts":"2026-10-20T13:30:00","type":"rapport","ref":".arthemis/reports/cadrage-1.md","commit":null,"note":"note de cadrage, documents soumis a validation"}
 {"ts":"2026-10-20T13:50:00","type":"fermeture","ref":"moteur-clash","commit":null,"note":"repartir de zero sur IfcOpenShell ; zoom.nightshift retire"}
+{"ts":"2026-10-20T14:30:00","type":"checkpoint","ref":"cadrage","commit":"8ffd7dc","note":"documents valides par l'utilisateur"}
+{"ts":"2026-10-20T14:30:00","type":"transition","ref":"COUNCIL_APPROCHE","commit":"8ffd7dc","note":"CADRAGE valide"}

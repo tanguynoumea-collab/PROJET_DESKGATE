@@ -11,7 +11,7 @@
     "roadmap_projet": "docs/passation/04-FEUILLE-DE-ROUTE.md"
   },
   "route": "full",
-  "phase": "CADRAGE",
+  "phase": "COUNCIL_APPROCHE",
   "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
@@ -41,10 +41,10 @@
   },
   "checkpoints": {
     "cadrage": {
-      "valide": false,
-      "le": null,
-      "commit": null,
-      "preuve": null,
+      "valide": true,
+      "le": "2026-10-20",
+      "commit": "8ffd7dc",
+      "preuve": ".arthemis/reports/cadrage-1.md",
       "differe": false
     },
     "plan_design": {
@@ -77,18 +77,6 @@
     }
   },
   "items_ouverts": [
-    {
-      "id": "v00-docs",
-      "type": "decision",
-      "titre": "Valider ARCHITECTURE.md, ROADMAP.md, AGENTS.md, CLAUDE.md et la note de cadrage",
-      "gravite": "bloquant",
-      "statut": "en_attente_decision",
-      "proprietaire": "humain",
-      "ouvert_le": "2026-10-20",
-      "source": "docs/passation/00-LISEZ-MOI.md",
-      "ref": null,
-      "condition_levee": "checkpoints.cadrage date"
-    },
     {
       "id": "verif-hdi-machine",
       "type": "porte_non_couverte",
@@ -163,6 +151,6 @@
   },
   "maj": {
     "le": "2026-10-20",
-    "commit": null
+    "commit": "8ffd7dc"
   }
 }
