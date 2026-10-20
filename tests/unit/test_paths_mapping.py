@@ -85,6 +85,8 @@ def test_racine_jonction() -> None:
 
 
 def test_artefact() -> None:
-    assert validate_artifact_path("C:/BIM/out/a.json", M, ROOTS, _resolver({})) == "/data/out/a.json"
+    assert (
+        validate_artifact_path("C:/BIM/out/a.json", M, ROOTS, _resolver({})) == "/data/out/a.json"
+    )
     with pytest.raises(PathDenied):
         validate_artifact_path("D:/out/a.json", M, ROOTS, _resolver({}))

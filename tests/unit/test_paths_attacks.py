@@ -70,7 +70,9 @@ def _verifie(exc: PathDenied, code: str) -> None:
     assert "error" not in exc.message.lower()
 
 
-@pytest.mark.parametrize("raw, code", CONTAINER_ATTACKS, ids=[repr(r) for r, _ in CONTAINER_ATTACKS])
+@pytest.mark.parametrize(
+    "raw, code", CONTAINER_ATTACKS, ids=[repr(r) for r, _ in CONTAINER_ATTACKS]
+)
 def test_attaque_conteneur(raw: str, code: str) -> None:
     with pytest.raises(PathDenied) as info:
         validate_container_path(raw, MAPPINGS, ROOTS, _resolver_interdit)
