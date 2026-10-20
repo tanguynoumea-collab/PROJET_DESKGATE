@@ -7,6 +7,7 @@ from typing import cast
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import JSONResponse
 
@@ -48,6 +49,12 @@ async def _http_exception(request: Request, exc: Exception) -> JSONResponse:
 
 async def _validation(request: Request, exc: Exception) -> JSONResponse:
     exc = cast(RequestValidationError, exc)
+    jobs = getattr(request.app.state, "jobs", None)
+    if request.method == "POST" and request.url.path == "/jobs" and jobs is not None:
+        try:
+            await run_in_threadpool(jobs.audit_refusal, INVALID_REQUEST)
+        except Exception as audit_exc:
+            _log.warning("Audit du refus impossible : %s.", type(audit_exc).__name__)
     # Ni `input` ni `msg` (anglais, peut contenir la valeur fautive) ne sont repris.
     details = "; ".join(
         f"{'.'.join(str(p) for p in e['loc'])} : {_fr(e['type'])}" for e in exc.errors()

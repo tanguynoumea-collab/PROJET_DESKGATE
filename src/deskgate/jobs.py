@@ -7,15 +7,20 @@ La resumeUrl (`callback_url`) est stockée brute et n'est jamais renvoyée (règ
 from __future__ import annotations
 
 import json
+import logging
 from collections.abc import Callable
 from contextlib import closing
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from deskgate import store
+from deskgate.core.callback_policy import CallbackUrlError, check_callback_url
 from deskgate.core.config import RunnerConfig
-from deskgate.core.errors import CAPABILITY_NOT_FOUND, IDEMPOTENCY_CONFLICT
+from deskgate.core.errors import (
+    CALLBACK_HOST_NOT_ALLOWED,
+    CAPABILITY_NOT_FOUND,
+    IDEMPOTENCY_CONFLICT,
+)
 from deskgate.core.jobspec import (
     JobRequestError,
     SubmitRequest,
@@ -24,6 +29,7 @@ from deskgate.core.jobspec import (
     resolve_timeout,
     work_dir_for,
 )
+from deskgate.core.payload import duration_s
 from deskgate.core.redact import redact_signature
 from deskgate.core.states import TERMINAL
 from deskgate.store import IdempotencyConflict, JobRow
@@ -31,12 +37,7 @@ from deskgate.store import IdempotencyConflict, JobRow
 LOG_LIMIT_DEFAULT = 65_536
 LOG_LIMIT_MAX = 1_048_576
 
-
-def _duration(started: str | None, finished: str | None) -> float | None:
-    if started is None or finished is None:
-        return None
-    delta = datetime.fromisoformat(finished) - datetime.fromisoformat(started)
-    return round(delta.total_seconds(), 3)
+logger = logging.getLogger("deskgate.jobs")
 
 
 def job_view(row: JobRow) -> dict[str, Any]:
@@ -60,7 +61,7 @@ def job_view(row: JobRow) -> dict[str, Any]:
         "created_at": row.created_at,
         "started_at": row.started_at,
         "finished_at": row.finished_at,
-        "duration_s": _duration(row.started_at, row.finished_at),
+        "duration_s": duration_s(row.started_at, row.finished_at),
     }
 
 
@@ -76,11 +77,32 @@ class JobsService:
         self._config = config
         self._wake = wake
 
+    def _refuse(self, code: str, capability: str | None, job_id: str | None = None) -> None:
+        """Audit d'un refus ; ne fait jamais échouer la réponse."""
+        try:
+            with closing(store.connect(self._db)) as conn:
+                store.record_refusal(conn, code=code, capability=capability, job_id=job_id)
+        except Exception as exc:
+            logger.warning("Audit du refus impossible : %s.", type(exc).__name__)
+
+    def audit_refusal(self, code: str, capability: str | None = None) -> None:
+        self._refuse(code, capability)
+
     def submit(self, req: SubmitRequest) -> str:
         cap = self._config.capabilities.get(req.capability)
         if cap is None:
+            self._refuse(CAPABILITY_NOT_FOUND, req.capability)
             raise JobRequestError(CAPABILITY_NOT_FOUND, "Capacité inconnue.", 404)
-        timeout_s = resolve_timeout(req.timeout, cap.timeout_max)
+        try:
+            timeout_s = resolve_timeout(req.timeout, cap.timeout_max)
+        except JobRequestError as exc:
+            self._refuse(exc.code, req.capability)
+            raise
+        try:
+            check_callback_url(req.callback.url, self._config.callback_allowed_hosts)
+        except CallbackUrlError as exc:
+            self._refuse(CALLBACK_HOST_NOT_ALLOWED, req.capability)
+            raise JobRequestError(CALLBACK_HOST_NOT_ALLOWED, exc.message, 422) from None
         job_id = new_job_id()
         try:
             with closing(store.connect(self._db)) as conn:
@@ -96,6 +118,7 @@ class JobsService:
                     work_dir=work_dir_for(self._config.effective_work_root(), job_id),
                 )
         except IdempotencyConflict as exc:
+            self._refuse(IDEMPOTENCY_CONFLICT, req.capability, job_id=exc.existing_job_id)
             raise JobRequestError(
                 IDEMPOTENCY_CONFLICT,
                 "Une tâche avec cette clé d'idempotence est déjà en file ou en cours.",

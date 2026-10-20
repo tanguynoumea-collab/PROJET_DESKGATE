@@ -27,7 +27,7 @@ class Env:
     def __init__(self, tmp_path: Path) -> None:
         self.db = tmp_path / "d.db"
         store.open_db(self.db).close()
-        self.cfg = make_config(tmp_path)
+        self.cfg = make_config(tmp_path, callback_allowed_hosts=["n8n", "localhost", "127.0.0.1"])
         self.wakes = 0
         self.service = JobsService(db_path=self.db, config=self.cfg, wake=self._wake)
 
@@ -249,3 +249,54 @@ def test_on_shutdown_appele_une_fois() -> None:
     with TestClient(app, base_url=BASE):
         assert calls == []
     assert calls == [1]
+
+
+def _post(client: TestClient, url: str) -> object:
+    return client.post(
+        "/jobs", json={"capability": "demo.sleep", "callback": {"url": url}}, headers=AUTH
+    )
+
+
+def _count_jobs(env: Env) -> int:
+    conn = store.connect(env.db)
+    try:
+        return int(conn.execute("SELECT count(*) FROM jobs").fetchone()[0])
+    finally:
+        conn.close()
+
+
+def test_hote_non_autorise_422_sans_url(env: Env, client: TestClient) -> None:
+    resp = _post(client, "http://evil.example/webhook-waiting/1?signature=SECRET-SIG")
+    assert resp.status_code == 422  # type: ignore[attr-defined]
+    assert resp.json()["error"]["code"] == "callback_host_not_allowed"  # type: ignore[attr-defined]
+    assert "evil.example" in resp.json()["error"]["message"]  # type: ignore[attr-defined]
+    assert "SECRET-SIG" not in resp.text  # type: ignore[attr-defined]
+    assert "webhook-waiting" not in resp.text  # type: ignore[attr-defined]
+    assert _count_jobs(env) == 0
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://localhost@evil.example/w?signature=SECRET-SIG",
+        "http://n8n	.evil/w",
+        "http://127.1/w",
+        "http://n8n.evil.example/w",
+    ],
+)
+def test_hotes_pieges_refuses(env: Env, client: TestClient, url: str) -> None:
+    resp = _post(client, url)
+    assert resp.status_code == 422  # type: ignore[attr-defined]
+    assert resp.json()["error"]["code"] == "callback_host_not_allowed"  # type: ignore[attr-defined]
+    assert _count_jobs(env) == 0
+
+
+def test_hotes_par_defaut(tmp_path: Path) -> None:
+    service = JobsService(db_path=tmp_path / "x.db", config=make_config(tmp_path))
+    store.open_db(tmp_path / "x.db").close()
+    app = create_app(token_sha256=hash_token(TOKEN), version="x", jobs=service)
+    client = TestClient(app, base_url=BASE)
+    ok = _post(client, "http://localhost:5678/webhook-waiting/1?signature=S")
+    assert ok.status_code == 202  # type: ignore[attr-defined]
+    ko = _post(client, "http://n8n:5678/webhook-waiting/1?signature=S")
+    assert ko.status_code == 422  # type: ignore[attr-defined]
