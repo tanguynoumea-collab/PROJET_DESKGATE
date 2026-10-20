@@ -33,8 +33,10 @@ Runner :
       d'exemple HTTP Request + Wait.
 
 Plugins BIM (en parallèle) :
-- [ ] `ifc.clash` écrit de zéro sur IfcOpenShell (`ifcclash`) : détection hard / clearance /
-      touch / duplicate, regroupement, BCF 2.1.
+- [ ] Module BCF maison `deskgate_bim.bcf`, BCF 2.1, écrit depuis la spécification buildingSMART
+      (salle blanche, voir `ARCHITECTURE.md` §11) : fichier, projet, sujets, points de vue.
+- [ ] `ifc.clash` écrit de zéro sur IfcOpenShell (`ifcclash`, détection seule) : détection hard /
+      clearance / touch / duplicate, regroupement, BCF 2.1 via le module maison.
 
 Critère d'acceptation :
 > Un IFC déposé dans `C:\BIM\depot\` déclenche dans n8n une détection de conflits exécutée par le
@@ -55,7 +57,9 @@ Runner :
 
 Plugins BIM :
 - [ ] `ifc.clash` migré en plugin à manifeste.
-- [ ] `ifc.audit` (IDS via `ifctester`), `ifc.diff` (`ifcdiff`), `ifc.quantities`.
+- [ ] `ifc.audit` (IDS via `ifctester`), `ifc.diff` (`ifcdiff`), `ifc.quantities` (`ifc5d.qto`).
+- [ ] `ifc.validate` et `ifc.info` (ressource `light`).
+- [ ] Module BCF : BCF 3.0, extensions, commentaires, édition des sujets.
 
 Critère d'acceptation :
 > `ifc.audit` est ajouté par `deskgate plugin add` **sans modifier le code du runner**. Un jeton
@@ -67,6 +71,8 @@ Critère d'acceptation :
       générés depuis le schéma, **soumission et attente dans un seul nœud**.
 - [ ] Interface web : catalogue par type, test d'un plugin, tâches, journaux, jetons et droits,
       audit, diagnostic.
+- [ ] Plugins BIM `ifc.patch` (recettes en liste blanche), `ifc.convert` (type `cli`, IfcConvert),
+      `ifc.table` (`ifccsv`).
 
 Critère d'acceptation :
 > Un collègue installe le runner et le nœud, puis construit et lance seul un workflow à deux nœuds
@@ -85,6 +91,7 @@ Critère d'acceptation :
 ## Backlog
 
 - `odm.audit_loi` : plugin ODM, après une version fonctionnelle (interface d'ODM à identifier).
+- `ifc.draw`, `ifc.cost`, `ifc.fm`, `ifc.4d`, `ifc.sql`.
 
 ## Hors périmètre
 

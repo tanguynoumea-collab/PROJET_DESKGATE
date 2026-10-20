@@ -225,20 +225,56 @@ jetons et droits ; audit ; diagnostic (`deskgate doctor`).
 
 ## 11. Plugins BIM (`deskgate-bim`)
 
-Écrits **de zéro, dans ce dépôt, en parallèle du runner**, directement sur les outils IfcOpenShell
-existants (`ifcopenshell.geom`, `ifcclash`, `ifctester`, `ifcdiff`), dans un paquet séparé : le cœur
-`deskgate` n'importe jamais `deskgate_bim` et ne connaît rien au BIM.
+Écrits **de zéro, dans ce dépôt, en parallèle du runner**, sur les bibliothèques IfcOpenShell
+existantes (LGPL-3, utilisées comme bibliothèques), dans un paquet séparé : le cœur `deskgate`
+n'importe jamais `deskgate_bim` et ne connaît rien au BIM.
 
-| Plugin | Type | Base | Arrivée |
-|---|---|---|---|
-| `ifc.clash` | python | IfcOpenShell (détection, regroupement, BCF 2.1) | v0.1 (en dur), v0.2 (manifeste) |
-| `ifc.audit` | python | IfcOpenShell + `ifctester` (IDS) | v0.2 |
-| `ifc.diff` | python | `ifcdiff` | v0.2 |
-| `ifc.quantities` | python | IfcOpenShell (géométrie, quantités) | v0.2 |
-| `odm.audit_loi` | à définir | ODM | backlog, après une version fonctionnelle |
+| Plugin | Type | Ressource | Base | Arrivée |
+|---|---|---|---|---|
+| `ifc.clash` | python | cpu-heavy | `ifcclash` (détection seule) + BCF maison | v0.1 (en dur), v0.2 (manifeste) |
+| `ifc.audit` | python | cpu-heavy | `ifctester` (IDS) | v0.2 |
+| `ifc.diff` | python | cpu-heavy | `ifcdiff` | v0.2 |
+| `ifc.quantities` | python | cpu-heavy | `ifc5d.qto`, `ifcopenshell.util.shape` | v0.2 |
+| `ifc.validate` | python | light | `ifcopenshell.validate` (conformité au schéma) | v0.2 |
+| `ifc.info` | python | light | `ifcopenshell.util` (`selector`, `element`, `pset`) : en-tête, inventaire, propriétés | v0.2 |
+| `ifc.patch` | python | cpu-heavy | `ifcpatch` (recette en paramètre, liste blanche) | v0.3 |
+| `ifc.convert` | cli | cpu-heavy | IfcConvert (exécutable) : glTF, OBJ, SVG, STEP… | v0.3 |
+| `ifc.table` | python | light | `ifccsv` (export / réimport CSV, XLSX, ODS) | v0.3 |
+| `ifc.draw`, `ifc.cost`, `ifc.fm`, `ifc.4d`, `ifc.sql` | python | — | `ifcopenshell.draw`, `ifc5d`, `ifcfm`, `ifc4d`, `ifcpatch` (Ifc2Sql) | backlog |
+| `odm.audit_loi` | à définir | — | ODM | backlog, après une version fonctionnelle |
+
+Écartés : Bonsai, ifcsverchok, intégration Blender (GPL, extensions Blender).
 
 IfcOpenShell 0.9.0.post1 dispose de roues Windows pour Python 3.10 à 3.15 ; installation et import
 vérifiés avec `uv` en 3.11 et 3.14.
+
+### Module BCF maison (`deskgate_bim.bcf`)
+
+La bibliothèque BCF de l'écosystème (`bcf-client`) est sous **GPL-3** : on ne l'importe pas, on ne
+la copie pas. `ifcclash` ne l'utilise que pour son export BCF (import paresseux) : `ifc.clash` appelle
+la détection d'`ifcclash` et écrit le BCF avec le module maison.
+
+**Règle de salle blanche** : le module est écrit **à partir de la spécification buildingSMART
+BCF-XML** (et de ses XSD), jamais à partir du code de `bcf-client`. Seule sa liste de
+fonctionnalités sert de cahier des charges :
+
+| Domaine | Fonctionnalités à couvrir | Arrivée |
+|---|---|---|
+| Fichier | Lire, créer, enregistrer un `.bcf` (archive ZIP) en **BCF 2.1** et **BCF 3.0** ; `bcf.version`, `project.bcfp`, `extensions.xsd` (2.1) / `extensions.xml` (3.0), `documents.xml` (3.0) ; validation contre les XSD officiels | 2.1 en v0.1, 3.0 en v0.2 |
+| Projet et version | Lire, créer, modifier le projet (id, nom) et la version | v0.1 |
+| Extensions | Lire et écrire les listes de types, statuts, priorités, libellés, utilisateurs, étapes | v0.2 |
+| Sujets (topics) | Créer, lister, lire, modifier ; en-tête avec fichiers IFC référencés (GUID du projet IFC, date, nom) ; extrait BIM (`BimSnippet`) ; fichiers et documents de référence | v0.1 (création), v0.2 (le reste) |
+| Commentaires | Ajouter, modifier, lister, lier à un point de vue | v0.2 |
+| Points de vue | Caméra perspective et orthogonale ; construction depuis des vecteurs, depuis une position cible, depuis le placement d'un élément ; composants : sélection, visibilité par défaut et exceptions, coloration ARGB ; lecture des GUID sélectionnés et de la visibilité ; point de vue « depuis un point et des GUID » ; capture PNG associée | v0.1 |
+| Client BCF API (REST OpenCDE, OAuth) | Échange avec un serveur d'issues (BIMcollab, etc.) | hors périmètre (projet d'intégration) |
+
+Conventions héritées du projet d'origine, appliquées par défaut par `ifc.clash` : deux points de vue
+par sujet, (1) objets du conflit seuls, (2) contexte gris transparent ; pas de sélection
+enregistrée ; couleurs ARGB.
+
+Point à vérifier en v0.2 : `ifctester` déclare `bcf-client` en dépendance. `ifc.audit` n'appelle
+jamais le rapporteur BCF d'`ifctester` et produit son BCF avec le module maison ; l'installation sans
+`bcf-client` (`--no-deps` ciblé) sera testée.
 
 ## 12. Structure du dépôt
 
