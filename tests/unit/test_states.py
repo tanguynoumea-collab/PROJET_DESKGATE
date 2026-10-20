@@ -57,6 +57,6 @@ def test_step_table(obs: Observation, now: float, expected: Decision) -> None:
 
 def test_statuses() -> None:
     assert STATUSES == (QUEUED, RUNNING, SUCCEEDED, FAILED, TIMEOUT, CANCELLED, INTERRUPTED)
-    assert TERMINAL == {SUCCEEDED, FAILED, TIMEOUT, CANCELLED, INTERRUPTED}
+    assert frozenset({SUCCEEDED, FAILED, TIMEOUT, CANCELLED, INTERRUPTED}) == TERMINAL
     assert QUEUED not in TERMINAL
     assert RUNNING not in TERMINAL
