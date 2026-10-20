@@ -14,7 +14,7 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
  (completed 2026-10-20)
 - [x] **Phase 2: Cœur d'exécution** - File SQLite, exécution en Job Object, API des tâches, délai, annulation, reprise après redémarrage
  (completed 2026-10-20)
-- [ ] **Phase 3: Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit
+- [x] **Phase 3: Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit (completed 2026-10-20)
 - [ ] **Phase 4: Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call`
 - [ ] **Phase 5: Installation et intégration n8n** - `deskgate init`, tâche planifiée, docker-compose n8n, workflow d'exemple, acceptation
 
@@ -69,7 +69,7 @@ Plans:
   2. Un rappel non livré est réessayé avec délai croissant et reprend après un redémarrage du runner ; les réponses sont distinguées (livré, Wait pas encore en attente, exécution terminée ou inconnue, signature refusée) avec abandon tracé quand il faut
   3. Un résumé de plus de 1 Mio est écrit dans `summary.json` et le rappel n'en porte que le chemin ; un hôte de rappel non autorisé est refusé
   4. La `signature` n'apparaît dans aucun journal, aucune réponse d'API ni l'audit ; chaque soumission, refus, fin de tâche et rappel figure dans l'audit local
-**Plans:** 8 plans
+**Plans:** 8/8 plans complete
 
 Plans:
 - [x] 03-01-PLAN.md — httpx2 en dépendance, configuration [callback], hôtes par défaut, faux n8n 2.43.8 (vague 0)
@@ -113,6 +113,6 @@ Plans:
 |-------|----------------|--------|----------|
 | 1. Fondations testables | 0/5 | Complete    | 2026-10-20 |
 | 2. Cœur d'exécution | 0/9 | Complete    | 2026-10-20 |
-| 3. Rappel fiable | 0/0 | Non commencée | - |
+| 3. Rappel fiable | 0/0 | Complete    | 2026-10-20 |
 | 4. Capacités v0.1 | 0/0 | Non commencée | - |
 | 5. Installation et intégration n8n | 0/0 | Non commencée | - |
