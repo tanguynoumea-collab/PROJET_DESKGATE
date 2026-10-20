@@ -8,3 +8,4 @@
 {"ts":"2026-10-20T13:50:00","type":"fermeture","ref":"moteur-clash","commit":null,"note":"repartir de zero sur IfcOpenShell ; zoom.nightshift retire"}
 {"ts":"2026-10-20T14:30:00","type":"checkpoint","ref":"cadrage","commit":"8ffd7dc","note":"documents valides par l'utilisateur"}
 {"ts":"2026-10-20T14:30:00","type":"transition","ref":"COUNCIL_APPROCHE","commit":"8ffd7dc","note":"CADRAGE valide"}
+{"ts":"2026-10-20T15:30:00","type":"rapport","ref":".planning/ROADMAP.md","commit":"ed26bcd","note":"gsd new-project : milestone v0.1, 5 phases, 36 exigences"}

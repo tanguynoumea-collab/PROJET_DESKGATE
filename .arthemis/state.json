@@ -23,8 +23,14 @@
   },
   "gsd": {
     "planning_dir": ".planning",
-    "milestone": null,
-    "phases": [],
+    "milestone": "v0.1",
+    "phases": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
     "quick_ids": [],
     "config_attendue": {
       "commit_docs": true,
@@ -151,6 +157,6 @@
   },
   "maj": {
     "le": "2026-10-20",
-    "commit": "8ffd7dc"
+    "commit": "ed26bcd"
   }
 }
