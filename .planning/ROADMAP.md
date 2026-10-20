@@ -12,7 +12,7 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
 
 - [x] **Phase 1: Fondations testables** - Runner local sécurisé : configuration, jeton, contrôle Host, chemins, instance unique, `/health`
  (completed 2026-10-20)
-- [ ] **Phase 2: Cœur d'exécution** - File SQLite, exécution en Job Object, API des tâches, délai, annulation, reprise après redémarrage
+- [x] **Phase 2: Cœur d'exécution** - File SQLite, exécution en Job Object, API des tâches, délai, annulation, reprise après redémarrage (completed 2026-10-20)
 - [ ] **Phase 3: Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit
 - [ ] **Phase 4: Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call`
 - [ ] **Phase 5: Installation et intégration n8n** - `deskgate init`, tâche planifiée, docker-compose n8n, workflow d'exemple, acceptation
@@ -47,7 +47,7 @@ Plans:
   3. Un faux plugin qui dépasse son délai est arrêté avec tout son arbre (petit-enfant orphelin compris) et passe `timeout` ; l'annulation (en file ou en cours) est idempotente
   4. Après `taskkill /F` du runner pendant une tâche, le redémarrage la passe `interrupted` (rappel couvert en phase 3)
   5. Une soumission avec une `idempotency_key` identique à une tâche non terminale est refusée ; le plugin tourne dans un sous-processus sans shell, jamais dans le processus du runner
-**Plans:** 9 plans
+**Plans:** 9/9 plans complete
 Plans:
 - [x] 02-01-PLAN.md — Config des capacités et work_root, contrat de soumission, codes d'erreur (vague 1)
 - [x] 02-02-PLAN.md — Noyau pur : step(), verdict, protocole worker (vague 1)
@@ -101,7 +101,7 @@ Plans:
 | Phase | Plans terminés | Statut | Terminée |
 |-------|----------------|--------|----------|
 | 1. Fondations testables | 0/5 | Complete    | 2026-10-20 |
-| 2. Cœur d'exécution | 0/9 | Planifiée | - |
+| 2. Cœur d'exécution | 0/9 | Complete    | 2026-10-20 |
 | 3. Rappel fiable | 0/0 | Non commencée | - |
 | 4. Capacités v0.1 | 0/0 | Non commencée | - |
 | 5. Installation et intégration n8n | 0/0 | Non commencée | - |
