@@ -65,10 +65,10 @@ def test_health_sans_jeton(runner: Runner) -> None:
 
 @pytest.mark.timeout(90)
 def test_route_protegee_sans_jeton(runner: Runner) -> None:
-    status, body = _get(runner.port, "/jobs")
+    status, body = _get(runner.port, "/inconnue")
     assert status == 401
     assert body["error"]["code"] == "unauthorized"
-    status, body = _get(runner.port, "/jobs", TOKEN)
+    status, body = _get(runner.port, "/inconnue", TOKEN)
     assert status == 404
     assert body["error"]["code"] == "http_404"
 
@@ -109,12 +109,19 @@ def test_config_non_loopback_refusee(data_home: Path, instance_name: str, free_p
 def test_second_runner_code_3(runner: Runner) -> None:
     db = runner.home / "deskgate.db"
     before = db.stat().st_mtime_ns
-    fichiers = sorted(p.name for p in runner.home.iterdir())
+
+    # -wal/-shm : fichiers annexes que l'engine du premier runner crée à son rythme.
+    def lister() -> list[str]:
+        return sorted(
+            p.name for p in runner.home.iterdir() if not p.name.endswith(("-wal", "-shm"))
+        )
+
+    fichiers = lister()
     res = _serve(runner.env, timeout=30)
     assert res.returncode == 3
     assert "déjà en cours" in res.stderr.decode("utf-8", "replace")
     assert db.stat().st_mtime_ns == before
-    assert sorted(p.name for p in runner.home.iterdir()) == fichiers
+    assert lister() == fichiers
     status, _ = _get(runner.port, "/health")
     assert status == 200
 

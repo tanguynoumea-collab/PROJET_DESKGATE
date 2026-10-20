@@ -415,7 +415,11 @@ class Engine:
         thread.start()
 
     def stop(self, timeout: float = 5.0) -> None:
-        """Arrête la boucle et tue le Job en cours ; la ligne reste `running` (recovery)."""
+        """Arrête la boucle et tue le Job en cours ; la ligne reste `running` (recovery).
+
+        Idempotent : appelé par le lifespan puis par le `finally` de `serve`.
+        """
+        already = self._stop.is_set()
         self._stop.set()
         self._wake.set()
         thread = self._thread
@@ -427,6 +431,8 @@ class Engine:
                 cur.job.terminate(1)
             with contextlib.suppress(Exception):
                 cur.job.close()
+        if not already:
+            logger.info("Engine arrêté.")
 
 
 def _params(params_json: str) -> dict[str, object]:

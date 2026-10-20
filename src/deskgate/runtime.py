@@ -9,6 +9,7 @@ import logging
 import sys
 from pathlib import Path
 
+import deskgate_sdk.run
 import uvicorn
 
 from deskgate import __version__
@@ -20,12 +21,15 @@ from deskgate.instance import (
     describe_bind_error,
     instance_name_from_env,
 )
+from deskgate.engine import Engine
+from deskgate.jobs import JobsService
 from deskgate.locations import config_path, db_path, resolve_home
-from deskgate.store import open_db
+from deskgate.store import SchemaTooNew, open_db, recover_interrupted
 
 EXIT_INVALID_CONFIG = 2
 EXIT_ALREADY_RUNNING = 3
 EXIT_BIND_FAILED = 4
+EXIT_DB_ERROR = 5
 
 logger = logging.getLogger("deskgate")
 
@@ -66,21 +70,47 @@ def serve(config_override: Path | None = None) -> int:
         _err(describe_bind_error(exc, cfg.host, cfg.port))
         return EXIT_BIND_FAILED
 
-    conn = open_db(db_path(home))
-    # phase 2 : recovery, engine, sender
     try:
-        warnings = cfg.listen_warnings()
-        app = create_app(token_sha256=cfg.token_sha256, version=__version__, warnings=warnings)
-        if warnings:
-            logger.warning(
-                "Attention : écoute sur une interface non locale (%s:%s), "
-                "activée par allow_non_loopback.",
-                cfg.host,
-                cfg.port,
-            )
-        logger.info("Écoute sur http://%s:%s", cfg.host, sock.getsockname()[1])
-        server = uvicorn.Server(uvicorn.Config(app, log_config=None, lifespan="on"))
-        server.run(sockets=[sock])
+        conn = open_db(db_path(home))  # migration
+    except SchemaTooNew as exc:
+        _err(str(exc))
+        return EXIT_DB_ERROR
+    try:
+        ids = recover_interrupted(conn)  # running -> interrupted + rappels pending + audit
     finally:
         conn.close()
+    if ids:
+        logger.warning("%d tâche(s) interrompue(s) par l'arrêt précédent du runner.", len(ids))
+
+    warnings = cfg.listen_warnings()
+    engine = Engine(
+        db_path=db_path(home),
+        config=cfg,
+        worker_script=Path(deskgate_sdk.run.__file__).resolve(),
+    )
+    jobs = JobsService(db_path=db_path(home), config=cfg, wake=engine.wake)
+    app = create_app(
+        token_sha256=cfg.token_sha256,
+        version=__version__,
+        warnings=warnings,
+        jobs=jobs,
+        on_shutdown=engine.stop,
+    )
+    if warnings:
+        logger.warning(
+            "Attention : écoute sur une interface non locale (%s:%s), "
+            "activée par allow_non_loopback.",
+            cfg.host,
+            cfg.port,
+        )
+    logger.info("Écoute sur http://%s:%s", cfg.host, sock.getsockname()[1])
+    server = uvicorn.Server(uvicorn.Config(app, log_config=None, lifespan="on"))
+    # Le Planificateur relancera le runner ; la recovery rend l'arrêt sûr.
+    engine.on_fatal = lambda: setattr(server, "should_exit", True)
+    engine.start()
+    # phase 3 : thread sender
+    try:
+        server.run(sockets=[sock])
+    finally:
+        engine.stop()  # KeyboardInterrupt ; la voie CTRL_BREAK passe par le lifespan
     return 0
