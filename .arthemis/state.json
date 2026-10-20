@@ -78,30 +78,6 @@
   },
   "items_ouverts": [
     {
-      "id": "v00-existant",
-      "type": "decision",
-      "titre": "Recherche de l'existant (06 §1) : construire, contribuer ou reutiliser une brique",
-      "gravite": "bloquant",
-      "statut": "ouvert",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-20",
-      "source": "docs/passation/06-POINTS-OUVERTS.md",
-      "ref": null,
-      "condition_levee": "rapport .arthemis/reports/ + decision utilisateur"
-    },
-    {
-      "id": "v00-verifs",
-      "type": "decision",
-      "titre": "Verifications techniques 06 §2 (attente noeud n8n, host.docker.internal, uv, arret arbre)",
-      "gravite": "bloquant",
-      "statut": "ouvert",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-20",
-      "source": "docs/passation/06-POINTS-OUVERTS.md",
-      "ref": null,
-      "condition_levee": "rapport .arthemis/reports/"
-    },
-    {
       "id": "v00-questions",
       "type": "decision",
       "titre": "Questions restantes : ODM (CLI/API, MCP stdio ou HTTP), licence MIT/Apache, emplacement de PROJET MCP",
@@ -136,6 +112,18 @@
       "source": "echange utilisateur 2026-10-20",
       "ref": null,
       "condition_levee": "reponse utilisateur"
+    },
+    {
+      "id": "verif-hdi-machine",
+      "type": "porte_non_couverte",
+      "titre": "Tester host.docker.internal -> runner sur 127.0.0.1 sur ce PC (test 2 min du rapport)",
+      "gravite": "majeur",
+      "statut": "ouvert",
+      "proprietaire": "ia",
+      "ouvert_le": "2026-10-20",
+      "source": ".arthemis/reports/verifs-techniques-cycle-1.md",
+      "ref": null,
+      "condition_levee": "test reussi en debut de v0.1"
     }
   ],
   "livraisons": [],

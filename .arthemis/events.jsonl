@@ -1,3 +1,5 @@
 {"ts":"2026-10-20T11:30:00","type":"cycle_ouvert","ref":"cycle-1","commit":null,"note":"profil web_saas, route full"}
 {"ts":"2026-10-20T11:30:00","type":"transition","ref":"CADRAGE","commit":null,"note":"ROADMAP sautee : passation"}
 {"ts":"2026-10-20T12:10:00","type":"rapport","ref":".arthemis/reports/existant-cycle-1.md","commit":null,"note":"perimetre recadre : passerelle seule, plugins BIM dans ce depot"}
+{"ts":"2026-10-20T12:30:00","type":"rapport","ref":".arthemis/reports/verifs-techniques-cycle-1.md","commit":null,"note":"6 verifs, attente noeud communautaire faisable"}
+{"ts":"2026-10-20T12:30:00","type":"fermeture","ref":"v00-existant,v00-verifs","commit":null,"note":"verdict construire ; verifs faites"}
