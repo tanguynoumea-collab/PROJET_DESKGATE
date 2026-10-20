@@ -22,10 +22,6 @@ host = "C:/BIM"
 """
 
 
-def _with(extra_root: str = "", extra_tail: str = "") -> str:
-    return f"{extra_root}\n{BASE}\n{extra_tail}"
-
-
 def _err(text: str) -> str:
     with pytest.raises(ConfigError) as info:
         parse_config(text, "test.toml")
