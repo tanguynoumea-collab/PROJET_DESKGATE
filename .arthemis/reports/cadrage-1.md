@@ -8,7 +8,8 @@ Date : 2026-10-20. Sources : `docs/passation/` (00 à 06), `existant-cycle-1.md`
 1. **Intention** : une passerelle locale pour que n8n (Docker) délègue des tâches lourdes ou
    dépendantes de Windows, de façon asynchrone. Usage immédiat : tests BIM de l'utilisateur.
 2. **Périmètre IN** : runner, nœud n8n, interface locale, sécurité, plugins BIM (`ifc.clash`,
-   `ifc.audit`, `ifc.diff`, `ifc.quantities`, `zoom.nightshift`) développés dans ce dépôt en
+   `ifc.audit`, `ifc.diff`, `ifc.quantities`) écrits de zéro sur IfcOpenShell,
+   développés dans ce dépôt en
    parallèle. **OUT** : workflows complets, ingestion, registre des maquettes, base et
    déduplication des conflits, tri IA, Hermes, superviseur, tableau de bord (projet
    d'intégration) ; exposition de Deskgate comme serveur MCP (sans usage dans ce périmètre) ;
@@ -44,11 +45,10 @@ Date : 2026-10-20. Sources : `docs/passation/` (00 à 06), `existant-cycle-1.md`
 
 ## Hypothèses assumées / zones ouvertes
 
-- **Moteur de conflits** : le projet d'origine `PROJET MCP` (`bim-assistant`) n'est pas présent
-  sur ce PC. Hypothèse : `ifc.clash` est écrit ici directement sur IfcOpenShell (qui fournit déjà
-  un module de détection de conflits avec export BCF), sauf si l'utilisateur récupère
-  `bim-assistant`. À trancher avant la planification de la v0.1.
-- **`zoom.nightshift`** dépendait du harnais `cli-anything-bczoom` du même projet d'origine :
-  même question, en v0.3.
+- **Moteur de conflits** : on repart de zéro. `ifc.clash` est écrit ici sur les outils IfcOpenShell
+  existants (`ifcclash`, export BCF). Le projet d'origine `PROJET MCP` n'est pas réutilisé (décision
+  utilisateur du 2026-10-20).
+- **BIMcollab Zoom** : aucun plugin Zoom dans ce périmètre (`zoom.nightshift` retiré). La ressource
+  `gui-session` reste dans le runner, générique.
 - **Réseau** : `host.docker.internal` → `127.0.0.1` à tester sur la machine au début de la v0.1.
 - **ODM** : non identifié, reporté.

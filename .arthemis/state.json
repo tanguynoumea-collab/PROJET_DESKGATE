@@ -102,18 +102,6 @@
       "condition_levee": "test reussi en debut de v0.1"
     },
     {
-      "id": "moteur-clash",
-      "type": "decision",
-      "titre": "bim-assistant absent de ce PC : ecrire ifc.clash sur IfcOpenShell (ifcclash) ou recuperer PROJET MCP ?",
-      "gravite": "bloquant",
-      "statut": "en_attente_decision",
-      "proprietaire": "humain",
-      "ouvert_le": "2026-10-20",
-      "source": ".arthemis/reports/cadrage-1.md",
-      "ref": null,
-      "condition_levee": "choix utilisateur avant planification v0.1"
-    },
-    {
       "id": "odm-backlog",
       "type": "roadmap",
       "titre": "odm.audit_loi : identifier ODM et son interface, apres une version fonctionnelle",
