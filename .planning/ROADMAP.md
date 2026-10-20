@@ -50,7 +50,7 @@ Plans:
 **Plans:** 9 plans
 Plans:
 - [x] 02-01-PLAN.md — Config des capacités et work_root, contrat de soumission, codes d'erreur (vague 1)
-- [ ] 02-02-PLAN.md — Noyau pur : step(), verdict, protocole worker (vague 1)
+- [x] 02-02-PLAN.md — Noyau pur : step(), verdict, protocole worker (vague 1)
 - [ ] 02-03-PLAN.md — Store : migration 1, file, outbox, annulation, recovery (vague 1)
 - [ ] 02-04-PLAN.md — jobobject (ctypes), env en liste blanche, frontières AST (vague 1)
 - [ ] 02-05-PLAN.md — deskgate_sdk (worker stdlib) et faux plugins (vague 2)
