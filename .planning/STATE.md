@@ -1,12 +1,16 @@
 ---
 gsd_state_version: 1.0
 milestone: v0.1
-milestone_name: "Runner minimal"
+milestone_name: Runner minimal
 status: planning
-stopped_at: feuille de route créée, conseil d'approche tenu
-last_updated: "2026-10-20T11:12:46.630Z"
+stopped_at: Phase 1 context gathered
+last_updated: "2026-10-20T11:16:53.413Z"
 last_activity: 2026-10-20 — feuille de route créée, conseil d'approche tenu
 progress:
+  total_phases: 5
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
   percent: 0
 ---
 
@@ -70,6 +74,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-20
-Stopped at: feuille de route créée, conseil d'approche tenu
-Resume file: None
+Last session: 2026-10-20T11:16:53.409Z
+Stopped at: Phase 1 context gathered
+Resume file: .planning/phases/01-fondations-testables/01-CONTEXT.md
