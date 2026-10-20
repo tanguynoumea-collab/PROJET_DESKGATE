@@ -72,7 +72,7 @@ Plans:
 **Plans:** 8 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — httpx2 en dépendance, configuration [callback], hôtes par défaut, faux n8n 2.43.8 (vague 0)
+- [x] 03-01-PLAN.md — httpx2 en dépendance, configuration [callback], hôtes par défaut, faux n8n 2.43.8 (vague 0)
 - [ ] 03-02-PLAN.md — Politique pure : classify, next_delay, check_callback_url (TDD)
 - [ ] 03-03-PLAN.md — Corps du rappel pur (core/payload) et masquage unique étendu (core/redact)
 - [ ] 03-04-PLAN.md — Store : migration 2 (maybe_delivered), outbox durable, purge, audit enrichi
