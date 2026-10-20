@@ -49,7 +49,7 @@ Plans:
   5. Une soumission avec une `idempotency_key` identique à une tâche non terminale est refusée ; le plugin tourne dans un sous-processus sans shell, jamais dans le processus du runner
 **Plans:** 9 plans
 Plans:
-- [ ] 02-01-PLAN.md — Config des capacités et work_root, contrat de soumission, codes d'erreur (vague 1)
+- [x] 02-01-PLAN.md — Config des capacités et work_root, contrat de soumission, codes d'erreur (vague 1)
 - [ ] 02-02-PLAN.md — Noyau pur : step(), verdict, protocole worker (vague 1)
 - [ ] 02-03-PLAN.md — Store : migration 1, file, outbox, annulation, recovery (vague 1)
 - [ ] 02-04-PLAN.md — jobobject (ctypes), env en liste blanche, frontières AST (vague 1)
