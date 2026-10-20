@@ -12,3 +12,4 @@
 {"ts":"2026-10-20T16:30:00","type":"rapport","ref":".arthemis/reports/llm-council-1.md","commit":"8fa1866","note":"architecture retenue, 2 points remontes"}
 {"ts":"2026-10-20T17:00:00","type":"fermeture","ref":"council-capacites-toml,council-une-fois","commit":"408b5c4","note":"decisions utilisateur consignees dans STATE.md"}
 {"ts":"2026-10-20T17:00:00","type":"transition","ref":"IMPLEMENTATION","commit":"408b5c4","note":"COUNCIL_APPROCHE fait, UX_DESIGN sautee (pas d'UI), DoD cycle 1 instanciee"}
+{"ts":"2026-10-20T19:00:00","type":"rapport","ref":".planning/phases/01-fondations-testables","commit":"c772bff","note":"phase 1 planifiee : 5 plans autonomes, horizon nul, plan-checker passe"}

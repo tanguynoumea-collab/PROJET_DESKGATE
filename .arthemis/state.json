@@ -92,18 +92,6 @@
   },
   "items_ouverts": [
     {
-      "id": "verif-hdi-machine",
-      "type": "porte_non_couverte",
-      "titre": "Tester host.docker.internal -> runner sur 127.0.0.1 sur ce PC (test 2 min du rapport)",
-      "gravite": "majeur",
-      "statut": "ouvert",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-20",
-      "source": ".arthemis/reports/verifs-techniques-cycle-1.md",
-      "ref": null,
-      "condition_levee": "test reussi en debut de v0.1"
-    },
-    {
       "id": "odm-backlog",
       "type": "roadmap",
       "titre": "odm.audit_loi : identifier ODM et son interface, apres une version fonctionnelle",
@@ -126,6 +114,18 @@
       "source": ".arthemis/dod/cycle-1.md",
       "ref": null,
       "condition_levee": "motif ecrit dans le journal de gate"
+    },
+    {
+      "id": "01-D1",
+      "type": "uat",
+      "titre": "Spike host.docker.internal vers 127.0.0.1 (Docker Desktop a demarrer), differe, bloque la phase 5",
+      "gravite": "majeur",
+      "statut": "ouvert",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-20",
+      "source": ".planning/phases/01-fondations-testables/01-03-PLAN.md",
+      "ref": "INS-05",
+      "condition_levee": "resultat saisi dans 01-HUMAN-UAT.md"
     }
   ],
   "livraisons": [],
@@ -183,6 +183,6 @@
   },
   "maj": {
     "le": "2026-10-20",
-    "commit": "408b5c4"
+    "commit": "c772bff"
   }
 }
