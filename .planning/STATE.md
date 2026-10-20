@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-10-20T15:49:21.452Z"
+stopped_at: Completed 04-04-PLAN.md
+last_updated: "2026-10-20T15:57:21.979Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 29
-  completed_plans: 25
+  completed_plans: 26
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 4 (Capacités v0.1) — EXECUTING
-Plan: 4 of 7
+Plan: 5 of 7
 Status: Ready to execute
 Last activity: 2026-10-20
 
@@ -72,6 +72,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04 P01 | 25min | 3 tasks | 25 files |
 | Phase 04 P02 | 25min | 2 tasks | 15 files |
 | Phase 04 P03 | 30min | 2 tasks | 6 files |
+| Phase 04 P04 | 40min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,7 @@ Recent decisions affecting current work:
 - [Phase 04]: Echec de uv sync d'un plugin = pytest.fail, pas de skip silencieux
 - [Phase 04]: Chemins déclarés reconvertis et revalidés au lancement ; secrets MCP hors input.json
 - [Phase 04]: deskgate-bcf : stderr forcé en UTF-8 (page de code Windows)
+- [Phase 04]: 04-04 : NS du GUID v5 de groupe figé ; p1/p2 échangés avec a/b (p1 sur A vérifié)
 
 ### Pending Todos
 
@@ -110,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-20T15:49:21.448Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-10-20T15:57:21.975Z
+Stopped at: Completed 04-04-PLAN.md
 Resume file: None
