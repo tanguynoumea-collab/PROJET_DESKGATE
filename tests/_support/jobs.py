@@ -24,6 +24,8 @@ DEFAULT_CAPS = (
     "artifact_ok",
     "exit_code",
     "fail",
+    "settings_echo",
+    "fail_code",
 )
 
 
@@ -31,9 +33,25 @@ def _slash(p: str | Path) -> str:
     return str(p).replace("\\", "/")
 
 
+def _toml_value(v: object) -> str:
+    if isinstance(v, bool):
+        return "true" if v else "false"
+    if isinstance(v, int | float):
+        return repr(v)
+    if isinstance(v, str):
+        return f"'{v}'" if "'" not in v else json.dumps(v)
+    if isinstance(v, list):
+        return "[" + ", ".join(_toml_value(x) for x in v) + "]"
+    if isinstance(v, dict):
+        return "{ " + ", ".join(f'"{k}" = {_toml_value(x)}' for k, x in v.items()) + " }"
+    raise TypeError(type(v).__name__)
+
+
 def make_config(
     tmp_path: Path,
     caps: Mapping[str, Mapping[str, object]] | None = None,
+    *,
+    mcp_servers: Mapping[str, Mapping[str, object]] | None = None,
     **top: object,
 ) -> RunnerConfig:
     """Configuration de test : racine `tmp_path/bim`, mapping `/data`, capacités `demo.*`."""
@@ -54,17 +72,22 @@ def make_config(
     if caps is None:
         caps = {f"demo.{name}": {"entry": f"deskgate_fakes:{name}"} for name in DEFAULT_CAPS}
     for cap_id, options in caps.items():
-        merged: dict[str, object] = {
-            "kind": "python",
-            "python": _slash(sys.executable),
-            "entry": "deskgate_fakes:sleep",
-            "timeout_max": 600,
-            "pythonpath": [_slash(FAKE_PLUGINS)],
-        }
+        if options.get("kind") == "mcp":
+            merged: dict[str, object] = {"kind": "mcp", "timeout_max": 600}
+        else:
+            merged = {
+                "kind": "python",
+                "python": _slash(sys.executable),
+                "entry": "deskgate_fakes:sleep",
+                "timeout_max": 600,
+                "pythonpath": [_slash(FAKE_PLUGINS)],
+            }
         merged.update(options)
         lines += ["", f'[capabilities."{cap_id}"]']
         for key, value in merged.items():
-            if isinstance(value, list):
+            if key in ("settings", "path_params"):
+                lines.append(f"{key} = {_toml_value(value)}")
+            elif isinstance(value, list):
                 items = ", ".join(f"'{_slash(v)}'" for v in value)
                 lines.append(f"{key} = [{items}]")
             elif isinstance(value, str):
@@ -72,6 +95,9 @@ def make_config(
                 lines.append(f"{key} = '{shown}'")
             else:
                 lines.append(f"{key} = {json.dumps(value)}")
+    for name, server in (mcp_servers or {}).items():
+        lines += ["", f'[mcp_servers."{name}"]']
+        lines += [f"{key} = {_toml_value(value)}" for key, value in server.items()]
     return parse_config("\n".join(lines) + "\n", "test")
 
 

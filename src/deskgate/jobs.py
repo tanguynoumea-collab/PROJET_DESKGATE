@@ -29,6 +29,7 @@ from deskgate.core.jobspec import (
     resolve_timeout,
     work_dir_for,
 )
+from deskgate.core.paths import PathDenied, Resolver, convert_path_params, default_resolver
 from deskgate.core.payload import duration_s
 from deskgate.core.redact import redact_signature
 from deskgate.core.states import TERMINAL
@@ -72,10 +73,12 @@ class JobsService:
         db_path: Path,
         config: RunnerConfig,
         wake: Callable[[], None] = lambda: None,
+        resolver: Resolver = default_resolver,
     ) -> None:
         self._db = db_path
         self._config = config
         self._wake = wake
+        self._resolver = resolver
 
     def _refuse(self, code: str, capability: str | None, job_id: str | None = None) -> None:
         """Audit d'un refus ; ne fait jamais échouer la réponse."""
@@ -103,6 +106,18 @@ class JobsService:
         except CallbackUrlError as exc:
             self._refuse(CALLBACK_HOST_NOT_ALLOWED, req.capability)
             raise JobRequestError(CALLBACK_HOST_NOT_ALLOWED, exc.message, 422) from None
+        try:
+            # Résultat ignoré : la base garde les chemins d'origine, l'engine reconvertit.
+            convert_path_params(
+                req.params,
+                cap.path_params,
+                self._config.mappings(),
+                self._config.paths.allowed_roots,
+                self._resolver,
+            )
+        except PathDenied as exc:
+            self._refuse(exc.code, req.capability)
+            raise JobRequestError(exc.code, exc.message, 422) from None
         job_id = new_job_id()
         try:
             with closing(store.connect(self._db)) as conn:

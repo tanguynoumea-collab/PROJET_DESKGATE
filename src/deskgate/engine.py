@@ -11,6 +11,7 @@ import contextlib
 import json
 import logging
 import os
+import sys
 import threading
 import time
 from collections.abc import Callable, Mapping
@@ -21,7 +22,7 @@ from typing import Protocol
 
 from deskgate import store
 from deskgate.core.config import RunnerConfig
-from deskgate.core.env import build_env
+from deskgate.core.env import build_env, mcp_env_var
 from deskgate.core.outcome import (
     ENGINE_ERROR,
     PLUGIN_ERROR,
@@ -33,6 +34,7 @@ from deskgate.core.outcome import (
 from deskgate.core.paths import (
     PathDenied,
     Resolver,
+    convert_path_params,
     default_resolver,
     host_to_container,
     validate_artifact_path,
@@ -119,6 +121,9 @@ class _Running:
     events_off: int = 0
 
 
+MCP_ENTRY = "deskgate.workers.mcp_call:run"
+
+
 class Engine:
     def __init__(
         self,
@@ -134,6 +139,7 @@ class Engine:
         base_env: Mapping[str, str] | None = None,
         resolver: Resolver = default_resolver,
         callback_max_bytes: int = CALLBACK_MAX_BYTES,
+        runner_python: str | None = None,
     ) -> None:
         self._db_path = db_path
         self._config = config
@@ -145,6 +151,7 @@ class Engine:
         self._grace = grace
         self._base_env = base_env
         self._resolver = resolver
+        self._runner_python = runner_python or sys.executable
         self._callback_max_bytes = callback_max_bytes
         self._conn: store.Connection | None = None
         self._cur: _Running | None = None
@@ -208,6 +215,52 @@ class Engine:
         if cap is None:
             self._fail(conn, row.id, SPAWN_FAILED, "Capacité absente de la configuration.")
             return
+        try:
+            # Revalidation au lancement : une jonction a pu changer depuis la soumission.
+            params = convert_path_params(
+                _params(row.params_json),
+                cap.path_params,
+                self._config.mappings(),
+                self._config.paths.allowed_roots,
+                self._resolver,
+            )
+        except PathDenied as exc:
+            self._fail(conn, row.id, exc.code, exc.message)
+            return
+        python: str
+        entry: str
+        sys_path: list[str]
+        settings: dict[str, object]
+        extra_env: dict[str, str]
+        if cap.kind == "mcp":
+            servers = self._config.mcp_servers
+            python = self._runner_python
+            entry = MCP_ENTRY
+            sys_path = []
+            settings = {
+                "servers": {
+                    name: {
+                        "command": s.command,
+                        "args": list(s.args),
+                        "allowed_tools": list(s.allowed_tools),
+                        "env_keys": sorted(s.env),
+                    }
+                    for name, s in servers.items()
+                }
+            }
+            # Valeurs d'env : mémoire et environnement du worker seulement, jamais sur disque.
+            extra_env = {
+                mcp_env_var(name, key): value
+                for name, s in servers.items()
+                for key, value in s.env.items()
+            }
+        else:
+            if cap.python is None or cap.entry is None:
+                raise ValueError("capacité python incomplète")
+            python, entry = cap.python, cap.entry
+            sys_path = list(cap.pythonpath)
+            settings = dict(cap.settings)
+            extra_env = {}
         work_dir = Path(row.work_dir)
         try:
             work_dir.mkdir(parents=True, exist_ok=False)
@@ -215,16 +268,17 @@ class Engine:
                 protocol=PROTOCOL,
                 job_id=row.id,
                 capability=row.capability,
-                entry=cap.entry,
-                params=_params(row.params_json),
+                entry=entry,
+                params=params,
                 work_dir=str(work_dir.resolve()).replace("\\", "/"),
-                sys_path=list(cap.pythonpath),
+                sys_path=sys_path,
+                settings=settings,
             )
             input_path = work_dir / "input.json"
             input_path.write_text(payload.model_dump_json(), encoding="utf-8")
             spec = LaunchSpec(
                 argv=[
-                    cap.python,
+                    python,
                     "-X",
                     "utf8",
                     str(self._worker_script),
@@ -233,7 +287,9 @@ class Engine:
                 ],
                 cwd=str(work_dir),
                 log_path=str(work_dir / "job.log"),
-                env=build_env(self._base_env if self._base_env is not None else os.environ),
+                env=build_env(
+                    self._base_env if self._base_env is not None else os.environ, extra_env
+                ),
                 memory_mb=cap.memory_mb,
             )
             job, proc = self._launcher(spec)

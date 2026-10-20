@@ -93,3 +93,15 @@ def exit_code(params: dict[str, Any], ctx: Any) -> dict[str, Any]:
 
 def fail(params: dict[str, Any], ctx: Any) -> dict[str, Any]:
     raise ValueError("échec volontaire")
+
+
+def settings_echo(params: dict[str, Any], ctx: Any) -> dict[str, Any]:
+    return {"summary": {"settings": ctx.settings}}
+
+
+class _CodeError(Exception):
+    error_code = "demo_code"
+
+
+def fail_code(params: dict[str, Any], ctx: Any) -> dict[str, Any]:
+    raise _CodeError("échec classé")
