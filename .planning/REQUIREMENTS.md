@@ -25,15 +25,15 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 
 ### Tâches
 
-- [ ] **JOB-01**: n8n soumet une tâche par `POST /jobs` et reçoit immédiatement `202 { job_id, status: "queued" }`
-- [ ] **JOB-02**: Les tâches sont persistées dans SQLite et exécutées une à la fois, dans l'ordre de soumission
-- [ ] **JOB-03**: `GET /jobs/{id}` renvoie l'état, la progression, le résumé et les artefacts ; `GET /jobs/{id}/logs` renvoie les journaux
-- [ ] **JOB-04**: `POST /jobs/{id}/cancel` annule une tâche en file ou en cours (annulation coopérative, puis arrêt forcé) ; l'appel est idempotent
-- [ ] **JOB-05**: Une tâche qui dépasse son délai maximum est arrêtée avec tout son arbre de processus (petits-enfants orphelins compris) et passe `timeout`
-- [ ] **JOB-06**: Au redémarrage du runner, chaque tâche `running` passe `interrupted` et son rappel est envoyé
-- [ ] **JOB-07**: Un plugin s'exécute dans un sous-processus placé dans un Job Object Windows, jamais dans le processus du runner, sans shell
-- [ ] **JOB-08**: Une soumission avec une `idempotency_key` identique à une tâche non terminale est refusée (pas de double calcul)
-- [ ] **JOB-09**: Chaque tâche dispose d'un dossier de travail `C:/BIM/travail/<job_id>/` et déclare ses artefacts produits
+- [x] **JOB-01**: n8n soumet une tâche par `POST /jobs` et reçoit immédiatement `202 { job_id, status: "queued" }`
+- [x] **JOB-02**: Les tâches sont persistées dans SQLite et exécutées une à la fois, dans l'ordre de soumission
+- [x] **JOB-03**: `GET /jobs/{id}` renvoie l'état, la progression, le résumé et les artefacts ; `GET /jobs/{id}/logs` renvoie les journaux
+- [x] **JOB-04**: `POST /jobs/{id}/cancel` annule une tâche en file ou en cours (annulation coopérative, puis arrêt forcé) ; l'appel est idempotent
+- [x] **JOB-05**: Une tâche qui dépasse son délai maximum est arrêtée avec tout son arbre de processus (petits-enfants orphelins compris) et passe `timeout`
+- [x] **JOB-06**: Au redémarrage du runner, chaque tâche `running` passe `interrupted` et son rappel est envoyé
+- [x] **JOB-07**: Un plugin s'exécute dans un sous-processus placé dans un Job Object Windows, jamais dans le processus du runner, sans shell
+- [x] **JOB-08**: Une soumission avec une `idempotency_key` identique à une tâche non terminale est refusée (pas de double calcul)
+- [x] **JOB-09**: Chaque tâche dispose d'un dossier de travail `C:/BIM/travail/<job_id>/` et déclare ses artefacts produits
 
 ### Rappel
 
@@ -131,15 +131,15 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | SEC-02 | Phase 1 | Complete |
 | SEC-03 | Phase 1 | Complete |
 | SEC-04 | Phase 1 | Complete |
-| JOB-01 | Phase 2 | Pending |
-| JOB-02 | Phase 2 | Pending |
-| JOB-03 | Phase 2 | Pending |
-| JOB-04 | Phase 2 | Pending |
-| JOB-05 | Phase 2 | Pending |
-| JOB-06 | Phase 2 | Pending |
-| JOB-07 | Phase 2 | Pending |
-| JOB-08 | Phase 2 | Pending |
-| JOB-09 | Phase 2 | Pending |
+| JOB-01 | Phase 2 | Complete |
+| JOB-02 | Phase 2 | Complete |
+| JOB-03 | Phase 2 | Complete |
+| JOB-04 | Phase 2 | Complete |
+| JOB-05 | Phase 2 | Complete |
+| JOB-06 | Phase 2 | Complete |
+| JOB-07 | Phase 2 | Complete |
+| JOB-08 | Phase 2 | Complete |
+| JOB-09 | Phase 2 | Complete |
 | CB-01 | Phase 3 | Pending |
 | CB-02 | Phase 3 | Pending |
 | CB-03 | Phase 3 | Pending |

@@ -57,7 +57,7 @@ Plans:
 - [x] 02-06-PLAN.md — Engine : tick, annulation, échéance, réveil, arrêt (vague 2)
 - [x] 02-07-PLAN.md — JobsService et routes /jobs, lifespan d'arrêt (vague 2)
 - [x] 02-08-PLAN.md — Engine prouvé avec de vrais sous-processus (vague 3)
-- [ ] 02-09-PLAN.md — Câblage deskgate serve et e2e (flux, taskkill, CTRL_BREAK) (vague 4)
+- [x] 02-09-PLAN.md — Câblage deskgate serve et e2e (flux, taskkill, CTRL_BREAK) (vague 4)
 
 ### Phase 3: Rappel fiable
 **Goal**: n8n reprend toujours, une fois et une seule, avec le bon statut, quel que soit l'état terminal de la tâche ou l'arrêt du runner, sans fuite de la signature.
