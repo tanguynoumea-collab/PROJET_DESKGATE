@@ -33,10 +33,9 @@ Runner :
       d'exemple HTTP Request + Wait.
 
 Plugins BIM (en parallèle) :
-- [ ] Module BCF maison `deskgate_bim.bcf`, BCF 2.1, écrit depuis la spécification buildingSMART
-      (salle blanche, voir `ARCHITECTURE.md` §11) : fichier, projet, sujets, points de vue.
-- [ ] `ifc.clash` écrit de zéro sur IfcOpenShell (`ifcclash`, détection seule) : détection hard /
-      clearance / touch / duplicate, regroupement, BCF 2.1 via le module maison.
+- [ ] Paquet `deskgate-bcf` (GPL-3) sur `bcf-client` : CLI JSON → `.bcf` (BCF 2.1).
+- [ ] `ifc.clash` écrit de zéro sur IfcOpenShell (`ifcclash`) : détection hard / clearance /
+      touch / duplicate, regroupement, BCF 2.1 via `deskgate-bcf` en sous-processus.
 
 Critère d'acceptation :
 > Un IFC déposé dans `C:\BIM\depot\` déclenche dans n8n une détection de conflits exécutée par le
@@ -59,7 +58,7 @@ Plugins BIM :
 - [ ] `ifc.clash` migré en plugin à manifeste.
 - [ ] `ifc.audit` (IDS via `ifctester`), `ifc.diff` (`ifcdiff`), `ifc.quantities` (`ifc5d.qto`).
 - [ ] `ifc.validate` et `ifc.info` (ressource `light`).
-- [ ] Module BCF : BCF 3.0, extensions, commentaires, édition des sujets.
+- [ ] `deskgate-bcf` : lecture `.bcf` → JSON, BCF 3.0 ; plugins `bcf.write` / `bcf.read` (type `cli`).
 
 Critère d'acceptation :
 > `ifc.audit` est ajouté par `deskgate plugin add` **sans modifier le code du runner**. Un jeton

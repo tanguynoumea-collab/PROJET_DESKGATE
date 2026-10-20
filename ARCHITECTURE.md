@@ -226,12 +226,12 @@ jetons et droits ; audit ; diagnostic (`deskgate doctor`).
 ## 11. Plugins BIM (`deskgate-bim`)
 
 Écrits **de zéro, dans ce dépôt, en parallèle du runner**, sur les bibliothèques IfcOpenShell
-existantes (LGPL-3, utilisées comme bibliothèques), dans un paquet séparé : le cœur `deskgate`
+existantes (LGPL-3, utilisées comme bibliothèques), dans un paquet séparé (MIT, sauf `deskgate-bcf`) : le cœur `deskgate`
 n'importe jamais `deskgate_bim` et ne connaît rien au BIM.
 
 | Plugin | Type | Ressource | Base | Arrivée |
 |---|---|---|---|---|
-| `ifc.clash` | python | cpu-heavy | `ifcclash` (détection seule) + BCF maison | v0.1 (en dur), v0.2 (manifeste) |
+| `ifc.clash` | python | cpu-heavy | `ifcclash` (détection) + `deskgate-bcf` en sous-processus | v0.1 (en dur), v0.2 (manifeste) |
 | `ifc.audit` | python | cpu-heavy | `ifctester` (IDS) | v0.2 |
 | `ifc.diff` | python | cpu-heavy | `ifcdiff` | v0.2 |
 | `ifc.quantities` | python | cpu-heavy | `ifc5d.qto`, `ifcopenshell.util.shape` | v0.2 |
@@ -248,33 +248,27 @@ n'importe jamais `deskgate_bim` et ne connaît rien au BIM.
 IfcOpenShell 0.9.0.post1 dispose de roues Windows pour Python 3.10 à 3.15 ; installation et import
 vérifiés avec `uv` en 3.11 et 3.14.
 
-### Module BCF maison (`deskgate_bim.bcf`)
+### Module BCF (`deskgate-bcf`, sous GPL-3)
 
-La bibliothèque BCF de l'écosystème (`bcf-client`) est sous **GPL-3** : on ne l'importe pas, on ne
-la copie pas. `ifcclash` ne l'utilise que pour son export BCF (import paresseux) : `ifc.clash` appelle
-la détection d'`ifcclash` et écrit le BCF avec le module maison.
+La bibliothèque BCF de l'écosystème, `bcf-client`, est sous **GPL-3**. On l'utilise telle quelle, et
+**seul le module qui l'importe est sous GPL-3** :
 
-**Règle de salle blanche** : le module est écrit **à partir de la spécification buildingSMART
-BCF-XML** (et de ses XSD), jamais à partir du code de `bcf-client`. Seule sa liste de
-fonctionnalités sert de cahier des charges :
+- paquet séparé `plugins/bim/bcf/` (`deskgate-bcf`), avec son propre `LICENSE` GPL-3 ; il importe
+  `bcf-client` (BCF 2.1 et 3.0 : sujets, commentaires, points de vue, captures, extensions) ;
+- il est exposé comme **programme en ligne de commande** `deskgate-bcf` : il reçoit un fichier JSON
+  (sujets, GUID, caméras, couleurs) et écrit le `.bcf`, ou lit un `.bcf` et rend du JSON ;
+- les plugins MIT (`ifc.clash`, `ifc.audit`) **ne l'importent jamais** : ils l'appellent en
+  sous-processus, avec des fichiers JSON comme seul échange. Deux programmes distincts, chacun sous
+  sa licence ;
+- il est aussi déclaré comme plugin `bcf.write` / `bcf.read` (type `cli`), ce qui permet de
+  produire ou relire un BCF depuis n8n et sert de cas de test de l'exécuteur `cli`.
 
-| Domaine | Fonctionnalités à couvrir | Arrivée |
-|---|---|---|
-| Fichier | Lire, créer, enregistrer un `.bcf` (archive ZIP) en **BCF 2.1** et **BCF 3.0** ; `bcf.version`, `project.bcfp`, `extensions.xsd` (2.1) / `extensions.xml` (3.0), `documents.xml` (3.0) ; validation contre les XSD officiels | 2.1 en v0.1, 3.0 en v0.2 |
-| Projet et version | Lire, créer, modifier le projet (id, nom) et la version | v0.1 |
-| Extensions | Lire et écrire les listes de types, statuts, priorités, libellés, utilisateurs, étapes | v0.2 |
-| Sujets (topics) | Créer, lister, lire, modifier ; en-tête avec fichiers IFC référencés (GUID du projet IFC, date, nom) ; extrait BIM (`BimSnippet`) ; fichiers et documents de référence | v0.1 (création), v0.2 (le reste) |
-| Commentaires | Ajouter, modifier, lister, lier à un point de vue | v0.2 |
-| Points de vue | Caméra perspective et orthogonale ; construction depuis des vecteurs, depuis une position cible, depuis le placement d'un élément ; composants : sélection, visibilité par défaut et exceptions, coloration ARGB ; lecture des GUID sélectionnés et de la visibilité ; point de vue « depuis un point et des GUID » ; capture PNG associée | v0.1 |
-| Client BCF API (REST OpenCDE, OAuth) | Échange avec un serveur d'issues (BIMcollab, etc.) | hors périmètre (projet d'intégration) |
+Le runner (`deskgate`) et les autres plugins restent MIT. L'export BCF intégré d'`ifcclash` (qui
+importe `bcf-client`) n'est utilisé que depuis `deskgate-bcf`.
 
 Conventions héritées du projet d'origine, appliquées par défaut par `ifc.clash` : deux points de vue
 par sujet, (1) objets du conflit seuls, (2) contexte gris transparent ; pas de sélection
 enregistrée ; couleurs ARGB.
-
-Point à vérifier en v0.2 : `ifctester` déclare `bcf-client` en dépendance. `ifc.audit` n'appelle
-jamais le rapporteur BCF d'`ifctester` et produit son BCF avec le module maison ; l'installation sans
-`bcf-client` (`--no-deps` ciblé) sera testée.
 
 ## 12. Structure du dépôt
 
@@ -292,7 +286,8 @@ deskgate/
 │  └─ cli.py        deskgate init | serve | doctor | plugin … | token …
 ├─ plugins/
 │  ├─ examples/     plugins minimaux python, cli, mcp
-│  └─ bim/          paquet deskgate-bim (pyproject propre) + un dossier par plugin
+│  └─ bim/          paquet deskgate-bim (MIT, pyproject propre) + un dossier par plugin
+│     └─ bcf/       paquet deskgate-bcf (GPL-3, LICENSE propre), CLI deskgate-bcf
 ├─ n8n/
 │  ├─ docker-compose.yml   n8n 2.43.8 épinglé + Postgres + montage C:\BIM
 │  ├─ examples/     workflows à importer

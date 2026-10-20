@@ -34,9 +34,10 @@ Identifiants de code, noms de routes et de champs JSON : anglais.
 8. **Déterminisme** : un plugin de calcul donne les mêmes sorties pour les mêmes entrées.
 9. **Licences** : le code du dépôt est MIT. Ne jamais intégrer de code GPL ou AGPL (Bonsai, xeokit,
    BIMserver, Windmill…) ; IfcOpenShell (LGPL-3) s'utilise comme bibliothèque.
-10. **BCF en salle blanche** : `bcf-client` (GPL-3) n'est ni importé, ni copié, ni consulté pour
-    écrire `deskgate_bim.bcf`. Source unique : la spécification buildingSMART BCF-XML et ses XSD.
-    Ne jamais appeler l'export BCF d'`ifcclash` ni le rapporteur BCF d'`ifctester`.
+10. **Frontière GPL** : seul `plugins/bim/bcf/` (`deskgate-bcf`, GPL-3) importe `bcf-client`.
+    Aucun autre paquet ne l'importe ni n'importe `deskgate-bcf` : on l'appelle en sous-processus,
+    avec des fichiers JSON. N'appeler l'export BCF d'`ifcclash` et le rapporteur BCF d'`ifctester`
+    que depuis `deskgate-bcf`.
 
 ## Pile
 

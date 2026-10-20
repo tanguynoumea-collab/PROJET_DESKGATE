@@ -27,4 +27,5 @@ Procédure détaillée, aussi utilisable par une IA : [`AGENTS.md`](AGENTS.md).
 
 ## Licence
 
-MIT — voir [`LICENSE`](LICENSE).
+MIT — voir [`LICENSE`](LICENSE). Exception : le module BCF `plugins/bim/bcf/` (`deskgate-bcf`)
+est sous GPL-3, car il s'appuie sur `bcf-client` ; il est appelé en programme séparé.
