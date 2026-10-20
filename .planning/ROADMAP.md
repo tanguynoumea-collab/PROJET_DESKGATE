@@ -27,7 +27,13 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
   2. Un `runner.toml` invalide fait échouer le démarrage avec un message clair en français ; un second runner lancé en parallèle s'arrête sans toucher à la base
   3. `GET /health` répond sans jeton et sans détail sensible ; toute autre route renvoie 401 sans jeton Bearer valide et 4xx si l'en-tête `Host` n'est pas `127.0.0.1`, `localhost` ou `host.docker.internal`
   4. Un chemin `/data/...` devient `C:/BIM/...` (et inversement) ; les chemins hors racines (`..`, lien symbolique, jonction, UNC, `C:/BIM2`, nom réservé, flux alternatif) sont refusés par des tests d'attaque
-**Plans**: TBD
+**Plans:** 5 plans
+Plans:
+- [ ] 01-01-PLAN.md — Outillage uv/CI, tests AST de frontière, mutex et socket exclusif, spike Job Object (vague 1)
+- [ ] 01-02-PLAN.md — Chemins : conversion /data ↔ C:/BIM et table d'attaques (vague 2)
+- [ ] 01-03-PLAN.md — Jeton, contrôle Host, erreurs D-08, /health (vague 2)
+- [ ] 01-04-PLAN.md — Configuration runner.toml typée, emplacement des données, gabarit (vague 3)
+- [ ] 01-05-PLAN.md — deskgate serve (ordre D-04), dev-token, tests e2e, gate complet (vague 4)
 **Note de recherche**: prérequis à vérifier tôt : `host.docker.internal` joint bien le loopback ; type de boucle Uvicorn (`asyncio`).
 
 ### Phase 2: Cœur d'exécution
@@ -83,7 +89,7 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
 
 | Phase | Plans terminés | Statut | Terminée |
 |-------|----------------|--------|----------|
-| 1. Fondations testables | 0/0 | Non commencée | - |
+| 1. Fondations testables | 0/5 | Non commencée | - |
 | 2. Cœur d'exécution | 0/0 | Non commencée | - |
 | 3. Rappel fiable | 0/0 | Non commencée | - |
 | 4. Capacités v0.1 | 0/0 | Non commencée | - |
