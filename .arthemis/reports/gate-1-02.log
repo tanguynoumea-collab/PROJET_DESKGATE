@@ -1,0 +1,37 @@
+# Gate cycle 1, phase 02 â€” 2026-10-20T14:53:06+02:00 â€” HEAD 8c388be
+
+## $ uv sync --locked
+Resolved 36 packages in 0.78ms
+Checked 35 packages in 3ms
+exit=0
+
+## $ uv run ruff check
+All checks passed!
+exit=0
+
+## $ uv run ruff format --check
+78 files already formatted
+exit=0
+
+## $ uv run pyright
+0 errors, 0 warnings, 0 informations
+exit=0
+
+## $ uv run pytest -m "not e2e" -q
+..........................                                               [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\fs\test_paths_real.py:116: Privilège de lien symbolique absent (mode développeur désactivé)
+313 passed, 1 skipped, 16 deselected in 16.59s
+exit=0
+
+## $ uv build --all-packages
+[deskgate] Building source distribution...
+[deskgate] Building wheel from source distribution...
+Successfully built dist\deskgate-0.1.0.dev0.tar.gz
+Successfully built dist\deskgate-0.1.0.dev0-py3-none-any.whl
+exit=0
+
+## $ uv run pytest -m e2e -q
+................                                                         [100%]
+16 passed, 314 deselected in 50.18s
+exit=0
