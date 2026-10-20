@@ -10,16 +10,34 @@ import json
 import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-SCHEMA_VERSION = 1
+from deskgate.core.payload import duration_s
+from deskgate.core.redact import redact_params, redact_signature
+
+SCHEMA_VERSION = 2
 
 Connection = sqlite3.Connection  # alias : les autres modules n'importent pas sqlite3
 
 CALLBACK_DELAY_S = 2
+AUDIT_PARAMS_MAX = 4096
+CALLBACK_FINAL_STATES = frozenset(
+    {
+        "delivered",
+        "delivered_duplicate",
+        "abandoned_stale",
+        "abandoned_rejected",
+        "abandoned_exhausted",
+    }
+)
+ABANDON_REASONS = {
+    "abandoned_stale": "stale",
+    "abandoned_rejected": "rejected",
+    "abandoned_exhausted": "exhausted",
+}
 
 
 class StoreError(Exception):
@@ -91,7 +109,12 @@ BEGIN SELECT RAISE(ABORT,'audit en ajout seul'); END""",
 BEGIN SELECT RAISE(ABORT,'audit en ajout seul'); END""",
 )
 
-MIGRATIONS: tuple[tuple[str, ...], ...] = (MIGRATION_1,)
+MIGRATION_2: tuple[str, ...] = (
+    "ALTER TABLE callbacks ADD COLUMN maybe_delivered INTEGER NOT NULL DEFAULT 0 "
+    "CHECK (maybe_delivered IN (0,1))",
+)
+
+MIGRATIONS: tuple[tuple[str, ...], ...] = (MIGRATION_1, MIGRATION_2)
 
 
 def iso(dt: datetime) -> str:
@@ -168,7 +191,7 @@ class JobRow:
     error_message: str | None
     resource: str
     idempotency_key: str | None
-    callback_url: str
+    callback_url: str = field(repr=False)
     work_dir: str
     created_at: str
     started_at: str | None
@@ -200,12 +223,21 @@ class JobRow:
 
 
 def _audit(
-    conn: sqlite3.Connection, event: str, job_id: str, detail: dict[str, Any], now: datetime
+    conn: sqlite3.Connection, event: str, job_id: str | None, detail: dict[str, Any], now: datetime
 ) -> None:
     conn.execute(
         "INSERT INTO audit(ts, event, job_id, detail_json) VALUES (?, ?, ?, ?)",
         (iso(now), event, job_id, json.dumps(detail, ensure_ascii=False)),
     )
+
+
+def _audit_params(params_json: str) -> Any:
+    """Paramètres masqués ; remplacés par un marqueur s'ils dépassent AUDIT_PARAMS_MAX."""
+    masked = redact_params(json.loads(params_json))
+    size = len(json.dumps(masked, ensure_ascii=False))
+    if size > AUDIT_PARAMS_MAX:
+        return {"truncated": True, "size": size}
+    return masked
 
 
 def _callback_and_audit(
@@ -214,13 +246,22 @@ def _callback_and_audit(
     to_status: str,
     error_code: str | None,
     now: datetime,
+    started_at: str | None,
 ) -> None:
     conn.execute(
         "INSERT INTO callbacks(job_id, state, next_attempt_at, not_before) "
         "VALUES (?, 'pending', ?, ?)",
         (job_id, iso(now), iso(now + timedelta(seconds=CALLBACK_DELAY_S))),
     )
-    _audit(conn, f"job.{to_status}", job_id, {"status": to_status, "error_code": error_code}, now)
+    finished_at = iso(now)
+    detail = {
+        "status": to_status,
+        "error_code": error_code,
+        "started_at": started_at,
+        "finished_at": finished_at,
+        "duration_s": duration_s(started_at, finished_at),
+    }
+    _audit(conn, f"job.{to_status}", job_id, detail, now)
 
 
 def _terminal(
@@ -237,12 +278,13 @@ def _terminal(
     """Écriture terminale (D-11) : à appeler DANS une transaction ouverte."""
     cur = conn.execute(
         "UPDATE jobs SET status=?, finished_at=?, result_json=?, error_code=?, error_message=? "
-        "WHERE id=? AND status=?",
+        "WHERE id=? AND status=? RETURNING started_at",
         (to_status, iso(now), result_json, error_code, error_message, job_id, from_status),
     )
-    if cur.rowcount != 1:
+    rows = cur.fetchall()
+    if len(rows) != 1:
         raise StaleTransition(job_id)
-    _callback_and_audit(conn, job_id, to_status, error_code, now)
+    _callback_and_audit(conn, job_id, to_status, error_code, now, rows[0]["started_at"])
 
 
 def insert_job(
@@ -286,7 +328,19 @@ def insert_job(
                     iso(moment),
                 ),
             )
-            _audit(conn, "job.submitted", job_id, {"capability": capability}, moment)
+            _audit(
+                conn,
+                "job.submitted",
+                job_id,
+                {
+                    "capability": capability,
+                    "client": "bearer",
+                    "params": _audit_params(params_json),
+                    "timeout_s": timeout_s,
+                    "has_idempotency_key": idempotency_key is not None,
+                },
+                moment,
+            )
     except sqlite3.IntegrityError as exc:
         if "jobs.capability" in str(exc) or "jobs.idempotency_key" in str(exc):
             row = conn.execute(
@@ -397,10 +451,25 @@ def recover_interrupted(conn: sqlite3.Connection, now: datetime | None = None) -
     with tx(conn):
         rows = conn.execute(
             "UPDATE jobs SET status='interrupted', finished_at=?, error_code='runner_restarted', "
-            "error_message=? WHERE status='running' RETURNING id",
+            "error_message=? WHERE status='running' RETURNING id, started_at",
             (iso(moment), "Runner redémarré pendant l'exécution."),
         ).fetchall()
         ids = [r["id"] for r in rows]
-        for job_id in ids:
-            _callback_and_audit(conn, job_id, "interrupted", "runner_restarted", moment)
+        for r in rows:
+            _callback_and_audit(
+                conn, r["id"], "interrupted", "runner_restarted", moment, r["started_at"]
+            )
     return ids
+
+
+def record_refusal(
+    conn: sqlite3.Connection,
+    *,
+    code: str,
+    capability: str | None,
+    job_id: str | None = None,
+    now: datetime | None = None,
+) -> None:
+    """Audit d'une soumission refusée (sans création de tâche)."""
+    with tx(conn):
+        _audit(conn, "job.refused", job_id, {"code": code, "capability": capability}, _now(now))
