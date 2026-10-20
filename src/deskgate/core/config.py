@@ -120,8 +120,8 @@ class Capability(Strict):
 
 
 class CallbackConfig(Strict):
-    max_window_s: int = Field(86400, ge=60, le=2_592_000)
-    max_backoff_s: int = Field(300, ge=1, le=3600)
+    max_window_s: int = Field(default=86400, ge=60, le=2_592_000)
+    max_backoff_s: int = Field(default=300, ge=1, le=3600)
 
 
 class RunnerConfig(Strict):

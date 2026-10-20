@@ -11,6 +11,8 @@ from pathlib import Path
 
 import pytest
 
+from _support.fake_n8n import FakeN8n
+
 
 @pytest.fixture
 def instance_name() -> str:
@@ -73,3 +75,13 @@ def symlink_ok(tmp_path: Path) -> bool:
         raise
     os.rmdir(lien)
     return True
+
+
+@pytest.fixture
+def fake_n8n() -> Iterator[FakeN8n]:
+    """Faux n8n 2.43.8 sur 127.0.0.1 (port libre), arrêté à la fin du test."""
+    serveur = FakeN8n().start()
+    try:
+        yield serveur
+    finally:
+        serveur.stop()
