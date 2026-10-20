@@ -21,6 +21,11 @@ from deskgate.core.callback_policy import (
 
 pytestmark = pytest.mark.unit
 
+
+def _rng(seed: int) -> random.Random:
+    return random.Random(seed)  # noqa: S311
+
+
 RUNNING = b'{"code":409,"message":"The execution \\"42\\" is running already."}'
 RESUME = b'{"message":"The execution \\"42\\" is about to resume."}'
 FINISHED = b'{"message":"The execution \\"42 has finished already."}'
@@ -81,7 +86,7 @@ def test_classify_corps_texte() -> None:
 
 
 def test_final() -> None:
-    assert FINAL == {DELIVERED, DELIVERED_DUPLICATE, ABANDONED_STALE, ABANDONED_REJECTED}
+    assert {DELIVERED, DELIVERED_DUPLICATE, ABANDONED_STALE, ABANDONED_REJECTED} == FINAL
 
 
 @pytest.mark.parametrize(
@@ -90,13 +95,13 @@ def test_final() -> None:
 )
 def test_next_delay_croit(attempts: int, low: float, high: float) -> None:
     for seed in range(20):
-        d = next_delay(attempts, max_backoff_s=300, rng=random.Random(seed))
+        d = next_delay(attempts, max_backoff_s=300, rng=_rng(seed))
         assert low <= d <= high
 
 
 def test_next_delay_plafonne() -> None:
     for seed in range(20):
-        assert next_delay(20, max_backoff_s=300, rng=random.Random(seed)) <= 300
+        assert next_delay(20, max_backoff_s=300, rng=_rng(seed)) <= 300
 
 
 @pytest.mark.parametrize(
@@ -105,11 +110,11 @@ def test_next_delay_plafonne() -> None:
 )
 def test_next_delay_court(attempts: int, low: float, high: float) -> None:
     for seed in range(20):
-        d = next_delay(attempts, max_backoff_s=300, rng=random.Random(seed), short=True)
+        d = next_delay(attempts, max_backoff_s=300, rng=_rng(seed), short=True)
         assert low <= d <= high
 
 
 def test_next_delay_court_plafonne() -> None:
     for seed in range(20):
-        d = next_delay(30, max_backoff_s=300, rng=random.Random(seed), short=True)
+        d = next_delay(30, max_backoff_s=300, rng=_rng(seed), short=True)
         assert 0 <= d <= 30
