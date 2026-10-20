@@ -53,7 +53,7 @@ Plans:
 - [x] 02-02-PLAN.md — Noyau pur : step(), verdict, protocole worker (vague 1)
 - [x] 02-03-PLAN.md — Store : migration 1, file, outbox, annulation, recovery (vague 1)
 - [x] 02-04-PLAN.md — jobobject (ctypes), env en liste blanche, frontières AST (vague 1)
-- [ ] 02-05-PLAN.md — deskgate_sdk (worker stdlib) et faux plugins (vague 2)
+- [x] 02-05-PLAN.md — deskgate_sdk (worker stdlib) et faux plugins (vague 2)
 - [ ] 02-06-PLAN.md — Engine : tick, annulation, échéance, réveil, arrêt (vague 2)
 - [ ] 02-07-PLAN.md — JobsService et routes /jobs, lifespan d'arrêt (vague 2)
 - [ ] 02-08-PLAN.md — Engine prouvé avec de vrais sous-processus (vague 3)
