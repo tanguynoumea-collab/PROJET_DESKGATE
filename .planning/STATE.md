@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-10-20T11:44:14.405Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-10-20T11:47:20.516Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 1 (Fondations testables) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-10-20
 
@@ -49,6 +49,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01 P01 | 25min | 3 tasks | 13 files |
 | Phase 01 P02 | 15min | 2 tasks | 4 files |
+| Phase 01 P03 | 20min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,7 @@ Recent decisions affecting current work:
 - [Phase 3]: Rappel garanti au moins une fois ; n8n ne reprend qu'une fois, un doublon reçoit 409 tracé delivered_duplicate (remplace « une fois et une seule ») — Exactement-une-fois impossible côté runner ; validé par l'utilisateur
 - [Phase 01]: ruff exclut .planning/.arthemis/.claude/docs (ruff 0.17 formate le Markdown)
 - [Phase 01]: validate_artifact_path convertit le chemin hôte lexical, pas le résolu
+- [Phase 01]: Handlers API : cast() à la place de assert (ruff S101)
 
 ### Pending Todos
 
@@ -78,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-20T11:44:14.401Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-10-20T11:47:20.512Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None
