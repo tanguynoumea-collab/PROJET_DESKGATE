@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: MIT
+"""Paramètres validés de la capacité ifc.clash et erreurs classées."""
+
+from __future__ import annotations
+
+from typing import Any, Literal
+
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+
+
+class ClashError(Exception):
+    """Erreur classée : `error_code` est lu par le SDK et devient `error.type`."""
+
+    def __init__(self, error_code: str, message: str) -> None:
+        super().__init__(message)
+        self.error_code = error_code
+
+
+class ClashParams(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    ifc_a: str = Field(min_length=1)
+    ifc_b: str | None = None
+    selector_a: str = Field(min_length=1, max_length=2000)
+    selector_b: str | None = Field(default=None, max_length=2000)
+    mode: Literal["hard", "clearance"]
+    tolerance: float | None = Field(default=None, ge=0, le=1)
+    clearance: float | None = Field(default=None, gt=0, le=10)
+    group_radius: float = Field(default=2.0, ge=0, le=1000)
+    max_clashes: int = Field(default=1000, ge=1, le=100_000)
+    threads: int | None = Field(default=None, ge=1, le=64)
+
+    @model_validator(mode="after")
+    def _threshold(self) -> ClashParams:
+        if self.mode == "hard":
+            if self.tolerance is None:
+                raise ValueError("mode hard : tolerance (m) obligatoire")
+            if self.clearance is not None:
+                raise ValueError("mode hard : clearance non admis")
+        else:
+            if self.clearance is None:
+                raise ValueError("mode clearance : clearance (m) obligatoire")
+            if self.tolerance is not None:
+                raise ValueError("mode clearance : tolerance non admis")
+        return self
+
+    @property
+    def threshold(self) -> float:
+        value = self.tolerance if self.mode == "hard" else self.clearance
+        return float(value or 0.0)
+
+
+def parse_params(raw: dict[str, Any]) -> ClashParams:
+    try:
+        return ClashParams.model_validate(raw)
+    except ValidationError as exc:
+        parts: list[str] = []
+        for err in exc.errors():
+            loc = ".".join(str(x) for x in err["loc"])
+            if err["type"] == "extra_forbidden":
+                parts.append(f"paramètre inconnu : {loc}")
+            elif err["type"] == "value_error":
+                parts.append(str(err["msg"]).removeprefix("Value error, "))
+            elif err["type"] == "missing":
+                parts.append(f"paramètre manquant : {loc}")
+            else:
+                parts.append(f"paramètre invalide : {loc}")
+        raise ClashError("invalid_params", " ; ".join(parts)) from None
