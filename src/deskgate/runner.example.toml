@@ -26,10 +26,18 @@ allowed_roots = ['C:/BIM']
 container = "/data"
 host = 'C:/BIM'
 
+# Dossier des tâches (un sous-dossier par tâche, conservé, sans purge automatique en v0.1 ;
+# job.log n'est pas plafonné). Doit être sous une racine autorisée.
+# Défaut : <première racine>/travail.
+# work_root = 'C:/BIM/travail'
+
 # Capacités : une section par identifiant (exemple générique, à adapter).
 # [capabilities.exemple]
 # kind = "python"
 # python = 'C:/chemin/vers/venv/Scripts/python.exe'
-# entry = "paquet.module"
-# timeout_max = 600
+# entry = "paquet.module:fonction"
+# # Plafond absolu 43200 s (12 h). Délai par défaut d'une tâche = min(7200, timeout_max).
+# timeout_max = 7200
+# # pythonpath = ['C:/chemin/vers/code']
+# # memory_mb = 4096
 # resource = "default"

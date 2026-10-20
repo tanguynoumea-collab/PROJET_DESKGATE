@@ -75,7 +75,7 @@ def test_unknown_nested_mapping_key() -> None:
 def test_unknown_capability_key() -> None:
     cap = (
         "[capabilities.fake]\n"
-        'kind = "python"\npython = "C:/venv/python.exe"\nentry = "pkg.mod"\n'
+        'kind = "python"\npython = "C:/venv/python.exe"\nentry = "pkg.mod:run"\n'
         "timeout_max = 600\nbogus = 1\n"
     )
     assert "capabilities.fake.bogus" in _err(BASE + cap)
@@ -120,7 +120,7 @@ def test_mapping_container_needs_slash() -> None:
 def test_capability_valid() -> None:
     cap = (
         "[capabilities.fake]\n"
-        'kind = "python"\npython = "C:/venv/python.exe"\nentry = "pkg.mod"\ntimeout_max = 600\n'
+        'kind = "python"\npython = "C:/venv/python.exe"\nentry = "pkg.mod:run"\ntimeout_max = 600\n'
     )
     cfg = parse_config(BASE + cap, "t")
     assert cfg.capabilities["fake"].timeout_max == 600
@@ -132,7 +132,7 @@ def test_capability_invalid(key: str, value: str) -> None:
     fields = {
         "kind": '"python"',
         "python": '"C:/venv/python.exe"',
-        "entry": '"pkg.mod"',
+        "entry": '"pkg.mod:run"',
         "timeout_max": "600",
         key: value,
     }
@@ -158,3 +158,52 @@ def test_load_config_ok(tmp_path: Path) -> None:
     p = tmp_path / "c.toml"
     p.write_text(BASE, encoding="utf-8")
     assert load_config(p).port == 8765
+
+
+def _cap(**over: str) -> str:
+    fields = {
+        "kind": '"python"',
+        "python": '"C:/venv/python.exe"',
+        "entry": '"pkg.mod:run"',
+        "timeout_max": "600",
+        **over,
+    }
+    return "[capabilities.fake]\n" + "".join(f"{k} = {v}\n" for k, v in fields.items())
+
+
+def test_timeout_max_ceiling() -> None:
+    assert "capabilities.fake.timeout_max" in _err(BASE + _cap(timeout_max="43201"))
+    cfg = parse_config(BASE + _cap(timeout_max="43200"), "t")
+    assert cfg.capabilities["fake"].timeout_max == 43200
+
+
+def test_entry_needs_function() -> None:
+    assert "capabilities.fake.entry" in _err(BASE + _cap(entry='"pkg.mod"'))
+
+
+def test_python_must_be_absolute() -> None:
+    assert "capabilities.fake.python" in _err(BASE + _cap(python='"python.exe"'))
+
+
+def test_pythonpath_normalized_and_validated() -> None:
+    cfg = parse_config(BASE + _cap(pythonpath="['C:/plugins/a/']"), "t")
+    assert cfg.capabilities["fake"].pythonpath == ["C:/plugins/a"]
+    assert "capabilities.fake.pythonpath.0" in _err(BASE + _cap(pythonpath="['rel']"))
+
+
+def test_memory_mb() -> None:
+    assert "capabilities.fake.memory_mb" in _err(BASE + _cap(memory_mb="8"))
+    assert parse_config(BASE + _cap(), "t").capabilities["fake"].memory_mb is None
+    assert parse_config(BASE + _cap(memory_mb="64"), "t").capabilities["fake"].memory_mb == 64
+
+
+def test_work_root_default_and_explicit() -> None:
+    assert parse_config(BASE, "t").effective_work_root() == "C:/BIM/travail"
+    cfg = parse_config(f"work_root = 'C:/BIM/jobs'\n{BASE}", "t")
+    assert cfg.effective_work_root() == "C:/BIM/jobs"
+
+
+def test_work_root_outside_roots() -> None:
+    msg = _err(f"work_root = 'D:/ailleurs'\n{BASE}")
+    assert "work_root" in msg
+    assert "racine" in msg

@@ -95,9 +95,16 @@ class Paths(Strict):
 
 class Capability(Strict):
     kind: Literal["python"]
-    python: str
-    entry: str
-    timeout_max: int = Field(gt=0)
+    python: Annotated[str, AfterValidator(_host_root)]
+    entry: Annotated[
+        str,
+        StringConstraints(
+            pattern=r"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*:[A-Za-z_][A-Za-z0-9_]*$"
+        ),
+    ]
+    timeout_max: int = Field(gt=0, le=43200)
+    pythonpath: list[Annotated[str, AfterValidator(_host_root)]] = []
+    memory_mb: int | None = Field(default=None, ge=16)
     resource: str = "default"
 
 
@@ -109,6 +116,23 @@ class RunnerConfig(Strict):
     paths: Paths
     callback_allowed_hosts: list[str] = []
     capabilities: dict[str, Capability] = {}
+    work_root: Annotated[str, AfterValidator(_host_root)] | None = None
+
+    @field_validator("work_root")
+    @classmethod
+    def _work_root_inside_roots(cls, v: str | None, info: ValidationInfo) -> str | None:
+        if v is None or "paths" not in info.data:
+            return v
+        roots: list[str] = info.data["paths"].allowed_roots
+        if not any(is_under(v, root) for root in roots):
+            raise PydanticCustomError(
+                "work_root_outside_roots",
+                "work_root doit être sous une racine autorisée",
+            )
+        return v
+
+    def effective_work_root(self) -> str:
+        return self.work_root or f"{self.paths.allowed_roots[0]}/travail"
 
     @field_validator("host")
     @classmethod
