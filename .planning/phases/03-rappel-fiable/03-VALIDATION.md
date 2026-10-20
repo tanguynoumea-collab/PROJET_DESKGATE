@@ -42,10 +42,8 @@ created: 2026-10-21
 
 ## Wave 0 Requirements
 
-- [ ] Faux plugins de test (`sleep`, `spawn_orphan`, `bad_result`, `chatty`, `artifact_outside`, `artifact_ok`, `exit_code`, `fail`) — plan 02-05, tâche 2
-- [ ] Déclaration `[capabilities."demo.*"]` : `tests/_support/jobs.py` (02-06) et `tests/e2e/conftest.py` (02-09)
-- [ ] `src/deskgate/jobobject.py` remplaçant `tests/_support/winjob.py` — plan 02-04
-- [ ] Aide `tests/_support/procs.py` (`is_alive`, `wait_dead`) — plan 02-04, tâche 2
+- [ ] Faux serveur n8n (thread HTTP sur 127.0.0.1) rejouant 200, 409 « running already », 409 « has finished already », 404, 401, 500, coupure, et enregistrant la ligne de requête brute
+- [ ] `httpx2` en dépendance d'exécution, `uv.lock` régénéré
 
 ---
 
