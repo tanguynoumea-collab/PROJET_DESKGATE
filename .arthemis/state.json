@@ -135,7 +135,7 @@
       "statut": "ouvert",
       "proprietaire": "humain",
       "ouvert_le": "2026-10-21",
-      "source": ".planning/phases/04-capacit-s-v0-1/04-07-PLAN.md",
+      "source": ".planning/phases/04-capacit-s-v0-1/04-HUMAN-UAT.md",
       "ref": "CAP-02",
       "condition_levee": "resultat saisi dans 04-HUMAN-UAT.md"
     }
@@ -195,6 +195,6 @@
   },
   "maj": {
     "le": "2026-10-21",
-    "commit": "e4f7ae9"
+    "commit": "2f868b1"
   }
 }

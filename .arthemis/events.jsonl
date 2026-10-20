@@ -22,3 +22,5 @@
 {"ts":"2026-10-21T06:00:00","type":"gate","ref":".arthemis/reports/gate-1-03.log","commit":"389b5aa","note":"gate D-12 vert apres phase 3 : 7/7, 468+26 tests, 1 skip symlink"}
 {"ts":"2026-10-21T06:00:00","type":"rapport","ref":".planning/phases/03-rappel-fiable/03-VERIFICATION.md","commit":"389b5aa","note":"phase 3 passed 4/4, CB-01..05 SEC-05 SEC-06 cochees"}
 {"ts":"2026-10-21T09:00:00","type":"rapport","ref":".planning/phases/04-capacit-s-v0-1","commit":"e4f7ae9","note":"phase 4 planifiee : 7 plans autonomes en 3 vagues, horizon nul, item differe 04-D1"}
+{"ts":"2026-10-21T15:00:00","type":"gate","ref":".arthemis/reports/gate-1-04.log","commit":"2f868b1","note":"gate D-12 vert apres phase 4 : 7/7, 615+26 tests, 1 skip symlink"}
+{"ts":"2026-10-21T15:00:00","type":"rapport","ref":".planning/phases/04-capacit-s-v0-1/04-VERIFICATION.md","commit":"2f868b1","note":"phase 4 human_needed 4/4, CAP-01..05 cochees, 04-D1 differe"}
