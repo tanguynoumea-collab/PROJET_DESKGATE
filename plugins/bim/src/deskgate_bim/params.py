@@ -7,6 +7,10 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
+ISO_8601 = (
+    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
+)
+
 
 class ClashError(Exception):
     """Erreur classée : `error_code` est lu par le SDK et devient `error.type`."""
@@ -29,6 +33,12 @@ class ClashParams(BaseModel):
     group_radius: float = Field(default=2.0, ge=0, le=1000)
     max_clashes: int = Field(default=1000, ge=1, le=100_000)
     threads: int | None = Field(default=None, ge=1, le=64)
+    bcf: bool = False
+    bcf_author: str = Field(default="deskgate", min_length=1, max_length=256)
+    bcf_project: str | None = Field(default=None, min_length=1, max_length=256)
+    created_at: str | None = Field(default=None, pattern=ISO_8601)
+    context_radius: float = Field(default=5.0, ge=0, le=1000)
+    max_context: int = Field(default=500, ge=0, le=5000)
 
     @model_validator(mode="after")
     def _threshold(self) -> ClashParams:
