@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
-status: verifying
-stopped_at: Phase 4 context gathered
-last_updated: "2026-10-20T15:11:22.061Z"
+status: executing
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-10-20T15:35:53.984Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 22
-  completed_plans: 22
+  total_plans: 29
+  completed_plans: 23
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-20)
 
 **Core value:** n8n délègue une tâche longue au PC Windows et reprend fiablement quand elle se termine, quel que soit le résultat (succès, échec, délai dépassé, annulation, redémarrage du runner).
-**Current focus:** Phase 3 — Rappel fiable
+**Current focus:** Phase 4 — Capacités v0.1
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 4 (Capacités v0.1) — EXECUTING
+Plan: 2 of 7
+Status: Ready to execute
 Last activity: 2026-10-20
 
 Progress: [░░░░░░░░░░] 0%
@@ -69,6 +69,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03 P06 | 25min | 2 tasks | 5 files |
 | Phase 03 P07 | 20min | 2 tasks | 4 files |
 | Phase 03 P08 | 25min | 2 tasks | 2 files |
+| Phase 04 P01 | 25min | 3 tasks | 25 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,7 @@ Recent decisions affecting current work:
 - [Phase 03]: CB-04 complet ; CB-05, SEC-05, SEC-06 restent Pending (03-06, 03-07)
 - [Phase 03]: 03-07 : compteur de rappels et battement du sender non exposés dans /health en v0.1
 - [Phase 4]: Valeurs env des serveurs MCP transmises au worker par son environnement, jamais écrites dans input.json ; path_params déclarés par capacité, convertis et validés par le runner ; Capability.settings vers ctx.settings ; kind mcp ; rendu visuel BCF dans BIMcollab = vérification humaine différée (phase 5) — Recherche phase 4 ; input.json lisible par n8n via /data/travail
+- [Phase 04]: Echec de uv sync d'un plugin = pytest.fail, pas de skip silencieux
 
 ### Pending Todos
 
@@ -104,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-20T14:47:22.654Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-capacit-s-v0-1/04-CONTEXT.md
+Last session: 2026-10-20T15:35:53.980Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None
