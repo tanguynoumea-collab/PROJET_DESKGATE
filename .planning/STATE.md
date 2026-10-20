@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 03-04-PLAN.md
-last_updated: "2026-10-20T13:36:01.050Z"
+stopped_at: Completed 03-05-PLAN.md
+last_updated: "2026-10-20T13:38:59.725Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 22
-  completed_plans: 18
+  completed_plans: 19
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 3 (Rappel fiable) — EXECUTING
-Plan: 5 of 8
+Plan: 6 of 8
 Status: Ready to execute
 Last activity: 2026-10-20
 
@@ -65,6 +65,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03 P02 | 10min | 2 tasks | 3 files |
 | Phase 03 P03 | 10min | 2 tasks | 4 files |
 | Phase 03 P04 | 25min | 2 tasks | 5 files |
+| Phase 03 P05 | 25min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,7 @@ Recent decisions affecting current work:
 - [Phase 01]: Handlers API : cast() à la place de assert (ruff S101)
 - [Phase 02]: stop() de l'engine ne conclut jamais la tâche : recovery au redémarrage
 - [Phase 3]: Migration 2 additive : colonne callbacks.maybe_delivered (posée avant chaque envoi) pour distinguer delivered_duplicate d'abandoned_stale ; 401/404 exigent deux constats consécutifs avant abandon ; pas de dernier envoi après 24 h ; 413 : un renvoi minimal puis backoff ; jobs.callback_url purgée à l'état final du rappel — Recherche phase 3 (code n8n 2.43.8) ; questions ouvertes tranchées par ARTHEMIS, aucun utilisateur réel
+- [Phase 03]: CB-04 complet ; CB-05, SEC-05, SEC-06 restent Pending (03-06, 03-07)
 
 ### Pending Todos
 
@@ -97,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-20T13:36:01.047Z
-Stopped at: Completed 03-04-PLAN.md
+Last session: 2026-10-20T13:38:59.721Z
+Stopped at: Completed 03-05-PLAN.md
 Resume file: None

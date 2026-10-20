@@ -40,7 +40,7 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 - [ ] **CB-01**: À chaque état terminal (`succeeded`, `failed`, `timeout`, `cancelled`, `interrupted`), le runner appelle la `resumeUrl` telle quelle avec `{ job_id, capability, status, duration_s, summary, artifacts, error }`
 - [ ] **CB-02**: Un rappel non livré est réessayé avec délai croissant, y compris après un redémarrage du runner (aucun résultat perdu)
 - [ ] **CB-03**: Le runner distingue les réponses de n8n : livré, Wait pas encore en attente (réessai court), exécution déjà terminée ou inconnue (abandon tracé), refus de signature (abandon tracé)
-- [ ] **CB-04**: Un résumé trop volumineux pour le rappel (> 1 Mio) est écrit dans `summary.json` et le rappel n'en porte que le chemin
+- [x] **CB-04**: Un résumé trop volumineux pour le rappel (> 1 Mio) est écrit dans `summary.json` et le rappel n'en porte que le chemin
 - [ ] **CB-05**: Le rappel n'est envoyé qu'à un hôte autorisé dans `runner.toml`
 
 ### Capacités
@@ -143,7 +143,7 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | CB-01 | Phase 3 | Pending |
 | CB-02 | Phase 3 | Pending |
 | CB-03 | Phase 3 | Pending |
-| CB-04 | Phase 3 | Pending |
+| CB-04 | Phase 3 | Complete |
 | CB-05 | Phase 3 | Pending |
 | SEC-05 | Phase 3 | Pending |
 | SEC-06 | Phase 3 | Pending |

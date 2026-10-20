@@ -76,7 +76,7 @@ Plans:
 - [x] 03-02-PLAN.md — Politique pure : classify, next_delay, check_callback_url (TDD)
 - [x] 03-03-PLAN.md — Corps du rappel pur (core/payload) et masquage unique étendu (core/redact)
 - [x] 03-04-PLAN.md — Store : migration 2 (maybe_delivered), outbox durable, purge, audit enrichi
-- [ ] 03-05-PLAN.md — Plafond 1 Mio et summary.json dans l'engine ; hôte autorisé et audit des refus à la soumission
+- [x] 03-05-PLAN.md — Plafond 1 Mio et summary.json dans l'engine ; hôte autorisé et audit des refus à la soumission
 - [ ] 03-06-PLAN.md — Thread sender : envoi de la resumeUrl telle quelle, réessais, politique de réponse
 - [ ] 03-07-PLAN.md — Câblage du sender dans deskgate serve, journaux masqués, rappel e2e pour 4 statuts
 - [ ] 03-08-PLAN.md — E2E : reprise après taskkill, envoi interrompu, statut interrupted, balayage de la signature, gate
