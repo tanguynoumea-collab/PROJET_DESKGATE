@@ -17,6 +17,8 @@ from typing import Any
 
 SCHEMA_VERSION = 1
 
+Connection = sqlite3.Connection  # alias : les autres modules n'importent pas sqlite3
+
 CALLBACK_DELAY_S = 2
 
 
