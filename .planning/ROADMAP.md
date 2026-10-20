@@ -12,7 +12,8 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
 
 - [x] **Phase 1: Fondations testables** - Runner local sécurisé : configuration, jeton, contrôle Host, chemins, instance unique, `/health`
  (completed 2026-10-20)
-- [x] **Phase 2: Cœur d'exécution** - File SQLite, exécution en Job Object, API des tâches, délai, annulation, reprise après redémarrage (completed 2026-10-20)
+- [x] **Phase 2: Cœur d'exécution** - File SQLite, exécution en Job Object, API des tâches, délai, annulation, reprise après redémarrage
+ (completed 2026-10-20)
 - [ ] **Phase 3: Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit
 - [ ] **Phase 4: Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call`
 - [ ] **Phase 5: Installation et intégration n8n** - `deskgate init`, tâche planifiée, docker-compose n8n, workflow d'exemple, acceptation
@@ -68,7 +69,17 @@ Plans:
   2. Un rappel non livré est réessayé avec délai croissant et reprend après un redémarrage du runner ; les réponses sont distinguées (livré, Wait pas encore en attente, exécution terminée ou inconnue, signature refusée) avec abandon tracé quand il faut
   3. Un résumé de plus de 1 Mio est écrit dans `summary.json` et le rappel n'en porte que le chemin ; un hôte de rappel non autorisé est refusé
   4. La `signature` n'apparaît dans aucun journal, aucune réponse d'API ni l'audit ; chaque soumission, refus, fin de tâche et rappel figure dans l'audit local
-**Plans**: TBD
+**Plans:** 8 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — httpx2 en dépendance, configuration [callback], hôtes par défaut, faux n8n 2.43.8 (vague 0)
+- [ ] 03-02-PLAN.md — Politique pure : classify, next_delay, check_callback_url (TDD)
+- [ ] 03-03-PLAN.md — Corps du rappel pur (core/payload) et masquage unique étendu (core/redact)
+- [ ] 03-04-PLAN.md — Store : migration 2 (maybe_delivered), outbox durable, purge, audit enrichi
+- [ ] 03-05-PLAN.md — Plafond 1 Mio et summary.json dans l'engine ; hôte autorisé et audit des refus à la soumission
+- [ ] 03-06-PLAN.md — Thread sender : envoi de la resumeUrl telle quelle, réessais, politique de réponse
+- [ ] 03-07-PLAN.md — Câblage du sender dans deskgate serve, journaux masqués, rappel e2e pour 4 statuts
+- [ ] 03-08-PLAN.md — E2E : reprise après taskkill, envoi interrompu, statut interrupted, balayage de la signature, gate
 **Note de recherche**: spike court : textes exacts des 409 de n8n 2.43.8 ; `httpx2` ne réencode pas la signature (hôte seulement réécrit, query intacte).
 
 ### Phase 4: Capacités v0.1
