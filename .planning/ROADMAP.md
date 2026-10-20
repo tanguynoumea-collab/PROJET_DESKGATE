@@ -10,7 +10,7 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
 
 ## Phases
 
-- [ ] **Phase 1: Fondations testables** - Runner local sécurisé : configuration, jeton, contrôle Host, chemins, instance unique, `/health`
+- [x] **Phase 1: Fondations testables** - Runner local sécurisé : configuration, jeton, contrôle Host, chemins, instance unique, `/health` (completed 2026-10-20)
 - [ ] **Phase 2: Cœur d'exécution** - File SQLite, exécution en Job Object, API des tâches, délai, annulation, reprise après redémarrage
 - [ ] **Phase 3: Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit
 - [ ] **Phase 4: Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call`
@@ -27,7 +27,7 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
   2. Un `runner.toml` invalide fait échouer le démarrage avec un message clair en français ; un second runner lancé en parallèle s'arrête sans toucher à la base
   3. `GET /health` répond sans jeton et sans détail sensible ; toute autre route renvoie 401 sans jeton Bearer valide et 4xx si l'en-tête `Host` n'est pas `127.0.0.1`, `localhost` ou `host.docker.internal`
   4. Un chemin `/data/...` devient `C:/BIM/...` (et inversement) ; les chemins hors racines (`..`, lien symbolique, jonction, UNC, `C:/BIM2`, nom réservé, flux alternatif) sont refusés par des tests d'attaque
-**Plans:** 5 plans
+**Plans:** 5/5 plans complete
 Plans:
 - [x] 01-01-PLAN.md — Outillage uv/CI, tests AST de frontière, mutex et socket exclusif, spike Job Object (vague 1)
 - [x] 01-02-PLAN.md — Chemins : conversion /data ↔ C:/BIM et table d'attaques (vague 2)
@@ -89,7 +89,7 @@ Plans:
 
 | Phase | Plans terminés | Statut | Terminée |
 |-------|----------------|--------|----------|
-| 1. Fondations testables | 0/5 | Non commencée | - |
+| 1. Fondations testables | 0/5 | Complete    | 2026-10-20 |
 | 2. Cœur d'exécution | 0/0 | Non commencée | - |
 | 3. Rappel fiable | 0/0 | Non commencée | - |
 | 4. Capacités v0.1 | 0/0 | Non commencée | - |
