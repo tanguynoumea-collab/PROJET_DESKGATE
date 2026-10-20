@@ -40,7 +40,7 @@ d'étapes. Une tâche = un appel d'un plugin. L'enchaînement est le rôle de n8
 │   └─ Sécurité            : jetons hachés, droits par plugin, audit, chemins│
 │                                                                           │
 │  Plugins (dossiers séparés, un environnement uv chacun)                    │
-│   ifc.clash  ifc.audit  ifc.diff  ifc.quantities  zoom.nightshift  …      │
+│   ifc.clash  ifc.audit  ifc.diff  ifc.quantities  …                       │
 └───────────────────────────────────────────────────────────────────────────┘
         Dossier partagé :  C:\BIM\   ⇄   /data  (monté dans les conteneurs)
 ```
@@ -225,7 +225,8 @@ jetons et droits ; audit ; diagnostic (`deskgate doctor`).
 
 ## 11. Plugins BIM (`deskgate-bim`)
 
-Développés **dans ce dépôt, en parallèle du runner**, mais dans un paquet séparé : le cœur
+Écrits **de zéro, dans ce dépôt, en parallèle du runner**, directement sur les outils IfcOpenShell
+existants (`ifcopenshell.geom`, `ifcclash`, `ifctester`, `ifcdiff`), dans un paquet séparé : le cœur
 `deskgate` n'importe jamais `deskgate_bim` et ne connaît rien au BIM.
 
 | Plugin | Type | Base | Arrivée |
@@ -234,7 +235,6 @@ Développés **dans ce dépôt, en parallèle du runner**, mais dans un paquet s
 | `ifc.audit` | python | IfcOpenShell + `ifctester` (IDS) | v0.2 |
 | `ifc.diff` | python | `ifcdiff` | v0.2 |
 | `ifc.quantities` | python | IfcOpenShell (géométrie, quantités) | v0.2 |
-| `zoom.nightshift` | cli | BIMcollab Zoom Nightshift (`requires_session`) | v0.3 |
 | `odm.audit_loi` | à définir | ODM | backlog, après une version fonctionnelle |
 
 IfcOpenShell 0.9.0.post1 dispose de roues Windows pour Python 3.10 à 3.15 ; installation et import

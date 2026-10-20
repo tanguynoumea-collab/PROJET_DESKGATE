@@ -33,7 +33,8 @@ Runner :
       d'exemple HTTP Request + Wait.
 
 Plugins BIM (en parallèle) :
-- [ ] `ifc.clash` : détection hard / clearance / touch / duplicate, regroupement, BCF 2.1.
+- [ ] `ifc.clash` écrit de zéro sur IfcOpenShell (`ifcclash`) : détection hard / clearance /
+      touch / duplicate, regroupement, BCF 2.1.
 
 Critère d'acceptation :
 > Un IFC déposé dans `C:\BIM\depot\` déclenche dans n8n une détection de conflits exécutée par le
@@ -66,7 +67,6 @@ Critère d'acceptation :
       générés depuis le schéma, **soumission et attente dans un seul nœud**.
 - [ ] Interface web : catalogue par type, test d'un plugin, tâches, journaux, jetons et droits,
       audit, diagnostic.
-- [ ] Plugin BIM `zoom.nightshift` (`cli`, `requires_session`).
 
 Critère d'acceptation :
 > Un collègue installe le runner et le nœud, puis construit et lance seul un workflow à deux nœuds
