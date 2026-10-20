@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
-status: planning
-stopped_at: Phase 1 context gathered
-last_updated: "2026-10-20T11:16:53.413Z"
-last_activity: 2026-10-20 — feuille de route créée, conseil d'approche tenu
+status: executing
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-10-20T11:41:57.971Z"
+last_activity: 2026-10-20
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 5
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-20)
 
 **Core value:** n8n délègue une tâche longue au PC Windows et reprend fiablement quand elle se termine, quel que soit le résultat (succès, échec, délai dépassé, annulation, redémarrage du runner).
-**Current focus:** Phase 1 : Fondations testables
+**Current focus:** Phase 1 — Fondations testables
 
 ## Current Position
 
-Phase: 1 of 5 (Fondations testables)
-Plan: 0 of 0 in current phase
-Status: Ready to plan
-Last activity: 2026-10-20 — feuille de route créée, conseil d'approche tenu
+Phase: 1 (Fondations testables) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-10-20
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 *Updated after each plan completion*
+| Phase 01 P01 | 25min | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,7 @@ Recent decisions affecting current work:
 - [Phase 2]: Capacités v0.1 déclarées dans runner.toml [capabilities.<id>] (kind, python, entry, timeout_max, resource), validées par Pydantic ; aucun nom BIM dans src/deskgate — Règle 1 de CLAUDE.md ; validé par l'utilisateur
 - [Phase 2]: Migration 1 complète en phase 2 (tables callbacks et audit) ; la phase 3 livre envoi, politique, plafond, masquage et contenu complet de l'audit — La recovery JOB-06 insère le rappel dans la transaction terminale ; validé par l'utilisateur
 - [Phase 3]: Rappel garanti au moins une fois ; n8n ne reprend qu'une fois, un doublon reçoit 409 tracé delivered_duplicate (remplace « une fois et une seule ») — Exactement-une-fois impossible côté runner ; validé par l'utilisateur
+- [Phase 01]: ruff exclut .planning/.arthemis/.claude/docs (ruff 0.17 formate le Markdown)
 
 ### Pending Todos
 
@@ -74,6 +76,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-20T11:16:53.409Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-fondations-testables/01-CONTEXT.md
+Last session: 2026-10-20T11:41:57.967Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None

@@ -9,9 +9,9 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 
 ### Runner
 
-- [ ] **RUN-01**: L'utilisateur démarre le runner (`deskgate serve`) et il n'écoute que sur 127.0.0.1 ; il refuse de démarrer sur une autre interface sans option explicite
+- [x] **RUN-01**: L'utilisateur démarre le runner (`deskgate serve`) et il n'écoute que sur 127.0.0.1 ; il refuse de démarrer sur une autre interface sans option explicite
 - [ ] **RUN-02**: Le runner lit sa configuration typée dans `runner.toml` (port, racines autorisées, correspondance des chemins, jeton, délais) et refuse de démarrer sur une configuration invalide avec un message clair en français
-- [ ] **RUN-03**: Un second runner lancé pendant que le premier tourne s'arrête sans toucher à la base ni aux tâches
+- [x] **RUN-03**: Un second runner lancé pendant que le premier tourne s'arrête sans toucher à la base ni aux tâches
 - [ ] **RUN-04**: `GET /health` répond sans jeton, sans détail sensible
 
 ### Sécurité
@@ -123,9 +123,9 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| RUN-01 | Phase 1 | Pending |
+| RUN-01 | Phase 1 | Complete |
 | RUN-02 | Phase 1 | Pending |
-| RUN-03 | Phase 1 | Pending |
+| RUN-03 | Phase 1 | Complete |
 | RUN-04 | Phase 1 | Pending |
 | SEC-01 | Phase 1 | Pending |
 | SEC-02 | Phase 1 | Pending |

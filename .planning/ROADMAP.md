@@ -29,7 +29,7 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
   4. Un chemin `/data/...` devient `C:/BIM/...` (et inversement) ; les chemins hors racines (`..`, lien symbolique, jonction, UNC, `C:/BIM2`, nom réservé, flux alternatif) sont refusés par des tests d'attaque
 **Plans:** 5 plans
 Plans:
-- [ ] 01-01-PLAN.md — Outillage uv/CI, tests AST de frontière, mutex et socket exclusif, spike Job Object (vague 1)
+- [x] 01-01-PLAN.md — Outillage uv/CI, tests AST de frontière, mutex et socket exclusif, spike Job Object (vague 1)
 - [ ] 01-02-PLAN.md — Chemins : conversion /data ↔ C:/BIM et table d'attaques (vague 2)
 - [ ] 01-03-PLAN.md — Jeton, contrôle Host, erreurs D-08, /health (vague 2)
 - [ ] 01-04-PLAN.md — Configuration runner.toml typée, emplacement des données, gabarit (vague 3)
