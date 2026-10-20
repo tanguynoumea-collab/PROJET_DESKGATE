@@ -1,0 +1,54 @@
+[project]
+name = "deskgate"
+version = "0.1.0.dev0"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = ["fastapi>=0.151,<0.152", "uvicorn>=0.54,<0.55", "pydantic>=2.14,<3", "platformdirs>=4.13", "typer>=0.27,<0.28"]
+
+[project.scripts]
+deskgate = "deskgate.cli:app"
+
+[build-system]
+requires = ["hatchling>=1.32"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/deskgate"]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.uv.workspace]
+members = []                       # "plugins/bim", "plugins/bim/bcf" ajoutés quand les répertoires existent
+
+[dependency-groups]
+dev = ["pytest>=9.1,<10", "pytest-timeout>=2.4", "httpx2>=2.15,<3", "psutil>=7.2", "ruff>=0.17,<0.18", "pyright>=1.1.414"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+extend-exclude = [".planning", ".arthemis", ".claude", "docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S603", "S607"]
+
+[tool.pyright]
+include = ["src", "tests"]
+extraPaths = ["tests"]
+pythonVersion = "3.11"
+typeCheckingMode = "standard"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--strict-markers", "--strict-config", "-ra", "--import-mode=importlib"]
+pythonpath = ["tests"]
+markers = [
+  "unit: noyau pur, sans disque, serveur ni sous-processus",
+  "fs: vrai système de fichiers (jonctions, ADS, noms réservés)",
+  "proc: vrais sous-processus Windows",
+  "e2e: deskgate serve en sous-processus",
+]
