@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
-status: executing
-stopped_at: Completed 04-06-PLAN.md
-last_updated: "2026-10-20T16:16:40.431Z"
+status: verifying
+stopped_at: Completed 04-07-PLAN.md
+last_updated: "2026-10-20T16:28:44.163Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 29
-  completed_plans: 28
+  completed_plans: 29
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 
 Phase: 4 (Capacités v0.1) — EXECUTING
 Plan: 7 of 7
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-10-20
 
 Progress: [░░░░░░░░░░] 0%
@@ -75,6 +75,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04 P04 | 40min | 3 tasks | 12 files |
 | Phase 04 P05 | 25min | 3 tasks | 7 files |
 | Phase 04 P06 | 20min | 2 tasks | 8 files |
+| Phase 04 P07 | 50min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,7 @@ Recent decisions affecting current work:
 - [Phase 04]: Chemins déclarés reconvertis et revalidés au lancement ; secrets MCP hors input.json
 - [Phase 04]: deskgate-bcf : stderr forcé en UTF-8 (page de code Windows)
 - [Phase 04]: 04-04 : NS du GUID v5 de groupe figé ; p1/p2 échangés avec a/b (p1 sur A vérifié)
+- [Phase 04]: Contexte gris BCF : arbre BREP natif + select_box (voie A du spike)
 
 ### Pending Todos
 
@@ -114,6 +116,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-20T16:16:40.426Z
-Stopped at: Completed 04-06-PLAN.md
+Last session: 2026-10-20T16:28:44.159Z
+Stopped at: Completed 04-07-PLAN.md
 Resume file: None
