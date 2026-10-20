@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
 stopped_at: Phase 3 context gathered
-last_updated: "2026-10-20T12:59:31.251Z"
+last_updated: "2026-10-20T13:09:17.369Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 5
@@ -80,6 +80,7 @@ Recent decisions affecting current work:
 - [Phase 01]: validate_artifact_path convertit le chemin hôte lexical, pas le résolu
 - [Phase 01]: Handlers API : cast() à la place de assert (ruff S101)
 - [Phase 02]: stop() de l'engine ne conclut jamais la tâche : recovery au redémarrage
+- [Phase 3]: Migration 2 additive : colonne callbacks.maybe_delivered (posée avant chaque envoi) pour distinguer delivered_duplicate d'abandoned_stale ; 401/404 exigent deux constats consécutifs avant abandon ; pas de dernier envoi après 24 h ; 413 : un renvoi minimal puis backoff ; jobs.callback_url purgée à l'état final du rappel — Recherche phase 3 (code n8n 2.43.8) ; questions ouvertes tranchées par ARTHEMIS, aucun utilisateur réel
 
 ### Pending Todos
 
