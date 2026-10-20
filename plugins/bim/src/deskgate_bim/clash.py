@@ -1,0 +1,249 @@
+# SPDX-License-Identifier: MIT
+"""Capacité ifc.clash : détection hard / clearance avec ifcclash (LGPL), sans export BCF."""
+
+from __future__ import annotations
+
+import json
+import logging
+import os
+import re
+import time
+from pathlib import Path
+from typing import Any
+
+import ifcopenshell
+import ifcopenshell.geom
+import ifcopenshell.util.selector as sel
+from ifcclash import ifcclash
+from lark.exceptions import LarkError
+
+from .grouping import build_groups, prepare
+from .params import ClashError, ClashParams, parse_params
+
+MEMORY_MESSAGE = "Mémoire insuffisante : réduisez la sélection ou augmentez memory_mb."
+DATA_MAX_BYTES = 900_000
+
+
+class _Progress:
+    """Progression bornée : écart d'au moins 1 % ou 0,5 s, jamais décroissante."""
+
+    def __init__(self, ctx: Any) -> None:
+        self.ctx = ctx
+        self.last_pct = -1.0
+        self.last_t = 0.0
+
+    def __call__(self, pct: float, message: str = "", *, force: bool = False) -> None:
+        pct = max(self.last_pct, min(100.0, float(pct)))
+        now = time.monotonic()
+        if not force and not (
+            pct - self.last_pct >= 1.0 or (pct > self.last_pct and now - self.last_t >= 0.5)
+        ):
+            return
+        self.last_pct, self.last_t = pct, now
+        self.ctx.progress(round(pct, 1), message)
+
+
+class DeskgateClasher(ifcclash.Clasher):
+    """Pré-résout les sélecteurs, ignore l'absence de géométrie, impose check_all=True."""
+
+    def __init__(self, num_threads: int, progress: _Progress) -> None:
+        settings = ifcclash.ClashSettings()
+        settings.logger = logging.getLogger("deskgate_bim.clash")
+        super().__init__(settings)
+        self.num_threads = num_threads
+        self.progress = progress
+        self.opened: dict[str, Any] = {}
+        self._added: set[tuple[int, int]] = set()
+        self.selected: dict[str, set[str]] = {}
+        self.found: dict[str, int] = {}
+        self.with_geom: dict[str, int] = {}
+        self._span: tuple[float, float] = (0.0, 45.0)
+
+    def load_ifc(self, path: str) -> Any:
+        return self.opened[path]
+
+    def add_collision_objects(self, name: str, ifc_file: Any, source: Any) -> None:
+        selector = source["selector"]
+        try:
+            found = set(sel.filter_elements(ifc_file, selector))
+        except (LarkError, re.error) as exc:
+            raise ClashError(
+                "invalid_selector", f"Sélecteur {name.upper()} invalide : {selector!r}"
+            ) from exc
+        with_geom = {e for e in found if getattr(e, "Representation", None) is not None}
+        self.found[name] = self.found.get(name, 0) + len(found)
+        self.with_geom[name] = self.with_geom.get(name, 0) + len(with_geom)
+        self.selected.setdefault(name, set()).update(e.GlobalId for e in with_geom)
+        if not with_geom:
+            return
+        fresh = {e for e in with_geom if (id(ifc_file), e.id()) not in self._added}
+        if fresh:
+            it = ifcopenshell.geom.iterator(
+                self.geom_settings, ifc_file, self.num_threads, include=fresh
+            )
+            if it.initialize():
+                lo, hi = self._span
+                while True:
+                    self.tree.add_element(it.get())  # pyright: ignore[reportOptionalMemberAccess]
+                    self.progress(lo + (hi - lo) * it.progress() / 100.0, f"géométrie {name}")
+                    if not it.next():
+                        break
+            self._added.update((id(ifc_file), e.id()) for e in fresh)
+        self.groups[name]["elements"].update({e.GlobalId: e for e in with_geom})
+
+    def process_clash_set(self, clash_set: Any) -> None:
+        self.tree = ifcopenshell.geom.tree(backend="opencascade.trianglebvh")
+        self.create_group("a")
+        self._span = (0.0, 45.0)
+        for src in clash_set["a"]:
+            src["ifc"] = self.load_ifc(src["file"])
+            self.add_collision_objects("a", src["ifc"], src)
+        self.progress(45, "géométrie A terminée", force=True)
+        other = "a"
+        if clash_set.get("b"):
+            self.create_group("b")
+            other = "b"
+            self._span = (45.0, 90.0)
+            for src in clash_set["b"]:
+                src["ifc"] = self.load_ifc(src["file"])
+                self.add_collision_objects("b", src["ifc"], src)
+        self.progress(90, "détection", force=True)
+        if not self.groups["a"]["elements"] or not self.groups[other]["elements"]:
+            clash_set["clashes"] = {}
+            return
+        a = list(self.groups["a"]["elements"].values())
+        b = list(self.groups[other]["elements"].values())
+        if clash_set["mode"] == "intersection":
+            results = self.tree.clash_intersection_many(  # pyright: ignore[reportOptionalMemberAccess]
+                a, b, tolerance=clash_set["tolerance"], check_all=True
+            )
+        else:
+            results = self.tree.clash_clearance_many(  # pyright: ignore[reportOptionalMemberAccess]
+                a, b, clearance=clash_set["clearance"], check_all=True
+            )
+        clash_set["clashes"] = {
+            f"{r.a.get_argument(0)}-{r.b.get_argument(0)}": {
+                "a_global_id": r.a.get_argument(0),
+                "b_global_id": r.b.get_argument(0),
+                "a_ifc_class": r.a.is_a(),
+                "b_ifc_class": r.b.is_a(),
+                "a_name": r.a.get_argument(2),
+                "b_name": r.b.get_argument(2),
+                "type": ifcopenshell.geom.tree.get_clash_type(r.clash_type),
+                "p1": list(r.p1),
+                "p2": list(r.p2),
+                "distance": r.distance,
+            }
+            for r in results
+        }
+
+
+def _open(path: str) -> Any:
+    if not os.path.isfile(path):
+        raise ClashError("ifc_not_found", f"Fichier IFC introuvable : {Path(path).name}")
+    try:
+        return ifcopenshell.open(path)
+    except MemoryError:
+        raise
+    except (ifcopenshell.Error, OSError, RuntimeError, ValueError) as exc:
+        raise ClashError(
+            "ifc_unreadable", f"Fichier IFC illisible : {Path(path).name} ({exc})"
+        ) from exc
+
+
+def _warning(name: str, selector: str, found: int, geom: int) -> tuple[str, dict[str, Any]]:
+    code = f"selection_{name}_empty"
+    msg = (
+        f"Sélection {name.upper()} vide pour {selector!r} : {found} élément(s) trouvé(s), "
+        f"{geom} avec géométrie."
+    )
+    return code, {"code": code, "message": msg}
+
+
+def _run(p: ClashParams, ctx: Any) -> dict[str, Any]:
+    progress = _Progress(ctx)
+    progress(0, "ouverture des fichiers", force=True)
+    threads = p.threads or int(ctx.settings.get("threads", 0)) or min(4, os.cpu_count() or 1)
+    clasher = DeskgateClasher(threads, progress)
+    for path in (p.ifc_a, p.ifc_b):
+        if path and path not in clasher.opened:
+            clasher.opened[path] = _open(path)
+    two_sides = p.ifc_b is not None or p.selector_b is not None
+    clash_set: dict[str, Any] = {
+        "name": "deskgate",
+        "mode": "intersection" if p.mode == "hard" else "clearance",
+        "tolerance" if p.mode == "hard" else "clearance": p.threshold,
+        "a": [{"file": p.ifc_a, "selector": p.selector_a}],
+        "b": (
+            [{"file": p.ifc_b or p.ifc_a, "selector": p.selector_b or p.selector_a}]
+            if two_sides
+            else []
+        ),
+    }
+    clasher.process_clash_set(clash_set)
+
+    warnings: list[str] = []
+    details: list[dict[str, Any]] = []
+    checks = [("a", p.selector_a)] + ([("b", p.selector_b or p.selector_a)] if two_sides else [])
+    for name, selector in checks:
+        if clasher.with_geom.get(name, 0) == 0:
+            code, detail = _warning(
+                name, selector, clasher.found.get(name, 0), clasher.with_geom.get(name, 0)
+            )
+            warnings.append(code)
+            details.append(detail)
+            ctx.log(detail["message"])
+
+    progress(90, "post-traitement", force=True)
+    sel_a = clasher.selected.get("a", set())
+    sel_b = clasher.selected.get("b", set()) if two_sides else sel_a
+    pairs = prepare(clash_set.get("clashes", {}).values(), sel_a, sel_b)
+    total = len(pairs)
+    truncated = total > p.max_clashes
+    pairs = pairs[: p.max_clashes]
+    groups = build_groups(pairs, p.group_radius, p.mode, p.threshold)
+    data: dict[str, Any] = {
+        "unit": "m",
+        "mode": p.mode,
+        "threshold": p.threshold,
+        "counts": {
+            "selection_a": len(sel_a),
+            "selection_b": len(sel_b),
+            "clashes": total,
+            "returned": len(pairs),
+            "groups": len(groups),
+        },
+        "truncated": truncated,
+        "groups": groups,
+    }
+    out = Path(ctx.work_dir) / "clashes.json"
+    out.write_text(json.dumps(data, ensure_ascii=False, sort_keys=True, indent=1), encoding="utf-8")
+    ctx.artifact(str(out), "clashes")
+    limit = int(ctx.settings.get("data_max_bytes", DATA_MAX_BYTES))
+    if len(json.dumps(data, ensure_ascii=False)) > limit:
+        for g in data["groups"]:
+            g["clashes"] = []
+        data["pairs_omitted"] = True
+        data["truncated"] = truncated = True
+        ctx.log("Résultat trop volumineux : paires omises, voir l'artefact clashes.json.")
+    progress(100, "terminé", force=True)
+    summary: dict[str, Any] = {
+        "clashes": total,
+        "groups": len(groups),
+        "truncated": truncated,
+        "warnings": warnings,
+        "warning_details": details,
+        "mode": p.mode,
+        "unit": "m",
+        "ifcopenshell": ifcopenshell.version,
+    }
+    summary["tolerance" if p.mode == "hard" else "clearance"] = p.threshold
+    return {"summary": summary, "data": data}
+
+
+def run(params: dict[str, Any], ctx: Any) -> dict[str, Any]:
+    p = parse_params(params)
+    try:
+        return _run(p, ctx)
+    except MemoryError:
+        raise ClashError("memory", MEMORY_MESSAGE) from None
