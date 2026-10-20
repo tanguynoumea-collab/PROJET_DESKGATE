@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-10-20T15:43:32.346Z"
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-10-20T15:49:21.452Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 29
-  completed_plans: 24
+  completed_plans: 25
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 4 (Capacités v0.1) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-10-20
 
@@ -71,6 +71,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03 P08 | 25min | 2 tasks | 2 files |
 | Phase 04 P01 | 25min | 3 tasks | 25 files |
 | Phase 04 P02 | 25min | 2 tasks | 15 files |
+| Phase 04 P03 | 30min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,7 @@ Recent decisions affecting current work:
 - [Phase 4]: Valeurs env des serveurs MCP transmises au worker par son environnement, jamais écrites dans input.json ; path_params déclarés par capacité, convertis et validés par le runner ; Capability.settings vers ctx.settings ; kind mcp ; rendu visuel BCF dans BIMcollab = vérification humaine différée (phase 5) — Recherche phase 4 ; input.json lisible par n8n via /data/travail
 - [Phase 04]: Echec de uv sync d'un plugin = pytest.fail, pas de skip silencieux
 - [Phase 04]: Chemins déclarés reconvertis et revalidés au lancement ; secrets MCP hors input.json
+- [Phase 04]: deskgate-bcf : stderr forcé en UTF-8 (page de code Windows)
 
 ### Pending Todos
 
@@ -108,6 +110,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-20T15:43:32.342Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-10-20T15:49:21.448Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None

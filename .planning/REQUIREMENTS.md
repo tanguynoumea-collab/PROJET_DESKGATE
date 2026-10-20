@@ -49,7 +49,7 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 - [ ] **CAP-02**: `ifc.clash` produit sur demande un BCF 2.1 avec deux points de vue par sujet (objets du conflit seuls ; contexte gris transparent), couleurs ARGB, sans sélection enregistrée
 - [ ] **CAP-03**: `ifc.clash` traite une sélection vide comme un succès à 0 conflit avec avertissement
 - [ ] **CAP-04**: La capacité `mcp.call` appelle un outil d'un serveur MCP stdio déclaré dans la configuration, sans LLM, dans le Job Object de la tâche, et renvoie son résultat
-- [ ] **CAP-05**: Le paquet `deskgate-bcf` (GPL-3) écrit un BCF 2.1 à partir d'un fichier JSON versionné, appelé en sous-processus ; aucun autre paquet n'importe `bcf-client` ni `deskgate-bcf` (vérifié par un test)
+- [x] **CAP-05**: Le paquet `deskgate-bcf` (GPL-3) écrit un BCF 2.1 à partir d'un fichier JSON versionné, appelé en sous-processus ; aucun autre paquet n'importe `bcf-client` ni `deskgate-bcf` (vérifié par un test)
 
 ### Installation et intégration
 
@@ -151,7 +151,7 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | CAP-02 | Phase 4 | Pending |
 | CAP-03 | Phase 4 | Pending |
 | CAP-04 | Phase 4 | Pending |
-| CAP-05 | Phase 4 | Pending |
+| CAP-05 | Phase 4 | Complete |
 | INS-01 | Phase 5 | Pending |
 | INS-02 | Phase 5 | Pending |
 | INS-03 | Phase 5 | Pending |

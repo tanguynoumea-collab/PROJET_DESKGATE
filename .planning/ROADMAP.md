@@ -97,7 +97,7 @@ Plans:
 Plans:
 - [x] 04-01-PLAN.md — Workspace uv, squelettes deskgate-bim / deskgate-bcf, contrat bcf-write-v1, garde-fous GPL (AST, licences, sdist)
 - [x] 04-02-PLAN.md — Cœur générique : settings, path_params, kind mcp et mcp_servers, ctx.settings, codes d'erreur des plugins
-- [ ] 04-03-PLAN.md — deskgate-bcf (GPL-3) : écriture BCF 2.1 à deux vues depuis le JSON du contrat, codes 0/2/3
+- [x] 04-03-PLAN.md — deskgate-bcf (GPL-3) : écriture BCF 2.1 à deux vues depuis le JSON du contrat, codes 0/2/3
 - [ ] 04-04-PLAN.md — ifc.clash : DeskgateClasher, modes hard/clearance, regroupement déterministe, sélection vide, erreurs classées
 - [ ] 04-05-PLAN.md — mcp.call : worker MCP stdio dans le Job Object, mini-serveur de test, arrêt de l'arbre, secrets hors disque
 - [ ] 04-06-PLAN.md — Classement memory_limit par le pic mémoire du Job Object
