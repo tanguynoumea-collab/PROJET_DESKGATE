@@ -106,6 +106,30 @@
       "source": "echange utilisateur 2026-10-20",
       "ref": "ROADMAP.md",
       "condition_levee": "cycle ulterieur"
+    },
+    {
+      "id": "council-capacites-toml",
+      "type": "decision",
+      "titre": "Capacites v0.1 declarees dans runner.toml [capabilities.*] plutot que codees en dur dans le coeur ?",
+      "gravite": "majeur",
+      "statut": "en_attente_decision",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-20",
+      "source": ".arthemis/reports/llm-council-1.md",
+      "ref": null,
+      "condition_levee": "reponse utilisateur avant plan de la phase 2"
+    },
+    {
+      "id": "council-une-fois",
+      "type": "decision",
+      "titre": "Reformuler le critere phase 3 une fois et une seule en au moins une fois + dedoublonnage n8n (409)",
+      "gravite": "mineur",
+      "statut": "en_attente_decision",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-20",
+      "source": ".arthemis/reports/llm-council-1.md",
+      "ref": null,
+      "condition_levee": "reponse utilisateur avant plan de la phase 3"
     }
   ],
   "livraisons": [],
