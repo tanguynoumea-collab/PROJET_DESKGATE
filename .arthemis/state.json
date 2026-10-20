@@ -5,7 +5,9 @@
     "type": "web_saas",
     "gate": [],
     "dir_audits": "audits/",
-    "fichiers_version": ["pyproject.toml"],
+    "fichiers_version": [
+      "pyproject.toml"
+    ],
     "roadmap_projet": "docs/passation/04-FEUILLE-DE-ROUTE.md"
   },
   "route": "full",
@@ -31,13 +33,48 @@
       "auto_advance": false
     }
   },
-  "iterations": { "cadrage_tours": 1, "design_review": 0, "audit_council": 0, "max": 3 },
+  "iterations": {
+    "cadrage_tours": 1,
+    "design_review": 0,
+    "audit_council": 0,
+    "max": 3
+  },
   "checkpoints": {
-    "cadrage": { "valide": false, "le": null, "commit": null, "preuve": null, "differe": false },
-    "plan_design": { "valide": false, "le": null, "commit": null, "preuve": null, "differe": false },
-    "triage": { "valide": false, "le": null, "commit": null, "preuve": null, "differe": false },
-    "go_publication": { "valide": false, "le": null, "commit": null, "preuve": null, "differe": false },
-    "roadmap": { "valide": false, "le": null, "commit": null, "preuve": null, "differe": false }
+    "cadrage": {
+      "valide": false,
+      "le": null,
+      "commit": null,
+      "preuve": null,
+      "differe": false
+    },
+    "plan_design": {
+      "valide": false,
+      "le": null,
+      "commit": null,
+      "preuve": null,
+      "differe": false
+    },
+    "triage": {
+      "valide": false,
+      "le": null,
+      "commit": null,
+      "preuve": null,
+      "differe": false
+    },
+    "go_publication": {
+      "valide": false,
+      "le": null,
+      "commit": null,
+      "preuve": null,
+      "differe": false
+    },
+    "roadmap": {
+      "valide": false,
+      "le": null,
+      "commit": null,
+      "preuve": null,
+      "differe": false
+    }
   },
   "items_ouverts": [
     {
@@ -67,7 +104,7 @@
     {
       "id": "v00-questions",
       "type": "decision",
-      "titre": "Questions 06 §3 : ODM, licence MIT/Apache, Hermes, source des depots, tableau de bord",
+      "titre": "Questions restantes : ODM (CLI/API, MCP stdio ou HTTP), licence MIT/Apache, emplacement de PROJET MCP",
       "gravite": "majeur",
       "statut": "en_attente_decision",
       "proprietaire": "humain",
@@ -87,12 +124,29 @@
       "source": "docs/passation/00-LISEZ-MOI.md",
       "ref": null,
       "condition_levee": "checkpoints.cadrage date"
+    },
+    {
+      "id": "perim-mcp-serveur",
+      "type": "decision",
+      "titre": "Exposer Deskgate comme serveur MCP (appel direct par un agent, sans n8n) : hors perimetre ?",
+      "gravite": "majeur",
+      "statut": "en_attente_decision",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-20",
+      "source": "echange utilisateur 2026-10-20",
+      "ref": null,
+      "condition_levee": "reponse utilisateur"
     }
   ],
   "livraisons": [],
   "dod": null,
   "phases_sautees": [
-    { "phase": "ROADMAP", "motif": "feuille de route fournie par la passation ; project-coding-prep saute (choix utilisateur)", "le": "2026-10-20", "cycle": 1 }
+    {
+      "phase": "ROADMAP",
+      "motif": "feuille de route fournie par la passation ; project-coding-prep saute (choix utilisateur)",
+      "le": "2026-10-20",
+      "cycle": 1
+    }
   ],
   "horizon": null,
   "pending_bloquant": null,
@@ -106,16 +160,33 @@
         "stade": "nouveau projet, aucun utilisateur",
         "source": "docs/passation/02-DECISIONS.md"
       },
-      "impact_donnees": { "migration": false, "destructive": false, "reversible_structure": null, "reversible_donnees": null, "utilisateurs_reels_concernes": false },
+      "impact_donnees": {
+        "migration": false,
+        "destructive": false,
+        "reversible_structure": null,
+        "reversible_donnees": null,
+        "utilisateurs_reels_concernes": false
+      },
       "environnements": [],
       "exploitation": {
         "dernier_deploiement": null,
-        "plan_retour_arriere": { "annulation_code": null, "code_avant_compatible_base_apres": null, "sort_des_donnees_ecrites": null, "signal_de_declenchement": null },
+        "plan_retour_arriere": {
+          "annulation_code": null,
+          "code_avant_compatible_base_apres": null,
+          "sort_des_donnees_ecrites": null,
+          "signal_de_declenchement": null
+        },
         "migrations_appliquees": [],
-        "verification_11a": { "le": null, "resultat": null },
+        "verification_11a": {
+          "le": null,
+          "resultat": null
+        },
         "collecte_due": false
       }
     }
   },
-  "maj": { "le": "2026-10-20", "commit": null }
+  "maj": {
+    "le": "2026-10-20",
+    "commit": null
+  }
 }
