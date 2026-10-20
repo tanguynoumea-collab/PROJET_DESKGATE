@@ -69,3 +69,19 @@ def test_aucun_shell_true() -> None:
             ):
                 offenders.append(py)
     assert not offenders, offenders
+
+
+def _importeurs(module: str) -> set[str]:
+    return {py.name for py in SRC.rglob("*.py") if module in set(_imports(py))}
+
+
+def test_ctypes_seulement_dans_jobobject() -> None:
+    assert _importeurs("ctypes") <= {"jobobject.py", "instance.py"}
+
+
+def test_sqlite3_seulement_dans_store() -> None:
+    assert _importeurs("sqlite3") <= {"store.py"}
+
+
+def test_subprocess_seulement_dans_jobobject() -> None:
+    assert _importeurs("subprocess") <= {"jobobject.py"}

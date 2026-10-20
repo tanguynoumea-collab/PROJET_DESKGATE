@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
-import time
 from pathlib import Path
 
 import pytest
+
+from _support.procs import is_alive, wait_dead
+from deskgate.core.env import build_env
+from deskgate.jobobject import create_job, spawn_in_job
 
 pytestmark = [
     pytest.mark.proc,
@@ -23,47 +27,32 @@ os._exit(0)
 """
 
 
-def _wait_dead(pid: int, delai: float = 5.0) -> bool:
-    from _support.winjob import is_alive
-
-    fin = time.monotonic() + delai
-    while time.monotonic() < fin:
-        if not is_alive(pid):
-            return True
-        time.sleep(0.1)
-    return not is_alive(pid)
-
-
 def _scenario(tmp_path: Path, tuer: str) -> None:
-    from _support.winjob import (
-        create_kill_on_close_job,
-        is_alive,
-        k32,
-        spawn_in_job,
-    )
-
     parent = tmp_path / "parent.py"
     parent.write_text(PARENT, encoding="utf-8")
     pidfile = tmp_path / "pid.txt"
-    job = create_kill_on_close_job()
+    job = create_job()
     pid = 0
-    closed = False
     try:
-        p = spawn_in_job(job, [sys.executable, str(parent), str(pidfile)])
+        p = spawn_in_job(
+            job,
+            [sys.executable, str(parent), str(pidfile)],
+            cwd=str(tmp_path),
+            log_path=str(tmp_path / "job.log"),
+            env=build_env(os.environ),
+        )
         p.wait(30)
         pid = int(pidfile.read_text(encoding="utf-8"))
         assert is_alive(pid)  # l'orphelin survit à son parent
         if tuer == "terminate":
-            assert k32.TerminateJobObject(job, 1)
+            job.terminate()
         else:
-            assert k32.CloseHandle(job)
-            closed = True
-        assert _wait_dead(pid)
+            job.close()
+        assert wait_dead(pid)
     finally:
         if pid and is_alive(pid):
             subprocess.run(["taskkill", "/F", "/T", "/PID", str(pid)], capture_output=True)
-        if not closed:
-            k32.CloseHandle(job)
+        job.close()
 
 
 @pytest.mark.timeout(90)
