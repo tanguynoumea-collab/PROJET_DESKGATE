@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-10-20T11:41:57.971Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-10-20T11:44:14.405Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 1 (Fondations testables) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-10-20
 
@@ -48,6 +48,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 01 P01 | 25min | 3 tasks | 13 files |
+| Phase 01 P02 | 15min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,7 @@ Recent decisions affecting current work:
 - [Phase 2]: Migration 1 complète en phase 2 (tables callbacks et audit) ; la phase 3 livre envoi, politique, plafond, masquage et contenu complet de l'audit — La recovery JOB-06 insère le rappel dans la transaction terminale ; validé par l'utilisateur
 - [Phase 3]: Rappel garanti au moins une fois ; n8n ne reprend qu'une fois, un doublon reçoit 409 tracé delivered_duplicate (remplace « une fois et une seule ») — Exactement-une-fois impossible côté runner ; validé par l'utilisateur
 - [Phase 01]: ruff exclut .planning/.arthemis/.claude/docs (ruff 0.17 formate le Markdown)
+- [Phase 01]: validate_artifact_path convertit le chemin hôte lexical, pas le résolu
 
 ### Pending Todos
 
@@ -76,6 +78,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-20T11:41:57.967Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-10-20T11:44:14.401Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None

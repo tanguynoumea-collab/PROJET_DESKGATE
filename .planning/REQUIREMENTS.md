@@ -18,8 +18,8 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 
 - [ ] **SEC-01**: Toute route sauf `/health` refuse une requête sans jeton Bearer valide (401) ; le jeton est stocké haché
 - [ ] **SEC-02**: Le runner refuse une requête dont l'en-tête `Host` n'est pas `127.0.0.1`, `localhost` ou `host.docker.internal`
-- [ ] **SEC-03**: Un chemin `/data/...` est converti en `C:/BIM/...` (et inversement pour les artefacts renvoyés)
-- [ ] **SEC-04**: Un chemin hors des racines autorisées est refusé, y compris via `..`, lien symbolique, jonction, chemin UNC, préfixe de segment (`C:/BIM2`), nom réservé ou flux alternatif
+- [x] **SEC-03**: Un chemin `/data/...` est converti en `C:/BIM/...` (et inversement pour les artefacts renvoyés)
+- [x] **SEC-04**: Un chemin hors des racines autorisées est refusé, y compris via `..`, lien symbolique, jonction, chemin UNC, préfixe de segment (`C:/BIM2`), nom réservé ou flux alternatif
 - [ ] **SEC-05**: La `signature` de la `resumeUrl` n'apparaît dans aucun journal, aucune réponse d'API ni l'audit
 - [ ] **SEC-06**: Chaque soumission, refus, fin de tâche et rappel est inscrit dans un journal d'audit local (client, capacité, paramètres sans secrets, début, fin, statut, durée)
 
@@ -129,8 +129,8 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | RUN-04 | Phase 1 | Pending |
 | SEC-01 | Phase 1 | Pending |
 | SEC-02 | Phase 1 | Pending |
-| SEC-03 | Phase 1 | Pending |
-| SEC-04 | Phase 1 | Pending |
+| SEC-03 | Phase 1 | Complete |
+| SEC-04 | Phase 1 | Complete |
 | JOB-01 | Phase 2 | Pending |
 | JOB-02 | Phase 2 | Pending |
 | JOB-03 | Phase 2 | Pending |
