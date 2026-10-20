@@ -15,3 +15,4 @@
 {"ts":"2026-10-20T19:00:00","type":"rapport","ref":".planning/phases/01-fondations-testables","commit":"c772bff","note":"phase 1 planifiee : 5 plans autonomes, horizon nul, plan-checker passe"}
 {"ts":"2026-10-20T21:00:00","type":"gate","ref":".arthemis/reports/gate-1-01.log","commit":"df62a7a","note":"gate D-12 vert apres phase 1 : 7/7 commandes, 159+8 tests, 1 skip symlink"}
 {"ts":"2026-10-20T21:00:00","type":"rapport","ref":".planning/phases/01-fondations-testables/01-VERIFICATION.md","commit":"df62a7a","note":"phase 1 human_needed, 4/4, verification humaine 01-D1 differee"}
+{"ts":"2026-10-20T23:00:00","type":"rapport","ref":".planning/phases/02-c-ur-d-ex-cution","commit":"3345f4c","note":"phase 2 planifiee : 9 plans autonomes en 4 vagues, horizon nul, plan-checker passe"}
