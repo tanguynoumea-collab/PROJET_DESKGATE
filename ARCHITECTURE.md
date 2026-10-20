@@ -141,7 +141,9 @@ requires:
 idempotent: true
 ```
 
-En v0.1, les capacités sont codées en dur ; le format de manifeste arrive en v0.2.
+En v0.1, les capacités sont déclarées dans `runner.toml` (`[capabilities.<id>]` : `kind`, `python`,
+`entry`, `timeout_max`, `resource`), validées par Pydantic ; le cœur ne contient aucun nom BIM. Le
+format `plugin.yaml` arrive en v0.2.
 
 ## 6. Protocole HTTP
 
