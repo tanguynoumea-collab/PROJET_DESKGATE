@@ -181,6 +181,8 @@ class FakeJob:
         self.terminated = 0
         self.closed = 0
         self.active = 0
+        self.peak = 0
+        self.peak_error = False
 
     def terminate(self, exit_code: int = 1) -> None:
         self.terminated += 1
@@ -189,6 +191,11 @@ class FakeJob:
 
     def active_processes(self) -> int:
         return self.active
+
+    def peak_memory(self) -> int:
+        if self.peak_error:
+            raise OSError("pic illisible")
+        return self.peak
 
     def close(self) -> None:
         self.closed += 1

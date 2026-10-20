@@ -13,11 +13,15 @@ INVALID_RESULT = "invalid_result"
 RESULT_TOO_LARGE = "result_too_large"
 ARTIFACT_OUTSIDE_ROOTS = "artifact_outside_roots"
 PLUGIN_ERROR = "plugin_error"
+MEMORY_LIMIT = "memory_limit"
 SPAWN_FAILED = "spawn_failed"
 ENGINE_ERROR = "engine_error"
 RUNNER_RESTARTED = "runner_restarted"
 TIMEOUT_CODE = "timeout"
 CANCELLED_CODE = "cancelled"
+
+MEMORY_RATIO = 0.95
+_MEMORY_CODES = (PLUGIN_ERROR, NONZERO_EXIT, MISSING_RESULT, INVALID_RESULT)
 
 RESTART_MESSAGE = "Runner redémarré pendant l'exécution."
 
@@ -33,8 +37,36 @@ def _failed(code: str, message: str) -> Verdict:
     return Verdict(FAILED, code, message)
 
 
-def verdict(*, exit_code: int, result_state: ResultState, artifacts_ok: bool) -> Verdict:
-    """Verdict d'un processus sorti sans annulation."""
+def memory_exhausted(peak_bytes: int | None, memory_mb: int | None) -> bool:
+    """Vrai si le pic mémoire du Job atteint au moins 95 % du plafond `memory_mb`."""
+    if peak_bytes is None or memory_mb is None:
+        return False
+    return peak_bytes >= MEMORY_RATIO * memory_mb * 1024 * 1024
+
+
+def verdict(
+    *,
+    exit_code: int,
+    result_state: ResultState,
+    artifacts_ok: bool,
+    memory_limit_mb: int | None = None,
+) -> Verdict:
+    """Verdict d'un processus sorti sans annulation.
+
+    `memory_limit_mb` ne doit être passé par l'appelant que si `memory_exhausted(...)` est
+    vrai : un échec est alors requalifié `memory_limit` ; un succès ne l'est jamais.
+    """
+    base = _base_verdict(exit_code, result_state, artifacts_ok)
+    if memory_limit_mb is not None and base.status == FAILED and base.error_code in _MEMORY_CODES:
+        return _failed(
+            MEMORY_LIMIT,
+            f"Plafond mémoire atteint ({memory_limit_mb} Mo) : "
+            "augmentez memory_mb de la capacité ou réduisez la sélection.",
+        )
+    return base
+
+
+def _base_verdict(exit_code: int, result_state: ResultState, artifacts_ok: bool) -> Verdict:
     if result_state == "plugin_error":
         return _failed(PLUGIN_ERROR, "Le plugin a signalé une erreur.")
     if result_state == "too_large":

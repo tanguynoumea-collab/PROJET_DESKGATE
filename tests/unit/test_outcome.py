@@ -4,7 +4,13 @@ from __future__ import annotations
 
 import pytest
 
-from deskgate.core.outcome import RESTART_MESSAGE, Verdict, kill_verdict, verdict
+from deskgate.core.outcome import (
+    RESTART_MESSAGE,
+    Verdict,
+    kill_verdict,
+    memory_exhausted,
+    verdict,
+)
 from deskgate.core.worker_protocol import ResultState
 
 pytestmark = pytest.mark.unit
@@ -46,3 +52,30 @@ def test_kill_verdict_rejects_other() -> None:
 
 def test_restart_message() -> None:
     assert RESTART_MESSAGE == "Runner redémarré pendant l'exécution."
+
+
+MO = 2**20
+
+
+def test_memory_exhausted_seuil() -> None:
+    assert not memory_exhausted(None, 200)
+    assert not memory_exhausted(190 * MO, None)
+    assert memory_exhausted(190 * MO, 200)
+    assert not memory_exhausted(150 * MO, 200)
+
+
+@pytest.mark.parametrize(
+    ("exit_code", "state"),
+    [(3221225477, "missing"), (1, "plugin_error"), (1, "invalid"), (1, "valid")],
+)
+def test_verdict_memory_limit(exit_code: int, state: ResultState) -> None:
+    v = verdict(exit_code=exit_code, result_state=state, artifacts_ok=True, memory_limit_mb=200)
+    assert (v.status, v.error_code) == ("failed", "memory_limit")
+    assert v.error_message is not None
+    assert "200 Mo" in v.error_message
+    assert "memory_mb" in v.error_message
+
+
+def test_verdict_memory_limit_ne_requalifie_pas_un_succes() -> None:
+    v = verdict(exit_code=0, result_state="valid", artifacts_ok=True, memory_limit_mb=200)
+    assert v.status == "succeeded"

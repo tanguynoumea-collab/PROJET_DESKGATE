@@ -25,10 +25,12 @@ from deskgate.core.config import RunnerConfig
 from deskgate.core.env import build_env, mcp_env_var
 from deskgate.core.outcome import (
     ENGINE_ERROR,
+    MEMORY_LIMIT,
     PLUGIN_ERROR,
     SPAWN_FAILED,
     Verdict,
     kill_verdict,
+    memory_exhausted,
     verdict,
 )
 from deskgate.core.paths import (
@@ -88,6 +90,8 @@ class JobLike(Protocol):
 
     def active_processes(self) -> int: ...
 
+    def peak_memory(self) -> int: ...
+
     def close(self) -> None: ...
 
 
@@ -119,6 +123,7 @@ class _Running:
     deadline: float
     cancel_sent_at: float | None = None
     events_off: int = 0
+    memory_mb: int | None = None
 
 
 MCP_ENTRY = "deskgate.workers.mcp_call:run"
@@ -311,6 +316,7 @@ class Engine:
             job=job,
             proc=proc,
             deadline=self._clock() + row.timeout_s,
+            memory_mb=cap.memory_mb,
         )
 
     # ------------------------------------------------------------ observation
@@ -358,15 +364,27 @@ class Engine:
                 raise RuntimeError("décision d'arrêt sans statut")
             self._conclude(conn, cur, kill_verdict(decision.status), None)
             return
-        # "exited" : nettoyage systématique des orphelins, puis verdict.
+        # "exited" : pic mémoire lu avant de tuer le Job, nettoyage des orphelins, puis verdict.
+        peak = self._peak(cur)
         self._reap(cur)
         if decision.status == CANCELLED:
             self._conclude(conn, cur, kill_verdict(CANCELLED), None)
             return
         if rc is None:
             raise RuntimeError("sortie sans code de retour")
-        outcome, result_json = self._evaluate(cur, rc)
+        outcome, result_json = self._evaluate(cur, rc, peak)
         self._conclude(conn, cur, outcome, result_json)
+
+    def _peak(self, cur: _Running) -> int | None:
+        if cur.memory_mb is None:
+            return None
+        try:
+            return cur.job.peak_memory()
+        except Exception as exc:
+            logger.warning(
+                "Pic mémoire illisible pour la tâche %s : %s.", cur.job_id, type(exc).__name__
+            )
+            return None
 
     def _reap(self, cur: _Running) -> None:
         cur.job.terminate(1)
@@ -394,7 +412,9 @@ class Engine:
         if last is not None:
             store.update_progress(conn, cur.job_id, last.pct, last.message)
 
-    def _evaluate(self, cur: _Running, rc: int) -> tuple[Verdict, str | None]:
+    def _evaluate(
+        self, cur: _Running, rc: int, peak: int | None = None
+    ) -> tuple[Verdict, str | None]:
         try:
             with open(cur.work_dir / "result.json", "rb") as f:
                 raw: bytes | None = f.read(RESULT_MAX_BYTES + 1)
@@ -417,9 +437,17 @@ class Engine:
                     artifacts_ok = False
                     break
                 artifacts.append({"kind": art.kind, "path": container})
-        outcome = verdict(exit_code=rc, result_state=state, artifacts_ok=artifacts_ok)
+        outcome = verdict(
+            exit_code=rc,
+            result_state=state,
+            artifacts_ok=artifacts_ok,
+            memory_limit_mb=cur.memory_mb if memory_exhausted(peak, cur.memory_mb) else None,
+        )
         if isinstance(parsed, ResultError) and outcome.error_code == PLUGIN_ERROR:
             message = f"{parsed.error.type} : {parsed.error.message}"[:2000]
+            outcome = Verdict(outcome.status, outcome.error_code, message)
+        elif isinstance(parsed, ResultError) and outcome.error_code == MEMORY_LIMIT:
+            message = f"{outcome.error_message} (plugin : {parsed.error.type})"[:2000]
             outcome = Verdict(outcome.status, outcome.error_code, message)
         result_json: str | None = None
         if outcome.status == SUCCEEDED and isinstance(parsed, ResultOk):

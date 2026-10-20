@@ -132,6 +132,19 @@ class JobHandle:
             raise ctypes.WinError(ctypes.get_last_error())
         return int(info.ActiveProcesses)
 
+    def peak_memory(self) -> int:
+        """Pic de mémoire (octets) de l'ensemble du Job (`PeakJobMemoryUsed`)."""
+        info = JOBOBJECT_EXTENDED_LIMIT_INFORMATION()
+        if not k32.QueryInformationJobObject(
+            self.handle,
+            JobObjectExtendedLimitInformation,
+            ctypes.byref(info),
+            ctypes.sizeof(info),
+            None,
+        ):
+            raise ctypes.WinError(ctypes.get_last_error())
+        return int(info.PeakJobMemoryUsed)
+
     def close(self) -> None:
         if self._handle is None:
             return
