@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 02-05-PLAN.md
-last_updated: "2026-10-20T12:37:07.208Z"
+stopped_at: Completed 02-06-PLAN.md
+last_updated: "2026-10-20T12:40:49.565Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 14
-  completed_plans: 10
+  completed_plans: 11
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 2 (Cœur d'exécution) — EXECUTING
-Plan: 6 of 9
+Plan: 7 of 9
 Status: Ready to execute
 Last activity: 2026-10-20
 
@@ -57,6 +57,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02 P03 | 15min | 2 tasks | 6 files |
 | Phase 02 P04 | 15min | 2 tasks | 8 files |
 | Phase 02 P05 | 10min | 2 tasks | 7 files |
+| Phase 02 P06 | 25min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,7 @@ Recent decisions affecting current work:
 - [Phase 01]: ruff exclut .planning/.arthemis/.claude/docs (ruff 0.17 formate le Markdown)
 - [Phase 01]: validate_artifact_path convertit le chemin hôte lexical, pas le résolu
 - [Phase 01]: Handlers API : cast() à la place de assert (ruff S101)
+- [Phase 02]: stop() de l'engine ne conclut jamais la tâche : recovery au redémarrage
 
 ### Pending Todos
 
@@ -87,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-20T12:37:07.204Z
-Stopped at: Completed 02-05-PLAN.md
+Last session: 2026-10-20T12:40:49.561Z
+Stopped at: Completed 02-06-PLAN.md
 Resume file: None
