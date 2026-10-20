@@ -1,0 +1,158 @@
+"""Service des tâches : soumission, lecture, annulation, journaux.
+
+Une connexion SQLite par appel (les routes sont synchrones, exécutées dans un thread).
+La resumeUrl (`callback_url`) est stockée brute et n'est jamais renvoyée (règle 6, D-13).
+"""
+
+from __future__ import annotations
+
+import json
+from collections.abc import Callable
+from contextlib import closing
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+from deskgate import store
+from deskgate.core.config import RunnerConfig
+from deskgate.core.errors import CAPABILITY_NOT_FOUND, IDEMPOTENCY_CONFLICT
+from deskgate.core.jobspec import (
+    JobRequestError,
+    SubmitRequest,
+    is_valid_job_id,
+    new_job_id,
+    resolve_timeout,
+    work_dir_for,
+)
+from deskgate.core.redact import redact_signature
+from deskgate.core.states import TERMINAL
+from deskgate.store import IdempotencyConflict, JobRow
+
+LOG_LIMIT_DEFAULT = 65_536
+LOG_LIMIT_MAX = 1_048_576
+
+
+def _duration(started: str | None, finished: str | None) -> float | None:
+    if started is None or finished is None:
+        return None
+    delta = datetime.fromisoformat(finished) - datetime.fromisoformat(started)
+    return round(delta.total_seconds(), 3)
+
+
+def job_view(row: JobRow) -> dict[str, Any]:
+    """Vue publique d'une tâche : sans callback, paramètres ni chemin hôte."""
+    result: dict[str, Any] = json.loads(row.result_json) if row.result_json else {}
+    progress: dict[str, Any] | None = None
+    if row.progress_pct is not None or row.progress_message is not None:
+        progress = {"pct": row.progress_pct, "message": row.progress_message}
+    error: dict[str, str | None] | None = None
+    if row.error_code is not None:
+        error = {"code": row.error_code, "message": row.error_message}
+    return {
+        "job_id": row.id,
+        "capability": row.capability,
+        "status": row.status,
+        "cancel_requested": row.cancel_requested,
+        "progress": progress,
+        "summary": result.get("summary", {}),
+        "artifacts": result.get("artifacts", []),
+        "error": error,
+        "created_at": row.created_at,
+        "started_at": row.started_at,
+        "finished_at": row.finished_at,
+        "duration_s": _duration(row.started_at, row.finished_at),
+    }
+
+
+class JobsService:
+    def __init__(
+        self,
+        *,
+        db_path: Path,
+        config: RunnerConfig,
+        wake: Callable[[], None] = lambda: None,
+    ) -> None:
+        self._db = db_path
+        self._config = config
+        self._wake = wake
+
+    def submit(self, req: SubmitRequest) -> str:
+        cap = self._config.capabilities.get(req.capability)
+        if cap is None:
+            raise JobRequestError(CAPABILITY_NOT_FOUND, "Capacité inconnue.", 404)
+        timeout_s = resolve_timeout(req.timeout, cap.timeout_max)
+        job_id = new_job_id()
+        try:
+            with closing(store.connect(self._db)) as conn:
+                store.insert_job(
+                    conn,
+                    job_id=job_id,
+                    capability=req.capability,
+                    params_json=json.dumps(req.params, ensure_ascii=False),
+                    timeout_s=timeout_s,
+                    resource=cap.resource,
+                    idempotency_key=req.idempotency_key,
+                    callback_url=req.callback.url,
+                    work_dir=work_dir_for(self._config.effective_work_root(), job_id),
+                )
+        except IdempotencyConflict as exc:
+            raise JobRequestError(
+                IDEMPOTENCY_CONFLICT,
+                "Une tâche avec cette clé d'idempotence est déjà en file ou en cours.",
+                409,
+                job_id=exc.existing_job_id,
+            ) from None
+        self._wake()
+        return job_id
+
+    def get(self, job_id: str) -> dict[str, Any] | None:
+        if not is_valid_job_id(job_id):
+            return None
+        with closing(store.connect(self._db)) as conn:
+            row = store.get_job(conn, job_id)
+        return None if row is None else job_view(row)
+
+    def cancel(self, job_id: str) -> dict[str, Any] | None:
+        if not is_valid_job_id(job_id):
+            return None
+        with closing(store.connect(self._db)) as conn:
+            row = store.request_cancel(conn, job_id)
+        if row is None:
+            return None
+        if row.status == "running":
+            self._wake()
+        return job_view(row)
+
+    def read_logs(
+        self,
+        job_id: str,
+        *,
+        offset: int | None = None,
+        limit: int = LOG_LIMIT_DEFAULT,
+        tail: int | None = None,
+    ) -> dict[str, Any] | None:
+        if not is_valid_job_id(job_id):
+            return None
+        with closing(store.connect(self._db)) as conn:
+            row = store.get_job(conn, job_id)
+        if row is None:
+            return None
+        limit = max(1, min(limit, LOG_LIMIT_MAX))
+        path = Path(row.work_dir) / "job.log"
+        try:
+            size = path.stat().st_size
+        except OSError:
+            return {"text": "", "offset": 0, "next_offset": 0, "size": 0, "complete": False}
+        start = max(0, size - tail) if tail is not None else (offset or 0)
+        length = tail if tail is not None else limit
+        with path.open("rb") as fh:
+            fh.seek(start)
+            data = fh.read(max(0, length))
+        next_offset = start + len(data)
+        return {
+            "text": redact_signature(data.decode("utf-8", errors="replace")),
+            "offset": start,
+            "next_offset": next_offset,
+            "size": size,
+            "complete": row.status in TERMINAL and next_offset >= size,
+        }

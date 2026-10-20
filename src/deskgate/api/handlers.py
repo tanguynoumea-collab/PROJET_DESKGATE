@@ -17,6 +17,7 @@ from deskgate.core.errors import (
     error_body,
     http_code,
 )
+from deskgate.core.jobspec import JobRequestError
 
 _log = logging.getLogger("deskgate.api")
 
@@ -56,6 +57,11 @@ async def _validation(request: Request, exc: Exception) -> JSONResponse:
     )
 
 
+async def _job_request(request: Request, exc: Exception) -> JSONResponse:
+    exc = cast(JobRequestError, exc)
+    return JSONResponse(error_body(exc.code, exc.message, **exc.extra), status_code=exc.status)
+
+
 async def _unexpected(request: Request, exc: Exception) -> JSONResponse:
     _log.error("Erreur interne non gérée", exc_info=exc)
     return JSONResponse(error_body(INTERNAL_ERROR, HTTP_MESSAGES_FR[500]), status_code=500)
@@ -65,4 +71,5 @@ def install_handlers(app: FastAPI) -> None:
     """Enregistre les gestionnaires 4xx/5xx au format D-08."""
     app.add_exception_handler(StarletteHTTPException, _http_exception)
     app.add_exception_handler(RequestValidationError, _validation)
+    app.add_exception_handler(JobRequestError, _job_request)
     app.add_exception_handler(Exception, _unexpected)
