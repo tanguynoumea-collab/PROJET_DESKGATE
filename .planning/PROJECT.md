@@ -19,11 +19,10 @@ soit le résultat (succès, échec, délai dépassé, annulation, redémarrage d
 
 - ✓ Runner sur 127.0.0.1, configuration typée `runner.toml`, jeton Bearer haché, contrôle Host, instance unique, `/health`, chemins `/data` ↔ `C:/BIM` avec refus hors racines — Validated in Phase 1: Fondations testables
 - ✓ File SQLite persistante, `POST/GET /jobs`, `/logs`, `/cancel`, exécution une à la fois dans un Job Object, délai avec arbre tué, `interrupted` après arrêt brutal, idempotence minimale — Validated in Phase 2: Cœur d'exécution
+- ✓ Rappel vers la `resumeUrl` (au moins une fois, outbox durable, politique n8n 2.43.8, plafond 1 Mio, hôtes autorisés, signature masquée partout, audit complet) — Validated in Phase 3: Rappel fiable
 
 ### Active
 
-- [ ] Soumission asynchrone (`POST /jobs` → 202) et rappel vers la `resumeUrl` n8n avec réessais
-- [ ] Rappel envoyé pour les tâches `interrupted` au redémarrage (transition faite en phase 2)
 - [ ] Capacités v0.1 : `ifc.clash` et `mcp.call` (outil d'un serveur MCP stdio)
 - [ ] Paquet `deskgate-bcf` (GPL-3, sur `bcf-client`) appelé en sous-processus pour écrire le BCF 2.1
 - [ ] `deskgate init` et démarrage à l'ouverture de session (Planificateur de tâches)
@@ -110,4 +109,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-20 after Phase 2*
+*Last updated: 2026-10-20 after Phase 3*
