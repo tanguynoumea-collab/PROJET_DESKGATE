@@ -105,3 +105,18 @@ class _CodeError(Exception):
 
 def fail_code(params: dict[str, Any], ctx: Any) -> dict[str, Any]:
     raise _CodeError("échec classé")
+
+
+def hog(params: dict[str, Any], ctx: Any) -> dict[str, Any]:
+    """Alloue des blocs de 1 Mio jusqu'à `stop_mb` ou jusqu'à MemoryError (plafond du Job)."""
+    stop_mb = params.get("stop_mb")
+    blocks: list[bytearray] = []
+    try:
+        while stop_mb is None or len(blocks) < int(stop_mb):
+            blocks.append(bytearray(1 << 20))
+    except MemoryError:
+        blocks.clear()
+        if params.get("crash"):
+            os._exit(3221225477)
+        raise
+    return {"summary": {"mb": len(blocks)}}
