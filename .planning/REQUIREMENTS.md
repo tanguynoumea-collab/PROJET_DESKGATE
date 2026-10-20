@@ -109,12 +109,48 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| RUN-01 | Phase 1 | Pending |
+| RUN-02 | Phase 1 | Pending |
+| RUN-03 | Phase 1 | Pending |
+| RUN-04 | Phase 1 | Pending |
+| SEC-01 | Phase 1 | Pending |
+| SEC-02 | Phase 1 | Pending |
+| SEC-03 | Phase 1 | Pending |
+| SEC-04 | Phase 1 | Pending |
+| JOB-01 | Phase 2 | Pending |
+| JOB-02 | Phase 2 | Pending |
+| JOB-03 | Phase 2 | Pending |
+| JOB-04 | Phase 2 | Pending |
+| JOB-05 | Phase 2 | Pending |
+| JOB-06 | Phase 2 | Pending |
+| JOB-07 | Phase 2 | Pending |
+| JOB-08 | Phase 2 | Pending |
+| JOB-09 | Phase 2 | Pending |
+| CB-01 | Phase 3 | Pending |
+| CB-02 | Phase 3 | Pending |
+| CB-03 | Phase 3 | Pending |
+| CB-04 | Phase 3 | Pending |
+| CB-05 | Phase 3 | Pending |
+| SEC-05 | Phase 3 | Pending |
+| SEC-06 | Phase 3 | Pending |
+| CAP-01 | Phase 4 | Pending |
+| CAP-02 | Phase 4 | Pending |
+| CAP-03 | Phase 4 | Pending |
+| CAP-04 | Phase 4 | Pending |
+| CAP-05 | Phase 4 | Pending |
+| INS-01 | Phase 5 | Pending |
+| INS-02 | Phase 5 | Pending |
+| INS-03 | Phase 5 | Pending |
+| INS-04 | Phase 5 | Pending |
+| INS-05 | Phase 5 | Pending |
+| ACC-01 | Phase 5 | Pending |
+| ACC-02 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 37 total
-- Mapped to phases: 0
-- Unmapped: 37 ⚠️
+- v1 requirements: 36 total
+- Mapped to phases: 36
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-20*
-*Last updated: 2026-10-20 after initial definition*
+*Last updated: 2026-10-20 after roadmap creation (traceability, count fixed to 36)*

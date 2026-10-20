@@ -1,0 +1,86 @@
+# Feuille de route : Deskgate
+
+## Vue d'ensemble
+
+Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection de conflits IFC réelle. Le noyau générique (sécurité, file SQLite, Job Object, rappel durable) est validé avec un faux plugin avant d'y brancher `ifc.clash` et `mcp.call`, puis intégré à n8n depuis la tâche planifiée. La feuille de route produit (v0.1 à v0.4) reste dans `ROADMAP.md` à la racine.
+
+## Phases
+
+- [ ] **Phase 1 : Fondations testables** - Runner local sécurisé : configuration, jeton, contrôle Host, chemins, instance unique, `/health`
+- [ ] **Phase 2 : Cœur d'exécution** - File SQLite, exécution en Job Object, API des tâches, délai, annulation, reprise après redémarrage
+- [ ] **Phase 3 : Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit
+- [ ] **Phase 4 : Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call`
+- [ ] **Phase 5 : Installation et intégration n8n** - `deskgate init`, tâche planifiée, docker-compose n8n, workflow d'exemple, acceptation
+
+## Détail des phases
+
+### Phase 1 : Fondations testables
+**Goal**: Un runner démarre localement avec une configuration valide, n'accepte que des requêtes authentifiées venant d'hôtes attendus et ne peut lire ou écrire que dans les racines autorisées.
+**Depends on**: Rien (première phase)
+**Requirements:** RUN-01, RUN-02, RUN-03, RUN-04, SEC-01, SEC-02, SEC-03, SEC-04
+**Success Criteria** (what must be TRUE):
+  1. `deskgate serve` écoute sur 127.0.0.1 uniquement et refuse de démarrer sur une autre interface sans option explicite
+  2. Un `runner.toml` invalide fait échouer le démarrage avec un message clair en français ; un second runner lancé en parallèle s'arrête sans toucher à la base
+  3. `GET /health` répond sans jeton et sans détail sensible ; toute autre route renvoie 401 sans jeton Bearer valide et 4xx si l'en-tête `Host` n'est pas `127.0.0.1`, `localhost` ou `host.docker.internal`
+  4. Un chemin `/data/...` devient `C:/BIM/...` (et inversement) ; les chemins hors racines (`..`, lien symbolique, jonction, UNC, `C:/BIM2`, nom réservé, flux alternatif) sont refusés par des tests d'attaque
+**Plans**: TBD
+**Note de recherche**: prérequis à vérifier tôt : `host.docker.internal` joint bien le loopback ; type de boucle Uvicorn (`asyncio`).
+
+### Phase 2 : Cœur d'exécution
+**Goal**: n8n peut soumettre une tâche, la suivre, l'annuler, et le runner l'exécute une à la fois dans un Job Object avec délai maximum, sans jamais perdre l'état après un arrêt brutal.
+**Depends on**: Phase 1
+**Requirements:** JOB-01, JOB-02, JOB-03, JOB-04, JOB-05, JOB-06, JOB-07, JOB-08, JOB-09
+**Success Criteria** (what must be TRUE):
+  1. `POST /jobs` renvoie immédiatement `202 { job_id, status: "queued" }` ; les tâches s'exécutent une à la fois dans l'ordre de soumission et survivent à un redémarrage (SQLite)
+  2. `GET /jobs/{id}` et `/logs` renvoient état, progression, résumé, artefacts et journaux ; chaque tâche a son dossier `C:/BIM/travail/<job_id>/` et déclare ses artefacts
+  3. Un faux plugin qui dépasse son délai est arrêté avec tout son arbre (petit-enfant orphelin compris) et passe `timeout` ; l'annulation (en file ou en cours) est idempotente
+  4. Après `taskkill /F` du runner pendant une tâche, le redémarrage la passe `interrupted` (rappel couvert en phase 3)
+  5. Une soumission avec une `idempotency_key` identique à une tâche non terminale est refusée ; le plugin tourne dans un sous-processus sans shell, jamais dans le processus du runner
+**Plans**: TBD
+
+### Phase 3 : Rappel fiable
+**Goal**: n8n reprend toujours, une fois et une seule, avec le bon statut, quel que soit l'état terminal de la tâche ou l'arrêt du runner, sans fuite de la signature.
+**Depends on**: Phase 2
+**Requirements:** CB-01, CB-02, CB-03, CB-04, CB-05, SEC-05, SEC-06
+**Success Criteria** (what must be TRUE):
+  1. À chaque état terminal (`succeeded`, `failed`, `timeout`, `cancelled`, `interrupted`), un faux serveur n8n reçoit `{ job_id, capability, status, duration_s, summary, artifacts, error }` sur la `resumeUrl` telle quelle, y compris pour une tâche de moins de 100 ms
+  2. Un rappel non livré est réessayé avec délai croissant et reprend après un redémarrage du runner ; les réponses sont distinguées (livré, Wait pas encore en attente, exécution terminée ou inconnue, signature refusée) avec abandon tracé quand il faut
+  3. Un résumé de plus de 1 Mio est écrit dans `summary.json` et le rappel n'en porte que le chemin ; un hôte de rappel non autorisé est refusé
+  4. La `signature` n'apparaît dans aucun journal, aucune réponse d'API ni l'audit ; chaque soumission, refus, fin de tâche et rappel figure dans l'audit local
+**Plans**: TBD
+**Note de recherche**: spike court : textes exacts des 409 de n8n 2.43.8 ; `httpx2` ne réencode pas la signature (hôte seulement réécrit, query intacte).
+
+### Phase 4 : Capacités v0.1
+**Goal**: Le runner réalise un vrai travail : détecter des conflits IFC avec export BCF 2.1 et appeler un outil MCP stdio, sans contaminer le code MIT avec du GPL.
+**Depends on**: Phase 3
+**Requirements:** CAP-01, CAP-02, CAP-03, CAP-04, CAP-05
+**Success Criteria** (what must be TRUE):
+  1. `ifc.clash` sur deux sélections IFC réelles renvoie un JSON groupé avec les GlobalId de chaque paire, en modes `hard` et `clearance` (tolérance explicite) ; une sélection vide donne un succès à 0 conflit avec avertissement
+  2. Sur demande, `ifc.clash` produit un BCF 2.1 ouvrable, avec deux points de vue par sujet (objets seuls ; contexte gris transparent), couleurs ARGB, sans sélection enregistrée
+  3. `mcp.call` appelle un outil d'un serveur MCP stdio déclaré, sans LLM, dans le Job Object de la tâche, et renvoie son résultat ; l'arrêt de la tâche tue le serveur MCP
+  4. `deskgate-bcf` (GPL-3) écrit le BCF depuis un JSON versionné en sous-processus ; un test CI échoue si un autre paquet importe `bcf-client` ou `deskgate-bcf`
+**Plans**: TBD
+**Note de recherche**: spikes nécessaires : SDK `mcp` 2.x dans un Job Object ; API bas niveau de `bcf-client` ; multiprocessing de `ifcclash` sous Windows.
+
+### Phase 5 : Installation et intégration n8n
+**Goal**: Sur la machine cible, un utilisateur installe Deskgate, lance n8n épinglé et voit un calcul long déclenché depuis n8n reprendre avec son résultat, même après un arrêt brutal du runner.
+**Depends on**: Phase 4
+**Requirements:** INS-01, INS-02, INS-03, INS-04, INS-05, ACC-01, ACC-02
+**Success Criteria** (what must be TRUE):
+  1. `deskgate init` crée `runner.toml`, `C:\BIM` (`depot`, `travail`, `livrables`) et un jeton affiché une seule fois ; avec l'accord de l'utilisateur, il installe une tâche du Planificateur lancée à l'ouverture de session, sans limite de durée et même sur batterie
+  2. `n8n/docker-compose.yml` lance n8n 2.43.8 avec Postgres et `C:\BIM` monté sur `/data` ; depuis le conteneur, `http://host.docker.internal:8765/health` répond
+  3. Le workflow d'exemple importé (HTTP Request, Wait, test du `status`) déclenche `ifc.clash` et reprend sur le rappel
+  4. Acceptation : un calcul de plus de 10 minutes, runner démarré par la tâche planifiée, reprend dans n8n avec le résumé et le chemin du BCF
+  5. Acceptation : un arrêt brutal du runner pendant une tâche produit, au redémarrage, un rappel `interrupted` reçu par n8n
+**Plans**: TBD
+**Note de recherche**: spikes nécessaires : Planificateur de tâches sans élévation (XML `schtasks`, repli `HKCU\Run`) ; `gui-scripts` sous uv ; sortie du Wait à l'échéance.
+
+## Progression
+
+| Phase | Plans terminés | Statut | Terminée |
+|-------|----------------|--------|----------|
+| 1. Fondations testables | 0/0 | Non commencée | - |
+| 2. Cœur d'exécution | 0/0 | Non commencée | - |
+| 3. Rappel fiable | 0/0 | Non commencée | - |
+| 4. Capacités v0.1 | 0/0 | Non commencée | - |
+| 5. Installation et intégration n8n | 0/0 | Non commencée | - |
