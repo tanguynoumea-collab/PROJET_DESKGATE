@@ -18,13 +18,12 @@ soit le résultat (succès, échec, délai dépassé, annulation, redémarrage d
 ### Validated
 
 - ✓ Runner sur 127.0.0.1, configuration typée `runner.toml`, jeton Bearer haché, contrôle Host, instance unique, `/health`, chemins `/data` ↔ `C:/BIM` avec refus hors racines — Validated in Phase 1: Fondations testables
+- ✓ File SQLite persistante, `POST/GET /jobs`, `/logs`, `/cancel`, exécution une à la fois dans un Job Object, délai avec arbre tué, `interrupted` après arrêt brutal, idempotence minimale — Validated in Phase 2: Cœur d'exécution
 
 ### Active
 
-- [ ] File SQLite persistante (runner FastAPI sur 127.0.0.1 et jeton : faits en phase 1)
 - [ ] Soumission asynchrone (`POST /jobs` → 202) et rappel vers la `resumeUrl` n8n avec réessais
-- [ ] Délai maximum et arrêt de tout l'arbre de processus (Job Object Windows)
-- [ ] Tâches `running` passées `interrupted` au redémarrage, avec rappel
+- [ ] Rappel envoyé pour les tâches `interrupted` au redémarrage (transition faite en phase 2)
 - [ ] Capacités v0.1 : `ifc.clash` et `mcp.call` (outil d'un serveur MCP stdio)
 - [ ] Paquet `deskgate-bcf` (GPL-3, sur `bcf-client`) appelé en sous-processus pour écrire le BCF 2.1
 - [ ] `deskgate init` et démarrage à l'ouverture de session (Planificateur de tâches)
@@ -111,4 +110,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-20 after Phase 1*
+*Last updated: 2026-10-20 after Phase 2*
