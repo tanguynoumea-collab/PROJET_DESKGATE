@@ -14,7 +14,7 @@ from deskgate.core.tokens import hash_token
 
 pytestmark = pytest.mark.unit
 
-TOKEN = "jeton-de-test-secret-0123456789"
+TOKEN = "jeton-de-test-secret-0123456789"  # noqa: S105
 VERSION = "0.1.0.dev0"
 AUTH = {"Authorization": f"Bearer {TOKEN}"}
 
