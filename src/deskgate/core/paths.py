@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable, Sequence
+from collections.abc import Mapping as AbcMapping
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -175,3 +176,27 @@ def validate_artifact_path(
 ) -> str:
     resolve_within_roots(host_path, roots, resolver)
     return host_to_container(host_path, mappings)
+
+
+def convert_path_params(
+    params: AbcMapping[str, object],
+    keys: Sequence[str],
+    mappings: Sequence[Mapping],
+    roots: Sequence[str],
+    resolver: Resolver = default_resolver,
+) -> dict[str, object]:
+    """Convertit en chemins hôte validés les paramètres déclarés (chaîne ou liste de chaînes)."""
+    out: dict[str, object] = dict(params)
+    for key in keys:
+        if key not in out:
+            continue
+        value = out[key]
+        if isinstance(value, str):
+            out[key] = validate_container_path(value, mappings, roots, resolver)
+        elif isinstance(value, list) and all(isinstance(v, str) for v in value):
+            out[key] = [validate_container_path(v, mappings, roots, resolver) for v in value]
+        else:
+            raise PathDenied(
+                _INVALID, f"Le paramètre {key} doit être un chemin ou une liste de chemins."
+            )
+    return out

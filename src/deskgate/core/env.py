@@ -40,3 +40,11 @@ def build_env(base: Mapping[str, str], extra: Mapping[str, str] | None = None) -
         env.update(extra)
     env["PYTHONUTF8"] = "1"
     return env
+
+
+def mcp_env_var(server: str, key: str) -> str:
+    """Nom de la variable d'environnement portant une valeur d'env d'un serveur MCP.
+
+    Windows met en majuscules les noms de variables ; le worker relit par la même fonction.
+    """
+    return f"DESKGATE_MCPENV__{server}__{key}".upper()

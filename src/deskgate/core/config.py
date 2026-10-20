@@ -21,6 +21,7 @@ from pydantic import (
     ValidationError,
     ValidationInfo,
     field_validator,
+    model_validator,
 )
 from pydantic_core import PydanticCustomError
 
@@ -104,19 +105,54 @@ class Paths(Strict):
         return v
 
 
+_IDENT = r"^[A-Za-z_][A-Za-z0-9_]*$"
+_SERVER = r"^[A-Za-z0-9_-]{1,64}$"
+_ENTRY = r"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*:[A-Za-z_][A-Za-z0-9_]*$"
+
+Scalar = str | int | float | bool
+SettingValue = Scalar | list[Scalar]
+Ident = Annotated[str, StringConstraints(pattern=_IDENT)]
+
+
 class Capability(Strict):
-    kind: Literal["python"]
-    python: Annotated[str, AfterValidator(_host_root)]
-    entry: Annotated[
-        str,
-        StringConstraints(
-            pattern=r"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*:[A-Za-z_][A-Za-z0-9_]*$"
-        ),
-    ]
+    kind: Literal["python", "mcp"]
+    python: Annotated[str, AfterValidator(_host_root)] | None = None
+    entry: Annotated[str, StringConstraints(pattern=_ENTRY)] | None = None
     timeout_max: int = Field(gt=0, le=43200)
     pythonpath: list[Annotated[str, AfterValidator(_host_root)]] = []
     memory_mb: int | None = Field(default=None, ge=16)
     resource: str = "default"
+    settings: dict[Ident, SettingValue] = {}
+    path_params: list[Ident] = []
+
+    @model_validator(mode="after")
+    def _kind(self) -> Capability:
+        if self.kind == "python":
+            if self.python is None or self.entry is None:
+                raise PydanticCustomError(
+                    "python_fields_missing", 'kind = "python" exige python et entry'
+                )
+        elif (
+            self.python is not None
+            or self.entry is not None
+            or self.pythonpath
+            or self.settings
+            or self.path_params
+        ):
+            raise PydanticCustomError(
+                "mcp_fields_forbidden",
+                'kind = "mcp" n\'accepte ni python, ni entry, ni pythonpath, '
+                "ni settings, ni path_params",
+            )
+        return self
+
+
+class McpServer(Strict):
+    # Chemin absolu : jamais de recherche dans le PATH (règle 2).
+    command: Annotated[str, AfterValidator(_host_root)]
+    args: list[str] = []
+    env: dict[Ident, str] = {}
+    allowed_tools: list[Annotated[str, StringConstraints(min_length=1, max_length=128)]] = []
 
 
 class CallbackConfig(Strict):
@@ -133,6 +169,7 @@ class RunnerConfig(Strict):
     callback_allowed_hosts: list[HostName] = ["localhost", "127.0.0.1"]
     callback: CallbackConfig = CallbackConfig()
     capabilities: dict[str, Capability] = {}
+    mcp_servers: dict[Annotated[str, StringConstraints(pattern=_SERVER)], McpServer] = {}
     work_root: Annotated[str, AfterValidator(_host_root)] | None = None
 
     @field_validator("work_root")
@@ -191,6 +228,8 @@ _MESSAGES = {
     "string_pattern_mismatch": "format invalide",
     "too_short": "liste vide non autorisée",
     "literal_error": "valeur non autorisée",
+    "float_type": "nombre attendu",
+    "float_parsing": "nombre attendu",
 }
 
 

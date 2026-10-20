@@ -31,6 +31,7 @@ CONTRACT: dict[str, Any] = {
         "job_id",
         "params",
         "protocol",
+        "settings",
         "sys_path",
         "work_dir",
     ],
@@ -68,6 +69,7 @@ class Ctx:
         self.job_id: str = inp["job_id"]
         self.work_dir: str = inp["work_dir"]
         self.params: dict[str, Any] = inp["params"]
+        self.settings: dict[str, Any] = inp.get("settings") or {}
         self.artifacts: list[dict[str, str]] = []
         self._events = open(  # noqa: SIM115  fermé à la fin du processus
             os.path.join(self.work_dir, "events.jsonl"), "ab", buffering=0
@@ -116,12 +118,15 @@ def main(argv: list[str]) -> int:
         )
     except BaseException as exc:
         traceback.print_exc()
+        # Un plugin classe ses erreurs par l'attribut `error_code` (str).
+        code = getattr(exc, "error_code", None)
+        etype = code if isinstance(code, str) and code else type(exc).__name__
         _write_atomic(
             res,
             {
                 "protocol": PROTOCOL,
                 "ok": False,
-                "error": {"type": type(exc).__name__, "message": str(exc)[:2000]},
+                "error": {"type": etype, "message": str(exc)[:2000]},
             },
         )
         return 1

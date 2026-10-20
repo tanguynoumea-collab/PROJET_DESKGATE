@@ -92,3 +92,24 @@ def test_contract() -> None:
     assert CONTRACT["files"]["cancel"] == "cancel.flag"
     assert CONTRACT["result_ok_keys"] == ["artifacts", "data", "ok", "protocol", "summary"]
     assert CONTRACT["result_error_keys"] == ["error", "ok", "protocol"]
+
+
+def _winput(**extra: object) -> WorkerInput:
+    return WorkerInput.model_validate(
+        {
+            "protocol": 1,
+            "job_id": "j",
+            "capability": "c",
+            "entry": "m:f",
+            "params": {},
+            "work_dir": "C:/w",
+            "sys_path": [],
+            **extra,
+        }
+    )
+
+
+def test_settings_default_and_carried() -> None:
+    assert _winput().settings == {}
+    assert _winput(settings={"a": [1, 2]}).settings == {"a": [1, 2]}
+    assert "settings" in CONTRACT["input_keys"]

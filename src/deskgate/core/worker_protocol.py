@@ -28,6 +28,7 @@ class WorkerInput(_Strict):
     params: dict[str, Any]
     work_dir: str
     sys_path: list[str]
+    settings: dict[str, Any] = Field(default_factory=dict)
 
 
 class ProgressEvent(_Strict):
