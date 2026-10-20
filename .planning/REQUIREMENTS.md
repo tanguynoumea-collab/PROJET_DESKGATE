@@ -20,8 +20,8 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 - [x] **SEC-02**: Le runner refuse une requête dont l'en-tête `Host` n'est pas `127.0.0.1`, `localhost` ou `host.docker.internal`
 - [x] **SEC-03**: Un chemin `/data/...` est converti en `C:/BIM/...` (et inversement pour les artefacts renvoyés)
 - [x] **SEC-04**: Un chemin hors des racines autorisées est refusé, y compris via `..`, lien symbolique, jonction, chemin UNC, préfixe de segment (`C:/BIM2`), nom réservé ou flux alternatif
-- [ ] **SEC-05**: La `signature` de la `resumeUrl` n'apparaît dans aucun journal, aucune réponse d'API ni l'audit
-- [ ] **SEC-06**: Chaque soumission, refus, fin de tâche et rappel est inscrit dans un journal d'audit local (client, capacité, paramètres sans secrets, début, fin, statut, durée)
+- [x] **SEC-05**: La `signature` de la `resumeUrl` n'apparaît dans aucun journal, aucune réponse d'API ni l'audit
+- [x] **SEC-06**: Chaque soumission, refus, fin de tâche et rappel est inscrit dans un journal d'audit local (client, capacité, paramètres sans secrets, début, fin, statut, durée)
 
 ### Tâches
 
@@ -37,11 +37,11 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 
 ### Rappel
 
-- [ ] **CB-01**: À chaque état terminal (`succeeded`, `failed`, `timeout`, `cancelled`, `interrupted`), le runner appelle la `resumeUrl` telle quelle avec `{ job_id, capability, status, duration_s, summary, artifacts, error }`
-- [ ] **CB-02**: Un rappel non livré est réessayé avec délai croissant, y compris après un redémarrage du runner (aucun résultat perdu)
-- [ ] **CB-03**: Le runner distingue les réponses de n8n : livré, Wait pas encore en attente (réessai court), exécution déjà terminée ou inconnue (abandon tracé), refus de signature (abandon tracé)
+- [x] **CB-01**: À chaque état terminal (`succeeded`, `failed`, `timeout`, `cancelled`, `interrupted`), le runner appelle la `resumeUrl` telle quelle avec `{ job_id, capability, status, duration_s, summary, artifacts, error }`
+- [x] **CB-02**: Un rappel non livré est réessayé avec délai croissant, y compris après un redémarrage du runner (aucun résultat perdu)
+- [x] **CB-03**: Le runner distingue les réponses de n8n : livré, Wait pas encore en attente (réessai court), exécution déjà terminée ou inconnue (abandon tracé), refus de signature (abandon tracé)
 - [x] **CB-04**: Un résumé trop volumineux pour le rappel (> 1 Mio) est écrit dans `summary.json` et le rappel n'en porte que le chemin
-- [ ] **CB-05**: Le rappel n'est envoyé qu'à un hôte autorisé dans `runner.toml`
+- [x] **CB-05**: Le rappel n'est envoyé qu'à un hôte autorisé dans `runner.toml`
 
 ### Capacités
 
@@ -140,13 +140,13 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | JOB-07 | Phase 2 | Complete |
 | JOB-08 | Phase 2 | Complete |
 | JOB-09 | Phase 2 | Complete |
-| CB-01 | Phase 3 | Pending |
-| CB-02 | Phase 3 | Pending |
-| CB-03 | Phase 3 | Pending |
+| CB-01 | Phase 3 | Complete |
+| CB-02 | Phase 3 | Complete |
+| CB-03 | Phase 3 | Complete |
 | CB-04 | Phase 3 | Complete |
-| CB-05 | Phase 3 | Pending |
-| SEC-05 | Phase 3 | Pending |
-| SEC-06 | Phase 3 | Pending |
+| CB-05 | Phase 3 | Complete |
+| SEC-05 | Phase 3 | Complete |
+| SEC-06 | Phase 3 | Complete |
 | CAP-01 | Phase 4 | Pending |
 | CAP-02 | Phase 4 | Pending |
 | CAP-03 | Phase 4 | Pending |

@@ -79,7 +79,7 @@ Plans:
 - [x] 03-05-PLAN.md — Plafond 1 Mio et summary.json dans l'engine ; hôte autorisé et audit des refus à la soumission
 - [x] 03-06-PLAN.md — Thread sender : envoi de la resumeUrl telle quelle, réessais, politique de réponse
 - [x] 03-07-PLAN.md — Câblage du sender dans deskgate serve, journaux masqués, rappel e2e pour 4 statuts
-- [ ] 03-08-PLAN.md — E2E : reprise après taskkill, envoi interrompu, statut interrupted, balayage de la signature, gate
+- [x] 03-08-PLAN.md — E2E : reprise après taskkill, envoi interrompu, statut interrupted, balayage de la signature, gate
 **Note de recherche**: spike court : textes exacts des 409 de n8n 2.43.8 ; `httpx2` ne réencode pas la signature (hôte seulement réécrit, query intacte).
 
 ### Phase 4: Capacités v0.1
