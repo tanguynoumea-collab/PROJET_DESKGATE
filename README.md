@@ -19,6 +19,15 @@ deskgate doctor
 
 Procédure détaillée, aussi utilisable par une IA : [`AGENTS.md`](AGENTS.md).
 
+## Capacités v0.1
+
+- `ifc.clash` : conflits IFC groupés en JSON et BCF 2.1 sur demande, voir
+  [`plugins/bim/README.md`](plugins/bim/README.md) ;
+- `mcp.call` : appel d'un outil d'un serveur MCP déclaré dans `runner.toml`.
+
+Contrats JSON versionnés : [`docs/contrats/`](docs/contrats/). Installation des plugins et exemples de
+configuration : [`AGENTS.md`](AGENTS.md) § 4.
+
 ## Documentation
 
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — conception technique

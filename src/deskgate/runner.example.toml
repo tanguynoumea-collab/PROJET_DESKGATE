@@ -48,3 +48,35 @@ max_backoff_s = 300
 # # pythonpath = ['C:/chemin/vers/code']
 # # memory_mb = 4096
 # resource = "default"
+
+# >>> exemples phase 4
+# # Capacité ifc.clash (plugin BIM). Les chemins sont à adapter : ils pointent les environnements
+# # créés par AGENTS.md § 4, jamais le PATH.
+# [capabilities."ifc.clash"]
+# kind = "python"
+# python = 'C:/Users/moi/AppData/Local/Deskgate/plugins/bim/Scripts/python.exe'
+# entry = "deskgate_bim.clash:run"
+# timeout_max = 14400
+# # memory_mb : plafond du Job Object ; un dépassement est classé memory_limit.
+# memory_mb = 8192
+# resource = "cpu-heavy"
+# # path_params : paramètres convertis (chemin n8n vers chemin hôte) et validés par le runner.
+# path_params = ["ifc_a", "ifc_b"]
+#
+# # settings : table libre, lue par le plugin (jamais par le runner).
+# [capabilities."ifc.clash".settings]
+# bcf_executable = 'C:/Users/moi/AppData/Local/Deskgate/plugins/bcf/Scripts/deskgate-bcf.exe'
+# threads = 4
+#
+# # Serveur MCP appelé par mcp.call. Les valeurs d'env ne sont jamais écrites dans le dossier
+# # de tâche ; en v0.1 évitez quand même d'y mettre des jetons (coffre de secrets en v0.2).
+# [mcp_servers.demo]
+# command = 'C:/Users/moi/AppData/Local/Programs/Python/Python312/python.exe'
+# args = ['C:/BIM/serveurs/demo_server.py']
+# env = { LANG = "fr" }
+# allowed_tools = ["echo"]
+#
+# [capabilities."mcp.call"]
+# kind = "mcp"
+# timeout_max = 600
+# <<< exemples phase 4

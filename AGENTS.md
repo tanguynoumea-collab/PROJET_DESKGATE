@@ -59,15 +59,32 @@ deskgate serve              # premier lancement manuel, pour vérifier
 
 Vérifier : `curl http://127.0.0.1:8765/health` répond.
 
-## 4. Installer un plugin
+## 4. Installer les plugins (v0.1)
+
+Chaque plugin a son propre environnement `uv`, séparé de celui du runner. `deskgate plugin add`
+arrive en v0.2 : en v0.1 la procédure est manuelle.
 
 ```powershell
-deskgate plugin add .\plugins\bim\ifc.clash      # dossier local ou dépôt git
-deskgate plugin list
-deskgate doctor
+$env:UV_PROJECT_ENVIRONMENT = "$env:LOCALAPPDATA\Deskgate\plugins\bim"
+uv sync --locked --package deskgate-bim --no-dev
+$env:UV_PROJECT_ENVIRONMENT = "$env:LOCALAPPDATA\Deskgate\plugins\bcf"
+uv sync --locked --package deskgate-bcf --no-dev
+Remove-Item Env:UV_PROJECT_ENVIRONMENT
 ```
 
-Un plugin dont un prérequis manque apparaît **indisponible** avec sa raison ; ne pas le forcer.
+Puis, dans `runner.toml`, copier le bloc d'exemples de `src/deskgate/runner.example.toml` (entre
+`# >>> exemples phase 4` et `# <<< exemples phase 4`), retirer les `# ` et remplacer les chemins par
+ceux des environnements créés ci-dessus (`...\bim\Scripts\python.exe` et
+`...\bcf\Scripts\deskgate-bcf.exe`). Les exemples couvrent `ifc.clash`, `mcp.call` et `mcp_servers`.
+Redémarrer le runner.
+
+Consignes :
+
+- ne jamais lancer `uv sync --all-packages` : cela mélange les dépendances de tous les plugins
+  dans un seul environnement ;
+- ne jamais lancer `uv python install` : utiliser l'interpréteur déjà installé (`UV_PYTHON`) ;
+- toujours définir `UV_PROJECT_ENVIRONMENT` avant `uv sync --package ...`, sinon l'environnement du
+  dépôt est modifié ; le restaurer avec `uv sync --locked`.
 
 ## 5. Brancher n8n
 
