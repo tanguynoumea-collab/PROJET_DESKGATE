@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
 stopped_at: Completed 04-07-PLAN.md
-last_updated: "2026-10-20T16:28:44.163Z"
+last_updated: "2026-10-20T16:34:41.730Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 5
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 
 ## Current Position
 
-Phase: 4 (Capacités v0.1) — EXECUTING
-Plan: 7 of 7
+Phase: 5
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-10-20
 

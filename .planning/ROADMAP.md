@@ -16,7 +16,7 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
  (completed 2026-10-20)
 - [x] **Phase 3: Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit
  (completed 2026-10-20)
-- [ ] **Phase 4: Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call`
+- [x] **Phase 4: Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call` (completed 2026-10-20)
 - [ ] **Phase 5: Installation et intégration n8n** - `deskgate init`, tâche planifiée, docker-compose n8n, workflow d'exemple, acceptation
 
 ## Phase Details
@@ -125,5 +125,5 @@ Plans:
 | 1. Fondations testables | 0/5 | Complete    | 2026-10-20 |
 | 2. Cœur d'exécution | 0/9 | Complete    | 2026-10-20 |
 | 3. Rappel fiable | 0/0 | Complete    | 2026-10-20 |
-| 4. Capacités v0.1 | 0/0 | Non commencée | - |
+| 4. Capacités v0.1 | 0/0 | Complete    | 2026-10-20 |
 | 5. Installation et intégration n8n | 0/0 | Non commencée | - |
