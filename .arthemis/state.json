@@ -126,6 +126,18 @@
       "source": ".planning/phases/01-fondations-testables/01-HUMAN-UAT.md",
       "ref": "INS-05",
       "condition_levee": "resultat saisi dans 01-HUMAN-UAT.md"
+    },
+    {
+      "id": "04-D1",
+      "type": "uat",
+      "titre": "Rendu du BCF ifc.clash dans BIMcollab Zoom (2 vues, contexte gris, couleurs), differe, bloque la phase 5",
+      "gravite": "mineur",
+      "statut": "ouvert",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-21",
+      "source": ".planning/phases/04-capacit-s-v0-1/04-07-PLAN.md",
+      "ref": "CAP-02",
+      "condition_levee": "resultat saisi dans 04-HUMAN-UAT.md"
     }
   ],
   "livraisons": [],
@@ -183,6 +195,6 @@
   },
   "maj": {
     "le": "2026-10-21",
-    "commit": "389b5aa"
+    "commit": "e4f7ae9"
   }
 }
