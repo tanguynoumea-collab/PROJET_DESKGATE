@@ -99,7 +99,7 @@ Plans:
 - [x] 04-02-PLAN.md — Cœur générique : settings, path_params, kind mcp et mcp_servers, ctx.settings, codes d'erreur des plugins
 - [x] 04-03-PLAN.md — deskgate-bcf (GPL-3) : écriture BCF 2.1 à deux vues depuis le JSON du contrat, codes 0/2/3
 - [x] 04-04-PLAN.md — ifc.clash : DeskgateClasher, modes hard/clearance, regroupement déterministe, sélection vide, erreurs classées
-- [ ] 04-05-PLAN.md — mcp.call : worker MCP stdio dans le Job Object, mini-serveur de test, arrêt de l'arbre, secrets hors disque
+- [x] 04-05-PLAN.md — mcp.call : worker MCP stdio dans le Job Object, mini-serveur de test, arrêt de l'arbre, secrets hors disque
 - [ ] 04-06-PLAN.md — Classement memory_limit par le pic mémoire du Job Object
 - [ ] 04-07-PLAN.md — Sortie BCF d'ifc.clash (contexte gris, appel de deskgate-bcf), bout en bout, documentation
 
