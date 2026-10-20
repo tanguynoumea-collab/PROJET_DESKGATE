@@ -6,6 +6,7 @@ Configuration, puis mutex, puis socket exclusif, puis base, puis Uvicorn.
 from __future__ import annotations
 
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -15,6 +16,7 @@ import deskgate_sdk.run
 from deskgate import __version__
 from deskgate.api import create_app
 from deskgate.core.config import ConfigError, load_config
+from deskgate.core.redact import RedactingFilter, RedactingFormatter
 from deskgate.engine import Engine
 from deskgate.instance import (
     acquire_mutex,
@@ -24,6 +26,7 @@ from deskgate.instance import (
 )
 from deskgate.jobs import JobsService
 from deskgate.locations import config_path, db_path, resolve_home
+from deskgate.sender import Sender
 from deskgate.store import SchemaTooNew, open_db, recover_interrupted
 
 EXIT_INVALID_CONFIG = 2
@@ -35,11 +38,23 @@ logger = logging.getLogger("deskgate")
 
 
 def configure_logging() -> None:
-    """Journal sur stderr ; ne journalise jamais d'en-tête ni de jeton."""
+    """Journal sur stderr, signature masquée sur tous les handlers (D-07, SEC-05)."""
     handler = logging.StreamHandler(sys.stderr)
-    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s : %(message)s"))
+    handler.setFormatter(RedactingFormatter("%(asctime)s %(levelname)s %(name)s : %(message)s"))
+    handler.addFilter(RedactingFilter())
     logger.handlers[:] = [handler]
     logger.setLevel(logging.INFO)
+    logger.propagate = False
+    root = logging.getLogger()
+    root.handlers[:] = [handler]
+    root.setLevel(logging.WARNING)
+    third = logging.WARNING
+    level = os.environ.get("DESKGATE_LOG_LEVEL", "").upper()
+    if level in ("DEBUG", "INFO", "WARNING"):
+        root.setLevel(level)
+        third = getattr(logging, level)
+    for name in ("httpx2", "httpcore2"):
+        logging.getLogger(name).setLevel(third)
 
 
 def _err(message: str) -> None:
@@ -89,12 +104,18 @@ def serve(config_override: Path | None = None) -> int:
         worker_script=Path(deskgate_sdk.run.__file__).resolve(),
     )
     jobs = JobsService(db_path=db_path(home), config=cfg, wake=engine.wake)
+    sender = Sender(db_path=db_path(home), config=cfg)
+
+    def _shutdown() -> None:
+        engine.stop()
+        sender.stop()
+
     app = create_app(
         token_sha256=cfg.token_sha256,
         version=__version__,
         warnings=warnings,
         jobs=jobs,
-        on_shutdown=engine.stop,
+        on_shutdown=_shutdown,
     )
     if warnings:
         logger.warning(
@@ -107,10 +128,12 @@ def serve(config_override: Path | None = None) -> int:
     server = uvicorn.Server(uvicorn.Config(app, log_config=None, lifespan="on"))
     # Le Planificateur relancera le runner ; la recovery rend l'arrêt sûr.
     engine.on_fatal = lambda: setattr(server, "should_exit", True)
+    sender.on_fatal = lambda: setattr(server, "should_exit", True)
     engine.start()
-    # phase 3 : thread sender
+    sender.start()
     try:
         server.run(sockets=[sock])
     finally:
-        engine.stop()  # KeyboardInterrupt ; la voie CTRL_BREAK passe par le lifespan
+        engine.stop()
+        sender.stop()  # KeyboardInterrupt ; la voie CTRL_BREAK passe par le lifespan
     return 0
