@@ -30,7 +30,14 @@ from deskgate.core.outcome import (
     kill_verdict,
     verdict,
 )
-from deskgate.core.paths import PathDenied, Resolver, default_resolver, validate_artifact_path
+from deskgate.core.paths import (
+    PathDenied,
+    Resolver,
+    default_resolver,
+    host_to_container,
+    validate_artifact_path,
+)
+from deskgate.core.payload import CALLBACK_MAX_BYTES, build_callback, encode
 from deskgate.core.states import (
     CANCELLED,
     FAILED,
@@ -103,6 +110,7 @@ def _utcnow() -> datetime:
 @dataclass
 class _Running:
     job_id: str
+    capability: str
     work_dir: Path
     job: JobLike
     proc: ProcLike
@@ -125,6 +133,7 @@ class Engine:
         grace: float = 10.0,
         base_env: Mapping[str, str] | None = None,
         resolver: Resolver = default_resolver,
+        callback_max_bytes: int = CALLBACK_MAX_BYTES,
     ) -> None:
         self._db_path = db_path
         self._config = config
@@ -136,6 +145,7 @@ class Engine:
         self._grace = grace
         self._base_env = base_env
         self._resolver = resolver
+        self._callback_max_bytes = callback_max_bytes
         self._conn: store.Connection | None = None
         self._cur: _Running | None = None
         self._stop = threading.Event()
@@ -240,6 +250,7 @@ class Engine:
             return
         self._cur = _Running(
             job_id=row.id,
+            capability=row.capability,
             work_dir=work_dir,
             job=job,
             proc=proc,
@@ -360,7 +371,57 @@ class Engine:
                 {"summary": parsed.summary, "data": parsed.data, "artifacts": artifacts},
                 ensure_ascii=False,
             )
+            result_json = self._cap_summary(cur, parsed.summary, result_json)
         return outcome, result_json
+
+    def _cap_summary(self, cur: _Running, summary: object, result_json: str) -> str:
+        """Déporte le résumé dans summary.json si le corps du rappel dépasserait le plafond."""
+        body = build_callback(
+            job_id=cur.job_id,
+            capability=cur.capability,
+            status=SUCCEEDED,
+            started_at=None,
+            finished_at=None,
+            result_json=result_json,
+            error_code=None,
+            error_message=None,
+            max_bytes=None,
+        )
+        if len(encode(body)) <= self._callback_max_bytes:
+            return result_json
+        result = json.loads(result_json)
+        try:
+            result["summary"] = {"path": self._write_summary(cur, summary), "truncated": True}
+        except OSError as exc:
+            logger.warning(
+                "Écriture de summary.json impossible pour la tâche %s : %s.",
+                cur.job_id,
+                type(exc).__name__,
+            )
+            result["summary"] = {"truncated": True, "error": "summary_write_failed"}
+        return json.dumps(result, ensure_ascii=False)
+
+    def _write_summary(self, cur: _Running, summary: object) -> str:
+        tmp = cur.work_dir / "summary.json.tmp"
+        try:
+            with open(tmp, "wb") as f:
+                f.write(json.dumps(summary, ensure_ascii=False).encode("utf-8"))
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp, cur.work_dir / "summary.json")
+        except OSError:
+            with contextlib.suppress(OSError):
+                tmp.unlink()
+            raise
+        host = str(cur.work_dir).replace("\\", "/") + "/summary.json"
+        try:
+            return host_to_container(host, self._config.mappings())
+        except PathDenied:
+            logger.warning(
+                "Aucun mapping ne couvre le dossier de la tâche %s : chemin hôte transmis.",
+                cur.job_id,
+            )
+            return host
 
     def _conclude(
         self,
