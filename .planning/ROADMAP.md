@@ -1,22 +1,26 @@
-# Feuille de route : Deskgate
+# Roadmap: Deskgate
 
-## Vue d'ensemble
+## Overview
 
 Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection de conflits IFC réelle. Le noyau générique (sécurité, file SQLite, Job Object, rappel durable) est validé avec un faux plugin avant d'y brancher `ifc.clash` et `mcp.call`, puis intégré à n8n depuis la tâche planifiée. La feuille de route produit (v0.1 à v0.4) reste dans `ROADMAP.md` à la racine.
 
+## Milestones
+
+- 🚧 **v0.1 Runner minimal** — Phases 1-5 (in progress)
+
 ## Phases
 
-- [ ] **Phase 1 : Fondations testables** - Runner local sécurisé : configuration, jeton, contrôle Host, chemins, instance unique, `/health`
-- [ ] **Phase 2 : Cœur d'exécution** - File SQLite, exécution en Job Object, API des tâches, délai, annulation, reprise après redémarrage
-- [ ] **Phase 3 : Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit
-- [ ] **Phase 4 : Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call`
-- [ ] **Phase 5 : Installation et intégration n8n** - `deskgate init`, tâche planifiée, docker-compose n8n, workflow d'exemple, acceptation
+- [ ] **Phase 1: Fondations testables** - Runner local sécurisé : configuration, jeton, contrôle Host, chemins, instance unique, `/health`
+- [ ] **Phase 2: Cœur d'exécution** - File SQLite, exécution en Job Object, API des tâches, délai, annulation, reprise après redémarrage
+- [ ] **Phase 3: Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit
+- [ ] **Phase 4: Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call`
+- [ ] **Phase 5: Installation et intégration n8n** - `deskgate init`, tâche planifiée, docker-compose n8n, workflow d'exemple, acceptation
 
-## Détail des phases
+## Phase Details
 
-### Phase 1 : Fondations testables
+### Phase 1: Fondations testables
 **Goal**: Un runner démarre localement avec une configuration valide, n'accepte que des requêtes authentifiées venant d'hôtes attendus et ne peut lire ou écrire que dans les racines autorisées.
-**Depends on**: Rien (première phase)
+**Depends on**: Nothing (first phase)
 **Requirements:** RUN-01, RUN-02, RUN-03, RUN-04, SEC-01, SEC-02, SEC-03, SEC-04
 **Success Criteria** (what must be TRUE):
   1. `deskgate serve` écoute sur 127.0.0.1 uniquement et refuse de démarrer sur une autre interface sans option explicite
@@ -26,7 +30,7 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
 **Plans**: TBD
 **Note de recherche**: prérequis à vérifier tôt : `host.docker.internal` joint bien le loopback ; type de boucle Uvicorn (`asyncio`).
 
-### Phase 2 : Cœur d'exécution
+### Phase 2: Cœur d'exécution
 **Goal**: n8n peut soumettre une tâche, la suivre, l'annuler, et le runner l'exécute une à la fois dans un Job Object avec délai maximum, sans jamais perdre l'état après un arrêt brutal.
 **Depends on**: Phase 1
 **Requirements:** JOB-01, JOB-02, JOB-03, JOB-04, JOB-05, JOB-06, JOB-07, JOB-08, JOB-09
@@ -38,7 +42,7 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
   5. Une soumission avec une `idempotency_key` identique à une tâche non terminale est refusée ; le plugin tourne dans un sous-processus sans shell, jamais dans le processus du runner
 **Plans**: TBD
 
-### Phase 3 : Rappel fiable
+### Phase 3: Rappel fiable
 **Goal**: n8n reprend toujours, une fois et une seule, avec le bon statut, quel que soit l'état terminal de la tâche ou l'arrêt du runner, sans fuite de la signature.
 **Depends on**: Phase 2
 **Requirements:** CB-01, CB-02, CB-03, CB-04, CB-05, SEC-05, SEC-06
@@ -50,7 +54,7 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
 **Plans**: TBD
 **Note de recherche**: spike court : textes exacts des 409 de n8n 2.43.8 ; `httpx2` ne réencode pas la signature (hôte seulement réécrit, query intacte).
 
-### Phase 4 : Capacités v0.1
+### Phase 4: Capacités v0.1
 **Goal**: Le runner réalise un vrai travail : détecter des conflits IFC avec export BCF 2.1 et appeler un outil MCP stdio, sans contaminer le code MIT avec du GPL.
 **Depends on**: Phase 3
 **Requirements:** CAP-01, CAP-02, CAP-03, CAP-04, CAP-05
@@ -62,7 +66,7 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
 **Plans**: TBD
 **Note de recherche**: spikes nécessaires : SDK `mcp` 2.x dans un Job Object ; API bas niveau de `bcf-client` ; multiprocessing de `ifcclash` sous Windows.
 
-### Phase 5 : Installation et intégration n8n
+### Phase 5: Installation et intégration n8n
 **Goal**: Sur la machine cible, un utilisateur installe Deskgate, lance n8n épinglé et voit un calcul long déclenché depuis n8n reprendre avec son résultat, même après un arrêt brutal du runner.
 **Depends on**: Phase 4
 **Requirements:** INS-01, INS-02, INS-03, INS-04, INS-05, ACC-01, ACC-02
@@ -75,7 +79,7 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
 **Plans**: TBD
 **Note de recherche**: spikes nécessaires : Planificateur de tâches sans élévation (XML `schtasks`, repli `HKCU\Run`) ; `gui-scripts` sous uv ; sortie du Wait à l'échéance.
 
-## Progression
+## Progress
 
 | Phase | Plans terminés | Statut | Terminée |
 |-------|----------------|--------|----------|
