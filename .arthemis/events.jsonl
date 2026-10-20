@@ -19,3 +19,5 @@
 {"ts":"2026-10-21T01:00:00","type":"gate","ref":".arthemis/reports/gate-1-02.log","commit":"40e0f2d","note":"gate D-12 vert apres phase 2 : 7/7, 313+16 tests, 1 skip symlink"}
 {"ts":"2026-10-21T01:00:00","type":"rapport","ref":".planning/phases/02-c-ur-d-ex-cution/02-VERIFICATION.md","commit":"40e0f2d","note":"phase 2 passed 5/5, JOB-01..09 cochees"}
 {"ts":"2026-10-21T03:00:00","type":"rapport","ref":".planning/phases/03-rappel-fiable","commit":"6330ae9","note":"phase 3 planifiee : 8 plans autonomes en 5 vagues, horizon nul, plan-checker passe"}
+{"ts":"2026-10-21T06:00:00","type":"gate","ref":".arthemis/reports/gate-1-03.log","commit":"389b5aa","note":"gate D-12 vert apres phase 3 : 7/7, 468+26 tests, 1 skip symlink"}
+{"ts":"2026-10-21T06:00:00","type":"rapport","ref":".planning/phases/03-rappel-fiable/03-VERIFICATION.md","commit":"389b5aa","note":"phase 3 passed 4/4, CB-01..05 SEC-05 SEC-06 cochees"}
