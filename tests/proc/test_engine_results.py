@@ -8,9 +8,9 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
-from _support.jobs import get, make_config, run_until_terminal, submit
 
 import deskgate_sdk.run as sdk_run
+from _support.jobs import get, make_config, run_until_terminal, submit
 from deskgate import store
 from deskgate.core.config import RunnerConfig
 from deskgate.engine import Engine

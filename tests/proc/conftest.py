@@ -8,10 +8,10 @@ from pathlib import Path
 import pytest
 
 import deskgate_sdk.run as sdk_run
+from _support.jobs import make_config
 from deskgate import store
 from deskgate.core.config import RunnerConfig
 from deskgate.engine import Engine
-from _support.jobs import make_config
 
 
 @pytest.fixture
