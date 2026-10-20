@@ -10,7 +10,8 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
 
 ## Phases
 
-- [x] **Phase 1: Fondations testables** - Runner local sécurisé : configuration, jeton, contrôle Host, chemins, instance unique, `/health` (completed 2026-10-20)
+- [x] **Phase 1: Fondations testables** - Runner local sécurisé : configuration, jeton, contrôle Host, chemins, instance unique, `/health`
+ (completed 2026-10-20)
 - [ ] **Phase 2: Cœur d'exécution** - File SQLite, exécution en Job Object, API des tâches, délai, annulation, reprise après redémarrage
 - [ ] **Phase 3: Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit
 - [ ] **Phase 4: Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call`
@@ -46,7 +47,17 @@ Plans:
   3. Un faux plugin qui dépasse son délai est arrêté avec tout son arbre (petit-enfant orphelin compris) et passe `timeout` ; l'annulation (en file ou en cours) est idempotente
   4. Après `taskkill /F` du runner pendant une tâche, le redémarrage la passe `interrupted` (rappel couvert en phase 3)
   5. Une soumission avec une `idempotency_key` identique à une tâche non terminale est refusée ; le plugin tourne dans un sous-processus sans shell, jamais dans le processus du runner
-**Plans**: TBD
+**Plans:** 9 plans
+Plans:
+- [ ] 02-01-PLAN.md — Config des capacités et work_root, contrat de soumission, codes d'erreur (vague 1)
+- [ ] 02-02-PLAN.md — Noyau pur : step(), verdict, protocole worker (vague 1)
+- [ ] 02-03-PLAN.md — Store : migration 1, file, outbox, annulation, recovery (vague 1)
+- [ ] 02-04-PLAN.md — jobobject (ctypes), env en liste blanche, frontières AST (vague 1)
+- [ ] 02-05-PLAN.md — deskgate_sdk (worker stdlib) et faux plugins (vague 2)
+- [ ] 02-06-PLAN.md — Engine : tick, annulation, échéance, réveil, arrêt (vague 2)
+- [ ] 02-07-PLAN.md — JobsService et routes /jobs, lifespan d'arrêt (vague 2)
+- [ ] 02-08-PLAN.md — Engine prouvé avec de vrais sous-processus (vague 3)
+- [ ] 02-09-PLAN.md — Câblage deskgate serve et e2e (flux, taskkill, CTRL_BREAK) (vague 4)
 
 ### Phase 3: Rappel fiable
 **Goal**: n8n reprend toujours, une fois et une seule, avec le bon statut, quel que soit l'état terminal de la tâche ou l'arrêt du runner, sans fuite de la signature.
@@ -90,7 +101,7 @@ Plans:
 | Phase | Plans terminés | Statut | Terminée |
 |-------|----------------|--------|----------|
 | 1. Fondations testables | 0/5 | Complete    | 2026-10-20 |
-| 2. Cœur d'exécution | 0/0 | Non commencée | - |
+| 2. Cœur d'exécution | 0/9 | Planifiée | - |
 | 3. Rappel fiable | 0/0 | Non commencée | - |
 | 4. Capacités v0.1 | 0/0 | Non commencée | - |
 | 5. Installation et intégration n8n | 0/0 | Non commencée | - |
