@@ -23,6 +23,10 @@ Aucune attente artificielle. Aucune modification de `runner.toml`.
 | 0 : sélections par défaut, hard 0,01 | `d0d658690e26` | 218,9 | 3665 | 267 conflits, 51 groupes | 253025 |
 | 1 : sélections élargies, hard 0,01 | `f98099bfcce9` | 281,4 | 3997 | 2312 conflits (tronqué), 359 groupes, 359 sujets BCF | 1694464 |
 | 2 : sélections élargies, clearance 0,05 | `595286f5ba6e` | 278,1 | 5078 | 9522 conflits (tronqué), 206 groupes, 206 sujets BCF | 959966 |
+| 3 : `IfcElement` x `IfcElement`, clearance 0,05 | `2befb1f418d5` | 460,7 | 4665 | 21227 conflits (tronqué), 138 groupes, 138 sujets BCF | 644960 |
+
+- Palier 3 (demandé par l'utilisateur le 2026-10-21) : mêmes constats (succeeded, « Succes », delivered, provenance
+  tâche planifiée), preuve `C:\BIM\recette\acc01-p3.json`, verdict du script faux sur le seul critère de durée.
 
 - Palier 0 : 2026-10-21T09:24:26Z à 09:28:33Z. Palier 1 : 09:28:44Z à 09:33:52Z. Palier 2 : 09:34:20Z à 09:39:27Z.
 - Pour les trois : `job_status` succeeded, nœud n8n « Succes », `callback_state` delivered, 1 tentative, artefacts
@@ -31,8 +35,8 @@ Aucune attente artificielle. Aucune modification de `runner.toml`.
 - Preuves JSON : `C:\BIM\recette\acc01-p0.json`, `acc01-p1.json`, `acc01-p2.json`.
 - BCF retenu pour 04-D1 : `C:\BIM\travail\f98099bfcce9\conflits.bcf`.
 
-Écart : le critère « calcul de plus de 600 s » n'est pas atteint. Même avec les sélections et le seuil élargis du
-palier 2, la durée maximale est de 281 s. Les sélections ne contiennent plus de classe IFC utile à ajouter ;
+Écart : le critère « calcul de plus de 600 s » n'est pas atteint. Même avec tous les `IfcElement` des deux
+maquettes (palier 3), la durée maximale est de 461 s. Les sélections ne contiennent plus de classe IFC utile à ajouter ;
 la durée n'a pas été allongée artificiellement (D-09). Le mécanisme de reprise est constaté sur 3 calculs réels de
 plus de 200 s, avec un fichier de 530 Mo et un de 51 Mo. Au vérificateur de décider.
 
