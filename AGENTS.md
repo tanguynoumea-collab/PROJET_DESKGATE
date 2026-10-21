@@ -1,9 +1,8 @@
 # AGENTS.md — installer Deskgate (procédure pour une IA)
 
-> **Statut : procédure cible.** Les commandes ci-dessous décrivent l'installation visée ; elles
-> deviennent exécutables au fil des versions (v0.1 pour le runner, v0.3 pour le nœud n8n) et la
-> procédure sera éprouvée sur un PC vierge en v0.4. Ne pas inventer de commande absente du dépôt :
-> si une étape échoue parce qu'elle n'existe pas encore, s'arrêter et le signaler.
+> **Statut : procédure éprouvée en v0.1 sur Windows 11 (phase 5).** Elle sera rejouée sur un PC
+> vierge en v0.4. Ne pas inventer de commande absente du dépôt : si une étape échoue parce qu'elle
+> n'existe pas, s'arrêter et le signaler.
 
 Règles de dépôt pour le développement : voir [`CLAUDE.md`](CLAUDE.md).
 
@@ -42,6 +41,16 @@ uv tool install .           # installe la commande `deskgate`
 deskgate --version
 ```
 
+Si `deskgate` n'est pas dans le `PATH` : `uv tool update-shell` (puis rouvrir le terminal), ou appeler
+l'exécutable dans le dossier donné par `uv tool dir --bin`. Si l'interpréteur géré par `uv` est
+indisponible, définir `UV_PYTHON` sur un Python ≥ 3.11 déjà installé.
+
+> **Terminal normal obligatoire.** Une application empaquetée en MSIX (par exemple les outils isolés
+> de l'application de bureau Claude) virtualise `%LOCALAPPDATA%` et `%APPDATA%`. Lancer `uv tool install`
+> et `deskgate init` depuis un terminal ordinaire (PowerShell ouvert depuis le menu Démarrer, pas
+> depuis une application empaquetée). Symptômes d'une installation virtualisée : tâche planifiée avec le
+> dernier résultat `0x8007010B`, fichiers sous `%LOCALAPPDATA%\Packages\<application>\LocalCache`.
+
 ## 3. Initialiser
 
 ```powershell
@@ -50,14 +59,43 @@ deskgate init
 
 `deskgate init` crée `runner.toml`, le dossier partagé (`C:\BIM` par défaut) et ses sous-dossiers
 `depot`, `travail`, `livrables`, génère le jeton et propose de créer la tâche du Planificateur
-(démarrage à l'ouverture de session). Puis :
+(démarrage à l'ouverture de session). Le **jeton est seul sur la sortie standard** (une ligne) ; le
+guidage va sur la sortie d'erreur.
+
+Options : `--root <dossier>` (racine partagée), `--force` (sauvegarde `runner.toml` en `.bak-*` puis le
+réécrit), `--no-task` (pas de tâche), `--yes` (crée la tâche sans question). La tâche est refusée si
+`DESKGATE_HOME` est défini.
+
+Pour une IA : rediriger le jeton vers un fichier hors du dépôt, sans jamais le lire dans la
+conversation. Dans Windows PowerShell 5.1, `>` écrit en UTF-16 et le jeton devient inutilisable : passer
+par `cmd` (ou `Out-File -Encoding ascii`).
 
 ```powershell
-deskgate doctor             # tout doit être vert ; sinon rapporter la sortie
-deskgate serve              # premier lancement manuel, pour vérifier
+cmd /c "deskgate init --yes > <fichier-hors-depot>"
 ```
 
-Vérifier : `curl http://127.0.0.1:8765/health` répond.
+Puis démarrer le runner par la tâche et vérifier :
+
+```powershell
+deskgate task run
+deskgate doctor > <fichier>   # tout doit être [ok] ; rapporter la sortie sinon
+curl http://127.0.0.1:8765/health
+```
+
+Ne pas relier `deskgate doctor` à un tube sur la console Windows (plantage de Rich) : le rediriger vers un
+fichier. Le journal est `%LOCALAPPDATA%\Deskgate\logs\runner.log`. `deskgate serve` en console ne sert
+qu'à voir une erreur de configuration.
+
+### Tâche du Planificateur
+
+```powershell
+deskgate task install | status | run | end | remove
+```
+
+`install` crée la tâche (sans élévation), `status` la compare à l'attendu, `run` la lance, `end` l'arrête,
+`remove` la supprime. Un runner tué brutalement **n'est pas relancé automatiquement** : relancer par
+`deskgate task run` ou à la prochaine ouverture de session. Les tâches `running` deviennent `interrupted`
+au redémarrage et n8n reçoit le rappel.
 
 ## 4. Installer les plugins (v0.1)
 
@@ -76,7 +114,8 @@ Puis, dans `runner.toml`, copier le bloc d'exemples de `src/deskgate/runner.exam
 `# >>> exemples phase 4` et `# <<< exemples phase 4`), retirer les `# ` et remplacer les chemins par
 ceux des environnements créés ci-dessus (`...\bim\Scripts\python.exe` et
 `...\bcf\Scripts\deskgate-bcf.exe`). Les exemples couvrent `ifc.clash`, `mcp.call` et `mcp_servers`.
-Redémarrer le runner.
+Adapter `memory_mb` de `[capabilities."ifc.clash"]` à la machine (24576 sur le PC de recette). Vérifier
+les chemins par `deskgate doctor`, puis `deskgate task end` et `deskgate task run`.
 
 Consignes :
 
@@ -88,30 +127,57 @@ Consignes :
 
 ## 5. Brancher n8n
 
-```powershell
-cd n8n
-docker compose up -d        # n8n 2.43.8 épinglé + Postgres, C:\BIM monté sur /data
-```
-
-Vérifier depuis le conteneur :
+Le compose du dépôt publie n8n 2.43.8 (et Postgres) sur `127.0.0.1:5679`, `C:\BIM` monté sur `/data`.
 
 ```powershell
-docker compose exec n8n wget -qO- http://host.docker.internal:8765/health
+cp n8n/.env.example n8n/.env          # puis remplacer chaque valeur a-remplacer par un secret généré
+docker compose -f n8n/docker-compose.yml pull
+docker compose -f n8n/docker-compose.yml up -d
 ```
 
-Puis, dans n8n : installer le nœud communautaire `n8n-nodes-deskgate` (v0.3) ou importer
-`n8n/examples/*.json` (v0.1), et créer l'identifiant « Deskgate » avec l'URL
-`http://host.docker.internal:8765` et le jeton.
+`n8n/.env` est ignoré par git ; `N8N_ENCRYPTION_KEY` doit rester stable ; `N8N_WEBHOOK_URL` désigne
+`127.0.0.1` ou `localhost` (sinon le runner refuse la `resumeUrl`). Vérifier depuis le conteneur :
+
+```powershell
+docker compose -f n8n/docker-compose.yml exec -T n8n wget -qO- http://host.docker.internal:8765/health
+docker compose -f n8n/docker-compose.yml exec -T n8n ls /data
+```
+
+Importer l'exemple et créer l'identifiant « Deskgate » (le jeton passe par l'entrée standard du
+conteneur, jamais par un fichier du dépôt) : `uv run python scripts/recette/n8n_setup.py`, ou les étapes
+de [`n8n/README.md`](n8n/README.md). Voir aussi [`scripts/recette/README.md`](scripts/recette/README.md).
+
+Avec un **n8n déjà installé** : importer à la main `n8n/examples/ifc-clash.json`, ne pas modifier sa
+configuration, et vérifier que sa `WEBHOOK_URL`/`N8N_WEBHOOK_URL` désigne `127.0.0.1` ou `localhost`.
+Le nœud communautaire `n8n-nodes-deskgate` n'arrive qu'en v0.3.
 
 ## 6. Test de bout en bout
 
-Importer `n8n/examples/ifc-clash.json`, déposer un IFC d'exemple dans `C:\BIM\depot\`, lancer le
-workflow : il doit se mettre en attente puis reprendre avec un résumé et le chemin d'un BCF.
+Déposer un IFC d'exemple dans `C:\BIM\depot\`, puis `POST http://127.0.0.1:5679/webhook/deskgate-ifc-clash`
+(corps `{"params": {...}, "timeout": 14400}` ; un 404 juste après la publication : réessayer), ou lancer
+`uv run python scripts/recette/recette.py smoke`. Le workflow se met en attente puis reprend avec un
+résumé et le chemin d'un BCF. Si `recette.py` tourne dans un contexte virtualisé, donner `--out`
+explicitement (dossier hors `%LOCALAPPDATA%`, par exemple sous `C:\BIM\recette`).
+
+## Mettre à jour
+
+```powershell
+deskgate task end
+uv tool upgrade deskgate        # ou : uv tool install --force .
+deskgate task run
+deskgate doctor > <fichier>
+```
 
 ## Dépannage
 
 | Symptôme | Cause probable |
 |---|---|
 | n8n ne joint pas le runner | Runner arrêté ; Docker Engine dans WSL (pas Docker Desktop) : voir `ARCHITECTURE.md` §2 |
+| Runner arrêté après un arrêt brutal | Pas de relance automatique : `deskgate task run` |
+| Aucun journal | Vérifier `logs\runner.log` ; sinon erreur de configuration : `deskgate doctor` |
+| Tâche planifiée en `0x8007010B` | Installation faite depuis une application MSIX : refaire depuis un terminal normal |
+| Jeton refusé après `init` | Fichier écrit en UTF-16 par `>` de PowerShell 5.1 : utiliser `cmd /c` |
+| Webhook 404 juste après la publication | Enregistrement en cours : réessayer après quelques secondes |
+| Wait expiré | Branche « Echec ou delai » : rappel absent ; voir `n8n/README.md` |
 | Rappel refusé en 401 | `resumeUrl` modifiée : elle doit être transmise telle quelle |
 | Plugin `requires_session` en échec | Session Windows verrouillée ou fermée |
