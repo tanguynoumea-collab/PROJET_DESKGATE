@@ -26,3 +26,4 @@
 {"ts":"2026-10-21T15:00:00","type":"rapport","ref":".planning/phases/04-capacit-s-v0-1/04-VERIFICATION.md","commit":"2f868b1","note":"phase 4 human_needed 4/4, CAP-01..05 cochees, 04-D1 differe"}
 {"ts":"2026-10-21T09:30:00","type":"fermeture","ref":"01-D1","commit":"b9e8a8c","note":"host.docker.internal vers 127.0.0.1 verifie depuis le n8n de l'utilisateur"}
 {"ts":"2026-10-21T09:41:00","type":"rapport","ref":".arthemis/PASSATION.md","commit":"ff5cba0","note":"passation preparee, phase 5 recherchee, prochaine etape planification"}
+{"ts":"2026-10-21T10:00","type":"reprise","ref":"passation 2026-10-21T09:41","commit":"6cc98d0","note":"decisions reportees ecrites ; items uv-pythons et remote-ci ouverts"}

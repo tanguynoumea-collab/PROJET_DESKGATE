@@ -126,6 +126,30 @@
       "source": ".planning/phases/04-capacit-s-v0-1/04-HUMAN-UAT.md",
       "ref": "CAP-02",
       "condition_levee": "resultat saisi dans 04-HUMAN-UAT.md"
+    },
+    {
+      "id": "uv-pythons",
+      "type": "decision",
+      "titre": "Pythons geres par uv casses (Roaming\\uv\\python 3.13/3.14) ; reparation proposee, contournement UV_PYTHON",
+      "gravite": "mineur",
+      "statut": "en_attente_decision",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-21",
+      "source": "passation 2026-10-21T09:41",
+      "ref": ".planning/STATE.md",
+      "condition_levee": "reparation acceptee et faite, ou refus consigne"
+    },
+    {
+      "id": "remote-ci",
+      "type": "decision",
+      "titre": "Depot sans remote : CI windows-latest jamais executee, Python 3.12/3.13 non testes",
+      "gravite": "majeur",
+      "statut": "en_attente_decision",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-21",
+      "source": "passation 2026-10-21T09:41",
+      "ref": null,
+      "condition_levee": "remote cree et CI verte, ou report consigne avant CLOTURE_MILESTONE"
     }
   ],
   "livraisons": [],
@@ -183,6 +207,6 @@
   },
   "maj": {
     "le": "2026-10-21",
-    "commit": "f04eb9b"
+    "commit": "6cc98d0"
   }
 }
