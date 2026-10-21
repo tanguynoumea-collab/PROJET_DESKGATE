@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
 stopped_at: "Phase 5 : recherche faite, prochaine étape planification (05-VALIDATION.md puis gsd-planner)"
-last_updated: "2026-10-21T07:41:44.809Z"
+last_updated: "2026-10-21T07:44:49.950Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 5
@@ -106,6 +106,8 @@ Recent decisions affecting current work:
 - [Phase 04]: Contexte gris BCF : arbre BREP natif + select_box (voie A du spike)
 - [Phase 5]: Accord utilisateur du 2026-10-21 : créer C:\BIM (depot, travail, livrables), %LOCALAPPDATA%\Deskgate, et installer la tâche du Planificateur ; recette sur le compose du dépôt (n8n 2.43.8, port 5679) ET sur le n8n de l'utilisateur (2.42.5, port 5678, non modifié) ; calcul long CVC (PIC-EXE-AW-CVC, 532 Mo) × ARC (PIC_REV_HRS_ARC) en mode hard, maquettes copiées depuis G:\Mon Drive\07_PROJETS\DESKGATE — Décisions de la discussion de la phase 5 ; 01-D1 (host.docker.internal) vérifié le 2026-10-21
 - [Phase 5]: Recherche phase 5 : action de la tâche = pythonw.exe -m deskgate serve + journal fichier après le mutex ; RestartOnFailure ne relance pas après taskkill /F (relance ACC-02 par schtasks /Run) ; N8N_WEBHOOK_URL ; workflow avec déclencheur Webhook ; test If sur $json.body?.status ; import CLI n8n (id requis) ; n8n de l'utilisateur : import manuel sauf accord — Expériences de 05-RESEARCH.md (tâche jetable supprimée, n8n 2.42.5 jetable)
+- [Phase 5]: Pythons gérés par uv (AppData\Roaming\uv\python 3.13/3.14) cassés depuis une recherche de la phase 1 ; en attendant réparation, UV_PYTHON=C:\Users\Tanguy\AppData\Local\Python\pythoncore-3.14-64\python.exe — Report de la passation 2026-10-21T09:41 ; réparation proposée, réponse utilisateur attendue
+- [Phase 5]: Exécution des plans séquentielle dans l'arbre principal (pas de worktree), un gsd-executor à la fois ; n8n de l'utilisateur (pipelines-n8n, 2.42.5, port 5678) jamais modifié — Report de la passation 2026-10-21T09:41
 
 ### Pending Todos
 
