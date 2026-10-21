@@ -30,3 +30,11 @@ def config_path(home: Path, override: Path | None = None) -> Path:
 
 def db_path(home: Path) -> Path:
     return home / "deskgate.db"
+
+
+def logs_dir(home: Path) -> Path:
+    return home / "logs"
+
+
+def log_path(home: Path) -> Path:
+    return logs_dir(home) / "runner.log"

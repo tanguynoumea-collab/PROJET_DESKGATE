@@ -6,6 +6,7 @@ Configuration, puis mutex, puis socket exclusif, puis base, puis Uvicorn.
 from __future__ import annotations
 
 import logging
+import logging.handlers
 import os
 import sys
 from pathlib import Path
@@ -25,7 +26,7 @@ from deskgate.instance import (
     instance_name_from_env,
 )
 from deskgate.jobs import JobsService
-from deskgate.locations import config_path, db_path, resolve_home
+from deskgate.locations import config_path, db_path, log_path, logs_dir, resolve_home
 from deskgate.sender import Sender
 from deskgate.store import SchemaTooNew, open_db, recover_interrupted
 
@@ -34,19 +35,26 @@ EXIT_ALREADY_RUNNING = 3
 EXIT_BIND_FAILED = 4
 EXIT_DB_ERROR = 5
 
+LOG_MAX_BYTES = 2 * 1024 * 1024
+LOG_BACKUPS = 5
+LOG_FORMAT = "%(asctime)s %(levelname)s %(name)s : %(message)s"
+
 logger = logging.getLogger("deskgate")
 
 
 def configure_logging() -> None:
     """Journal sur stderr, signature masquée sur tous les handlers (D-07, SEC-05)."""
-    handler = logging.StreamHandler(sys.stderr)
-    handler.setFormatter(RedactingFormatter("%(asctime)s %(levelname)s %(name)s : %(message)s"))
-    handler.addFilter(RedactingFilter())
-    logger.handlers[:] = [handler]
+    handlers: list[logging.Handler] = []
+    if sys.stderr is not None:  # pythonw : pas de flux, le journal fichier prend le relais
+        handler = logging.StreamHandler(sys.stderr)
+        handler.setFormatter(RedactingFormatter(LOG_FORMAT))
+        handler.addFilter(RedactingFilter())
+        handlers.append(handler)
+    logger.handlers[:] = handlers
     logger.setLevel(logging.INFO)
     logger.propagate = False
     root = logging.getLogger()
-    root.handlers[:] = [handler]
+    root.handlers[:] = handlers
     root.setLevel(logging.WARNING)
     third = logging.WARNING
     level = os.environ.get("DESKGATE_LOG_LEVEL", "").upper()
@@ -55,6 +63,20 @@ def configure_logging() -> None:
         third = getattr(logging, level)
     for name in ("httpx2", "httpcore2"):
         logging.getLogger(name).setLevel(third)
+
+
+def attach_file_log(home: Path) -> Path:
+    """Ajoute le journal fichier rotatif (appelé après le mutex), signature masquée."""
+    logs_dir(home).mkdir(parents=True, exist_ok=True)
+    path = log_path(home)
+    handler = logging.handlers.RotatingFileHandler(
+        path, maxBytes=LOG_MAX_BYTES, backupCount=LOG_BACKUPS, encoding="utf-8"
+    )
+    handler.setFormatter(RedactingFormatter(LOG_FORMAT))
+    handler.addFilter(RedactingFilter())
+    logger.addHandler(handler)
+    logging.getLogger().addHandler(handler)
+    return path
 
 
 def _err(message: str) -> None:
@@ -78,6 +100,13 @@ def serve(config_override: Path | None = None) -> int:
             "arrêt sans toucher à la base."
         )
         return EXIT_ALREADY_RUNNING
+
+    try:
+        path = attach_file_log(home)
+    except OSError as exc:
+        path = None
+        _err(f"Journal fichier indisponible : {exc}")
+    logger.info("Runner Deskgate %s démarré (pid %d), journal : %s", __version__, os.getpid(), path)
 
     try:
         sock = bind_exclusive(cfg.host, cfg.port)

@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import logging
+import sys
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 
-from deskgate.runtime import configure_logging
+from deskgate.runtime import attach_file_log, configure_logging
 
 pytestmark = pytest.mark.unit
 
@@ -58,3 +60,32 @@ def test_niveau_info_sur_demande(
     err = capsys.readouterr().err
     assert "ligne signature=***" in err
     assert "SEC9" not in err
+
+
+@pytest.mark.usefixtures("logging_isole")
+def test_stderr_none_sans_handler(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(sys, "stderr", None)
+    configure_logging()
+    assert logging.getLogger("deskgate").handlers == []
+    assert logging.getLogger().handlers == []
+
+
+@pytest.mark.usefixtures("logging_isole")
+def test_journal_fichier_masque_et_additif(tmp_path: Path) -> None:
+    configure_logging()
+    avant = len(logging.getLogger("deskgate").handlers)
+    path = attach_file_log(tmp_path)
+    lg = logging.getLogger("deskgate")
+    try:
+        assert len(lg.handlers) == avant + 1
+        lg.info("rappel vers http://h/w?signature=SECRET123")
+        for h in lg.handlers:
+            h.flush()
+        texte = path.read_text(encoding="utf-8")
+        assert path == tmp_path / "logs" / "runner.log"
+        assert "rappel vers" in texte
+        assert "SECRET123" not in texte
+    finally:
+        for h in list(lg.handlers) + list(logging.getLogger().handlers):
+            if isinstance(h, logging.FileHandler):
+                h.close()

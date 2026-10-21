@@ -9,7 +9,7 @@ from typing import Annotated
 
 import typer
 
-from deskgate import runtime
+from deskgate import __version__, runtime
 from deskgate.core.tokens import generate_token, hash_token
 
 # cp1252 par défaut sous Windows ; sous pythonw le flux vaut None (isinstance l'écarte).
@@ -22,6 +22,27 @@ app = typer.Typer(
     add_completion=False,
     help="Deskgate : passerelle locale entre n8n et le poste Windows.",
 )
+
+
+def _version(value: bool) -> None:
+    if value:
+        typer.echo(f"deskgate {__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def main(
+    version: Annotated[
+        bool,
+        typer.Option(
+            "--version",
+            callback=_version,
+            is_eager=True,
+            help="Affiche la version et quitte.",
+        ),
+    ] = False,
+) -> None:
+    """Deskgate : passerelle locale entre n8n et le poste Windows."""
 
 
 @app.command()
