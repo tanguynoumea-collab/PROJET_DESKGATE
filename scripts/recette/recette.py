@@ -233,7 +233,8 @@ def run(scenario: str, args: argparse.Namespace) -> int:
         if scenario == "smoke":
             proof["verdict"] = succes
         elif scenario == "acc01":
-            proof["verdict"] = succes and (proof["duration_s"] or 0) > 600
+            proof["min_duration_s"] = args.min_duration_s
+            proof["verdict"] = succes and (proof["duration_s"] or 0) > args.min_duration_s
         else:
             proof["verdict"] = bool(
                 node == "Echec ou delai"
@@ -264,6 +265,8 @@ def main() -> int:
         p.add_argument("--params-file")
         p.add_argument("--timeout", type=int, default=600 if name == "smoke" else 14400)
         p.add_argument("--out")
+        if name == "acc01":
+            p.add_argument("--min-duration-s", type=int, default=600)
         if name == "acc02":
             p.add_argument("--kill-after-s", type=int, default=90)
     return run(*(lambda a: (a.scenario, a))(parser.parse_args()))
