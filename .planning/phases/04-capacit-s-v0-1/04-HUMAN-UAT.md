@@ -1,5 +1,5 @@
 ---
-status: partial
+status: diagnosed
 phase: 04-capacit-s-v0-1
 source: [04-07-PLAN.md]
 started: 2026-10-20T00:00:00Z
@@ -20,7 +20,10 @@ awaiting: user response
 
 ### 1. Rendu du BCF ifc.clash dans BIMcollab Zoom (deux vues, contexte gris transparent, couleurs)
 expected: Vue 1 : seuls les deux objets du conflit visibles, rouge et bleu ; vue 2 : maquette visible, contexte gris transparent, objets du conflit colorés ; caméra cadrée sur le conflit
-result: pending
+result: issue
+reported: "Ce n'est pas validé il manque les points de vue." (utilisateur, 2026-10-21, BIMcollab Zoom)
+severity: major
+diagnostic_initial: chaque sujet a 2 fichiers .bcfv (camera, visibilite, couleurs) mais aucun snapshot PNG ni balise Snapshot dans markup.bcf ; cameras en coordonnees georeferencees (X ~ 2 498 991 m)
 id: 04-D1
 kind: verify
 source: 04-07/T2
@@ -33,8 +36,8 @@ if_fail: gap, /gsd:plan-phase 4 --gaps
 
 total: 1
 passed: 0
-issues: 0
-pending: 1
+issues: 1
+pending: 0
 skipped: 0
 blocked: 0
 
