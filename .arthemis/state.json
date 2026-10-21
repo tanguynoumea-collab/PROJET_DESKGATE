@@ -176,6 +176,18 @@
       "source": "execution 05-06 tache 3",
       "ref": "src/deskgate/doctor.py",
       "condition_levee": "doctor detecte ou init refuse un home virtualise ; teste"
+    },
+    {
+      "id": "acc01-duree",
+      "type": "decision",
+      "titre": "ACC-01 : 3 calculs reels repris par n8n (219 a 281 s) mais aucun au-dela de 600 s",
+      "gravite": "majeur",
+      "statut": "en_attente_decision",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-21",
+      "source": "05-08-SUMMARY.md",
+      "ref": "ACC-01",
+      "condition_levee": "calcul > 600 s constate, ou critere revu par decision datee"
     }
   ],
   "livraisons": [],
