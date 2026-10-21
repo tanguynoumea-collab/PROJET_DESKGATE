@@ -10,7 +10,7 @@ Runner démarré par la tâche planifiée « Deskgate » (pythonw sous svchost.e
 |---|---|---|
 | INS-01, INS-02 | Constaté | 05-06-SUMMARY |
 | INS-03, INS-04, INS-05 | Constaté | 05-07-SUMMARY (smoke `d6e17341c4b3`) |
-| ACC-01 | **Non atteint tel qu'écrit (durée)** : reprise, résumé et BCF constatés, mais durée maximale 281 s < 600 s | section ACC-01 |
+| ACC-01 | Constaté selon le critère revu le 2026-10-21 (palier 4 `1ec19b03b33d`, 486 s, complet) ; la durée de 600 s écrite n'est plus un objectif (décision STATE.md) | section ACC-01 |
 | ACC-02 | Constaté | section ACC-02 |
 
 ## ACC-01
@@ -25,6 +25,18 @@ Aucune attente artificielle. Aucune modification de `runner.toml`.
 | 2 : sélections élargies, clearance 0,05 | `595286f5ba6e` | 278,1 | 5078 | 9522 conflits (tronqué), 206 groupes, 206 sujets BCF | 959966 |
 | 3 : `IfcElement` x `IfcElement`, clearance 0,05 | `2befb1f418d5` | 460,7 | 4665 | 21227 conflits (tronqué), 138 groupes, 138 sujets BCF | 644960 |
 
+| 4 : coordination fiable, hard 0,01, `max_clashes` 100000 | `1ec19b03b33d` | 485,8 | 5964 | 3690 conflits (complet), 526 groupes, 526 sujets BCF | 2518670 |
+
+- Palier 4 (critère revu par l'utilisateur le 2026-10-21, STATE.md : durée indifférente, coordination la plus
+  fiable) : sélection A = CVC `IfcElement` sans `IfcOpeningElement`, `IfcVirtualElement`, `IfcElementAssembly`
+  (34628 éléments) ; sélection B = ARC idem sans `IfcCurtainWall`, `IfcStair`, `IfcFurnishingElement` (8070
+  éléments). `clashes.json` complet (3690 retournés sur 3690, `truncated` faux) ; le `truncated` du résumé du
+  rappel vient seulement de l'omission des paires au-delà de 900 Ko (règle 7, artefact complet). succeeded,
+  « Succes », delivered en 1 tentative, provenance tâche planifiée. Preuve `C:\BIM\recette\acc01-p4.json` ;
+  le verdict du script est faux sur le seul ancien critère de durée. **ACC-01 constaté selon le critère revu.**
+- BCF retenu pour 04-D1 (remplace celui du palier 1) : `C:\BIM\travail\1ec19b03b33d\conflits.bcf`.
+- Les paliers 1 à 3 étaient tronqués à 1000 paires (`max_clashes` par défaut) et le palier 3 incluait les
+  réservations ARC : findings `clash-troncature` et `clash-reservations` ouverts dans l'état ARTHEMIS.
 - Palier 3 (demandé par l'utilisateur le 2026-10-21) : mêmes constats (succeeded, « Succes », delivered, provenance
   tâche planifiée), preuve `C:\BIM\recette\acc01-p3.json`, verdict du script faux sur le seul critère de durée.
 

@@ -61,7 +61,7 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 
 ### Acceptation
 
-- [ ] **ACC-01**: Un calcul de plus de 10 minutes lancé depuis n8n, avec le runner démarré par la tâche planifiée, reprend dans n8n avec le résumé et le chemin du BCF
+- [x] **ACC-01**: Un calcul de plus de 10 minutes lancé depuis n8n, avec le runner démarré par la tâche planifiée, reprend dans n8n avec le résumé et le chemin du BCF
 - [x] **ACC-02**: Un arrêt brutal du runner pendant une tâche produit, au redémarrage, un rappel `interrupted` reçu par n8n
 
 ### Socle ARTHEMIS
@@ -157,7 +157,7 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | INS-03 | Phase 5 | Complete |
 | INS-04 | Phase 5 | Complete |
 | INS-05 | Phase 5 | Complete |
-| ACC-01 | Phase 5 | Pending |
+| ACC-01 | Phase 5 | Complete |
 | ACC-02 | Phase 5 | Complete |
 | SOC-01 | Phase 5 | Pending |
 | SOC-02 | Phase 5 | Pending |
