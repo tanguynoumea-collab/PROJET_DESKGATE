@@ -14,7 +14,9 @@ from pathlib import Path
 
 import jsonschema
 
-SUPPORTED = {1: "bcf-write-v1.json"}
+SUPPORTED = {1: "bcf-write-v1.json", 2: "bcf-write-v2.json"}
+MAX_SNAPSHOT = 2_097_152
+PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
 
 
 def _err(*lines: str) -> None:
@@ -23,10 +25,29 @@ def _err(*lines: str) -> None:
     print("\n".join(lines), file=sys.stderr)
 
 
+def _check_snapshots(doc: dict, base: Path) -> list[str]:
+    """Refus des snapshots douteux (règle 4) : une ligne par refus."""
+    refus: list[str] = []
+    for topic in doc.get("topics", []):
+        for rel in (topic.get("snapshots") or {}).values():
+            p = (base / rel).resolve()
+            if not p.is_relative_to(base):
+                refus.append(f"Snapshot hors du dossier d'entrée : {rel}.")
+            elif not p.is_file():
+                refus.append(f"Snapshot introuvable : {rel}.")
+            elif p.stat().st_size > MAX_SNAPSHOT:
+                refus.append(f"Snapshot trop gros (> 2 Mio) : {rel}.")
+            else:
+                with p.open("rb") as f:
+                    if f.read(8) != PNG_MAGIC:
+                        refus.append(f"Snapshot non PNG : {rel}.")
+    return refus
+
+
 def _parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="deskgate-bcf", description="Écriture BCF 2.1 pour Deskgate.")
     sub = p.add_subparsers(dest="command", required=True)
-    w = sub.add_parser("write", help="écrit un BCF depuis un JSON bcf-write-v1")
+    w = sub.add_parser("write", help="écrit un BCF depuis un JSON bcf-write-v1 ou v2")
     w.add_argument("--input", required=True, help="JSON d'entrée")
     w.add_argument("--output", required=True, help="fichier .bcf à écrire")
     return p
@@ -50,7 +71,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     version = doc.get("schema_version") if isinstance(doc, dict) else None
     if isinstance(version, bool) or not isinstance(version, int) or version not in SUPPORTED:
-        _err("schema_version inconnue : versions acceptées 1.")
+        _err("schema_version inconnue : versions acceptées 1, 2.")
         return 2
     schema_text = (resources.files("deskgate_bcf") / "schemas" / SUPPORTED[version]).read_text(
         encoding="utf-8"
@@ -60,12 +81,18 @@ def main(argv: list[str] | None = None) -> int:
         key=lambda e: [str(x) for x in e.absolute_path],
     )
     if errors:
-        lines = ["Entrée non conforme au contrat bcf-write-v1 :"]
+        lines = [f"Entrée non conforme au contrat bcf-write-v{version} :"]
         for e in errors[:10]:
             path = "/".join(str(x) for x in e.absolute_path)
             lines.append(f"- {path} : {e.message[:300]}")
         _err(*lines)
         return 2
+    base = src.resolve().parent
+    if version == 2:
+        refus = _check_snapshots(doc, base)
+        if refus:
+            _err(*refus[:10])
+            return 2
     out = Path(args.output)
     if not out.parent.is_dir():
         _err(f"Dossier de sortie introuvable : {out.parent}.")
@@ -73,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         from deskgate_bcf import writer
 
-        writer.write(doc, out)
+        writer.write(doc, out, base=base)
     except Exception as e:
         _err(f"Écriture du BCF impossible : {type(e).__name__} : {str(e)[:500]}.")
         return 3
