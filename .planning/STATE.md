@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
 stopped_at: Completed 05-09-PLAN.md
-last_updated: "2026-10-21T11:28:42.325Z"
+last_updated: "2026-10-21T12:22:33.857Z"
 last_activity: 2026-10-21
 progress:
   total_phases: 5
@@ -122,6 +122,7 @@ Recent decisions affecting current work:
 - [Phase 5]: 05-06 : Claude (app MSIX) virtualise %LOCALAPPDATA% et %APPDATA% ; l'installation (uv tool install, init, plugins, bloc ifc.clash) est faite par l'utilisateur dans un PowerShell hors Claude, après suppression des copies virtualisées. Les exécuteurs ne font que lire %LOCALAPPDATA%\Deskgate, jamais y écrire — Choix utilisateur (option A) du 2026-10-21, parcours d'installation réel
 - [Phase 05]: Recette: paramètres et preuves sous C:\BIM\recette (MSIX), n8n 2.43.8 sans écart
 - [Phase 05]: ACC-01 non marqué complet : durée max 281 s < 600 s après paliers D-09; ACC-02 constaté
+- [Phase 5]: ACC-01 : la durée n'est pas un objectif ; le critère retenu est un calcul de coordination réel et complet (maquettes réelles, aucun conflit tronqué, réservations exclues, mode hard 1 cm) lancé depuis n8n, runner démarré par la tâche, repris avec résumé et chemin du BCF — Décision utilisateur du 2026-10-21 : « peu importe le temps de calcul, la coordination la plus fiable »
 
 ### Pending Todos
 
