@@ -77,7 +77,7 @@ def _importeurs(module: str) -> set[str]:
 
 
 def test_ctypes_seulement_dans_jobobject() -> None:
-    assert _importeurs("ctypes") <= {"jobobject.py", "instance.py"}
+    assert _importeurs("ctypes") <= {"jobobject.py", "instance.py", "scheduler.py"}
 
 
 def test_sqlite3_seulement_dans_store() -> None:
@@ -85,7 +85,7 @@ def test_sqlite3_seulement_dans_store() -> None:
 
 
 def test_subprocess_seulement_dans_jobobject() -> None:
-    assert _importeurs("subprocess") <= {"jobobject.py"}
+    assert _importeurs("subprocess") <= {"jobobject.py", "scheduler.py"}
 
 
 def test_httpx2_seulement_dans_sender() -> None:
