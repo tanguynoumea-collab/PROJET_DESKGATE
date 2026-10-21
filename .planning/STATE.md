@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: executing
 stopped_at: Completed 05-04-PLAN.md
-last_updated: "2026-10-21T08:43:27.814Z"
+last_updated: "2026-10-21T08:59:58.861Z"
 last_activity: 2026-10-21
 progress:
   total_phases: 5
@@ -116,6 +116,7 @@ Recent decisions affecting current work:
 - [Phase 5]: scheduler.py autorisé à importer ctypes et subprocess (tests d'architecture)
 - [Phase 5]: 05-02 : journal fichier après le mutex, échec d'ouverture non bloquant ; --version ajouté
 - [Phase 5]: 05-05 : fuseau par défaut du compose en UTC (GENERIC_TIMEZONE)
+- [Phase 5]: 05-06 : Claude (app MSIX) virtualise %LOCALAPPDATA% et %APPDATA% ; l'installation (uv tool install, init, plugins, bloc ifc.clash) est faite par l'utilisateur dans un PowerShell hors Claude, après suppression des copies virtualisées. Les exécuteurs ne font que lire %LOCALAPPDATA%\Deskgate, jamais y écrire — Choix utilisateur (option A) du 2026-10-21, parcours d'installation réel
 
 ### Pending Todos
 
