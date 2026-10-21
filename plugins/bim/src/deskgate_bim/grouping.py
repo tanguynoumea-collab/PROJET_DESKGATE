@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import itertools
 import math
 import uuid
 from collections.abc import Iterable
@@ -60,19 +61,35 @@ def prepare(
 
 
 def group_clashes(clashes: list[dict[str, Any]], radius: float) -> list[list[dict[str, Any]]]:
-    """Regroupe par proximité des milieux (premier membre = centre) ; `clashes` déjà triés."""
+    """Regroupe par proximité des milieux (premier membre = centre) ; `clashes` déjà triés.
+
+    Grille spatiale de pas `radius` ; mêmes groupes que la recherche linéaire (premier groupe,
+    dans l'ordre de création, dont le centre est à au plus `radius`).
+    """
     if radius <= 0:
         return [[c] for c in clashes]
-    groups: list[tuple[list[float], list[dict[str, Any]]]] = []
+    centres: list[list[float]] = []
+    members_of: list[list[dict[str, Any]]] = []
+    cells: dict[tuple[int, int, int], list[int]] = {}
+
+    def key(p: list[float]) -> tuple[int, int, int]:
+        return (math.floor(p[0] / radius), math.floor(p[1] / radius), math.floor(p[2] / radius))
+
     for c in clashes:
         m = midpoint(c)
-        for centre, members in groups:
-            if math.dist(centre, m) <= radius:
-                members.append(c)
-                break
+        kx, ky, kz = key(m)
+        best = -1
+        for dx, dy, dz in itertools.product(range(-2, 3), repeat=3):
+            for gi in cells.get((kx + dx, ky + dy, kz + dz), ()):
+                if (best < 0 or gi < best) and math.dist(centres[gi], m) <= radius:
+                    best = gi
+        if best >= 0:
+            members_of[best].append(c)
         else:
-            groups.append((m, [c]))
-    return [members for _, members in groups]
+            cells.setdefault((kx, ky, kz), []).append(len(centres))
+            centres.append(m)
+            members_of.append([c])
+    return members_of
 
 
 def group_guid(members: list[dict[str, Any]], mode: str, threshold: float) -> str:

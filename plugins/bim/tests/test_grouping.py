@@ -6,6 +6,8 @@ from __future__ import annotations
 import ast
 import importlib.util
 import itertools
+import math
+import random
 import sys
 from pathlib import Path
 from types import ModuleType
@@ -121,3 +123,43 @@ def test_grouping_stdlib_seule():
         elif isinstance(node, ast.ImportFrom) and node.module:
             mods.add(node.module.split(".")[0])
     assert mods <= set(sys.stdlib_module_names) | {"__future__"}
+
+
+def _reference_group_clashes(clashes: list[dict], radius: float) -> list[list[dict]]:
+    """Algorithme linéaire d'origine, figé comme référence (D-13)."""
+    if radius <= 0:
+        return [[c] for c in clashes]
+    groups: list[tuple[list[float], list[dict]]] = []
+    for c in clashes:
+        m = g.midpoint(c)
+        for centre, members in groups:
+            if math.dist(centre, m) <= radius:
+                members.append(c)
+                break
+        else:
+            groups.append((m, [c]))
+    return [members for _, members in groups]
+
+
+@pytest.mark.parametrize("radius", [0.5, 2.0, 7.3])
+def test_grille_equivalente(radius: float):
+    rng = random.Random(0)
+    cl = []
+    for i in range(5000):
+        c = clash(f"A{i:05d}", f"B{i:05d}")
+        c["p1"] = [rng.uniform(0, 50) for _ in range(3)]
+        c["p2"] = [rng.uniform(0, 50) for _ in range(3)]
+        cl.append(c)
+    cl.sort(key=g.sort_key)
+
+    def ids(groups: list[list[dict]]) -> list[list[tuple[str, str]]]:
+        return [[(c["a_global_id"], c["b_global_id"]) for c in m] for m in groups]
+
+    assert ids(g.group_clashes(cl, radius)) == ids(_reference_group_clashes(cl, radius))
+    assert g.group_clashes(cl[:50], 0) == _reference_group_clashes(cl[:50], 0)
+
+
+def test_group_guid_fige():
+    m = [clash("A1", "B1"), clash("A2", "B2")]
+    assert g.group_guid(m, "hard", 0.002) == g.group_guid(m, "hard", 0.002)
+    assert g.NS.hex == "6f1c2b7e3b1e5d0a9a532f0f8e5d7a10"
