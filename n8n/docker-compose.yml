@@ -1,0 +1,59 @@
+# Infrastructure n8n du dépôt Deskgate (INS-03).
+#
+# - Versions épinglées (tag + digest) : jamais de tag flottant (CLAUDE.md).
+# - Port hôte 5679 (127.0.0.1 seulement) : coexiste avec un n8n déjà installé sur 5678.
+# - N8N_WEBHOOK_URL (nom moderne de WEBHOOK_URL, déprécié depuis n8n 2.35) rend la
+#   resumeUrl joignable depuis Windows : le runner la rappelle telle quelle.
+# - Pas d'extra_hosts : Docker Desktop fournit déjà host.docker.internal.
+# - Secrets : POSTGRES_PASSWORD et N8N_ENCRYPTION_KEY viennent de n8n/.env (non versionné).
+name: deskgate-n8n
+services:
+  postgres:
+    image: postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-n8n}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?définir POSTGRES_PASSWORD dans .env}
+      POSTGRES_DB: ${POSTGRES_DB:-n8n}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.43.8@sha256:a18edcf018198b33b5488fb47ededafe11e0b10d28f65b9535b7c447c9ce3b2c
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${N8N_HOST_PORT:-5679}:5678"
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: "5432"
+      DB_POSTGRESDB_DATABASE: ${POSTGRES_DB:-n8n}
+      DB_POSTGRESDB_USER: ${POSTGRES_USER:-n8n}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?définir N8N_ENCRYPTION_KEY dans .env}
+      N8N_WEBHOOK_URL: http://127.0.0.1:${N8N_HOST_PORT:-5679}/
+      N8N_EDITOR_BASE_URL: http://127.0.0.1:${N8N_HOST_PORT:-5679}/
+      N8N_SECURE_COOKIE: "false" # interface en http local
+      GENERIC_TIMEZONE: ${GENERIC_TIMEZONE:-UTC}
+      TZ: ${GENERIC_TIMEZONE:-UTC}
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_VERSION_NOTIFICATIONS_ENABLED: "false"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ${DESKGATE_SHARE:-C:/BIM}:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5678/healthz >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+volumes:
+  postgres_data:
+  n8n_data:
