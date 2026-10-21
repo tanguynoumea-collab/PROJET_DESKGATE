@@ -118,7 +118,7 @@ Plans:
   5. Acceptation : un arrêt brutal du runner pendant une tâche produit, au redémarrage, un rappel `interrupted` reçu par n8n
 **Plans:** 9 plans
 Plans:
-- [ ] 05-01-PLAN.md — Module scheduler : XML de tâche D-03, relecture, enveloppe schtasks, marqueurs (vague 1)
+- [x] 05-01-PLAN.md — Module scheduler : XML de tâche D-03, relecture, enveloppe schtasks, marqueurs (vague 1)
 - [ ] 05-02-PLAN.md — Journal fichier après le mutex (pythonw) et deskgate --version (vague 1)
 - [ ] 05-03-PLAN.md — deskgate init et deskgate task install|remove|status|run|end (vague 2)
 - [ ] 05-05-PLAN.md — Compose n8n 2.43.8 + Postgres, workflow d'exemple ifc-clash.json, tests statiques (vague 2)

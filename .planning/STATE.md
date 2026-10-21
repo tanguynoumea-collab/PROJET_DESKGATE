@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: "Phase 5 : recherche faite, prochaine étape planification (05-VALIDATION.md puis gsd-planner)"
-last_updated: "2026-10-21T08:17:00.036Z"
-last_activity: 2026-10-21 -- Phase 05 execution started
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-10-21T08:19:49.469Z"
+last_activity: 2026-10-21
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 38
-  completed_plans: 29
+  completed_plans: 30
   percent: 0
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 05 (installation-et-int-gration-n8n) — EXECUTING
-Plan: 1 of 9
-Status: Executing Phase 05
-Last activity: 2026-10-21 -- Phase 05 execution started
+Plan: 2 of 9
+Status: Ready to execute
+Last activity: 2026-10-21
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -76,6 +76,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04 P05 | 25min | 3 tasks | 7 files |
 | Phase 04 P06 | 20min | 2 tasks | 8 files |
 | Phase 04 P07 | 50min | 3 tasks | 12 files |
+| Phase 05 P01 | 20min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,7 @@ Recent decisions affecting current work:
 - [Phase 5]: Recherche phase 5 : action de la tâche = pythonw.exe -m deskgate serve + journal fichier après le mutex ; RestartOnFailure ne relance pas après taskkill /F (relance ACC-02 par schtasks /Run) ; N8N_WEBHOOK_URL ; workflow avec déclencheur Webhook ; test If sur $json.body?.status ; import CLI n8n (id requis) ; n8n de l'utilisateur : import manuel sauf accord — Expériences de 05-RESEARCH.md (tâche jetable supprimée, n8n 2.42.5 jetable)
 - [Phase 5]: Pythons gérés par uv (AppData\Roaming\uv\python 3.13/3.14) cassés depuis une recherche de la phase 1 ; en attendant réparation, UV_PYTHON=C:\Users\Tanguy\AppData\Local\Python\pythoncore-3.14-64\python.exe — Report de la passation 2026-10-21T09:41 ; réparation proposée, réponse utilisateur attendue
 - [Phase 5]: Exécution des plans séquentielle dans l'arbre principal (pas de worktree), un gsd-executor à la fois ; n8n de l'utilisateur (pipelines-n8n, 2.42.5, port 5678) jamais modifié — Report de la passation 2026-10-21T09:41
+- [Phase 5]: scheduler.py autorisé à importer ctypes et subprocess (tests d'architecture)
 
 ### Pending Todos
 
@@ -126,6 +128,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-21T07:41:44.803Z
-Stopped at: Phase 5 : recherche faite, prochaine étape planification (05-VALIDATION.md puis gsd-planner)
-Resume file: .planning/phases/05-installation-et-int-gration-n8n/05-RESEARCH.md
+Last session: 2026-10-21T08:19:49.464Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None
