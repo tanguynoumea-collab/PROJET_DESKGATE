@@ -8,10 +8,13 @@ et le XML relu comptent.
 
 from __future__ import annotations
 
+import ctypes
 import getpass
 import os
 import re
+import subprocess
 import sys
+import uuid
 import xml.etree.ElementTree as ET
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -175,3 +178,59 @@ def audit_settings(s: TaskSettings) -> list[tuple[str, str]]:
     if s.restart_interval is None:
         out.append(("avertissement", "Aucun redémarrage automatique sur échec n'est configuré."))
     return out
+
+
+SCHTASKS = os.path.join(os.environ.get("SYSTEMROOT", r"C:\Windows"), "System32", "schtasks.exe")
+
+
+def _oem_encoding() -> str:
+    try:
+        return f"cp{ctypes.windll.kernel32.GetOEMCP()}"  # type: ignore[attr-defined]
+    except (AttributeError, OSError):
+        return "cp850"
+
+
+def _run(*args: str) -> subprocess.CompletedProcess[str]:
+    """Appelle schtasks (liste d'arguments, exécutable absolu, sans shell)."""
+    return subprocess.run(  # noqa: S603
+        [SCHTASKS, *args],
+        capture_output=True,
+        text=True,
+        encoding=_oem_encoding(),
+        errors="replace",
+        check=False,
+        creationflags=subprocess.CREATE_NO_WINDOW,
+    )
+
+
+def create_task(name: str, xml: bytes, tmp_dir: Path) -> None:
+    """Crée ou remplace la tâche ``name`` à partir du XML."""
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    fichier = tmp_dir / f"tache-{uuid.uuid4().hex}.xml"
+    fichier.write_bytes(xml)
+    try:
+        res = _run("/Create", "/XML", str(fichier), "/TN", name, "/F")
+    finally:
+        fichier.unlink(missing_ok=True)
+    if res.returncode != 0:
+        raise SchedulerError(
+            f"Création de la tâche « {name} » refusée par le Planificateur (code {res.returncode})."
+        )
+
+
+def query_task_xml(name: str) -> str | None:
+    """XML relu de la tâche, ou ``None`` si elle n'existe pas."""
+    res = _run("/Query", "/TN", name, "/XML")
+    return res.stdout if res.returncode == 0 else None
+
+
+def run_task(name: str) -> bool:
+    return _run("/Run", "/TN", name).returncode == 0
+
+
+def end_task(name: str) -> bool:
+    return _run("/End", "/TN", name).returncode == 0
+
+
+def delete_task(name: str) -> bool:
+    return _run("/Delete", "/TN", name, "/F").returncode == 0
