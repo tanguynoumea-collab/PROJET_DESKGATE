@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
 stopped_at: Completed 04-07-PLAN.md
-last_updated: "2026-10-20T16:34:41.730Z"
+last_updated: "2026-10-21T07:19:46.970Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 5
@@ -104,6 +104,7 @@ Recent decisions affecting current work:
 - [Phase 04]: deskgate-bcf : stderr forcé en UTF-8 (page de code Windows)
 - [Phase 04]: 04-04 : NS du GUID v5 de groupe figé ; p1/p2 échangés avec a/b (p1 sur A vérifié)
 - [Phase 04]: Contexte gris BCF : arbre BREP natif + select_box (voie A du spike)
+- [Phase 5]: Accord utilisateur du 2026-10-21 : créer C:\BIM (depot, travail, livrables), %LOCALAPPDATA%\Deskgate, et installer la tâche du Planificateur ; recette sur le compose du dépôt (n8n 2.43.8, port 5679) ET sur le n8n de l'utilisateur (2.42.5, port 5678, non modifié) ; calcul long CVC (PIC-EXE-AW-CVC, 532 Mo) × ARC (PIC_REV_HRS_ARC) en mode hard, maquettes copiées depuis G:\Mon Drive\07_PROJETS\DESKGATE — Décisions de la discussion de la phase 5 ; 01-D1 (host.docker.internal) vérifié le 2026-10-21
 
 ### Pending Todos
 
