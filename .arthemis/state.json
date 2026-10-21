@@ -198,8 +198,8 @@
   "pending_bloquant": {
     "plan": "05-06",
     "task": 3,
-    "kind": "decision",
-    "resume_signal": "choix A (terminal hors Claude), B (DESKGATE_HOME reel) ou C (sandbox desactive)",
+    "kind": "human-action",
+    "resume_signal": "sorties de la procedure hors Claude : True, task status, /health, doctor",
     "completed_tasks": [
       {
         "task": 1,
@@ -216,7 +216,7 @@
     ],
     "current_task": "runner lance par la tache : echec 0x8007010B, %LOCALAPPDATA% virtualise par le paquet MSIX de Claude",
     "checkpoint_details": "config, secrets, logs, plugins dans Packages\\Claude_pzs8sxrjxfjjc\\LocalCache ; invisibles du Planificateur",
-    "reponse": null
+    "reponse": "option A choisie le 2026-10-21 : installation par l'utilisateur hors Claude"
   },
   "extension": {
     "web_saas": {
