@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05.1-06-PLAN.md
-last_updated: "2026-10-21T16:56:19.685Z"
+stopped_at: Completed 05.1-07-PLAN.md
+last_updated: "2026-10-21T17:02:45.014Z"
 last_activity: 2026-10-21
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 46
-  completed_plans: 44
+  completed_plans: 45
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 05.1 (bcf-exploitable-dans-bimcollab-et-nommage-des-sujets) — EXECUTING
-Plan: 7 of 8
+Plan: 8 of 8
 Status: Ready to execute
 Last activity: 2026-10-21
 
@@ -90,6 +90,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.1 P04 | 30min | 3 tasks | 7 files |
 | Phase 05.1 P05 | 35min | 3 tasks | 8 files |
 | Phase 05.1 P06 | 30min | 2 tasks | 7 files |
+| Phase 05.1 P07 | 30min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -132,6 +133,7 @@ Recent decisions affecting current work:
 - [Phase 5]: Titre des sujets BCF : « <trigramme bâtiment>/<étage>/<techniques>/<sujet> », ex. « BaJ/P01/CVC-ARC/Gaine x Faux-plafond » ; trigramme et code étage tirés d'une charte passée en paramètre du job (bâtiment IFC → trigramme, ex. Jura → BaJ, Tour → BaT ; niveau → code court) ; sujet = types des deux objets principaux ; entrée absente de la charte → valeur IFC brute + avertissement dans le résumé — Décision utilisateur du 2026-10-21 (04-D1) : trier facilement les sujets
 - [Phase 5]: Phase insérée 5.1 : BCF exploitable dans BIMcollab Zoom (points de vue absents, 04-D1), nommage des sujets, findings clash-troncature et clash-reservations — 04-D1 en échec le 2026-10-21 ; findings d'audit corrigés par phase insérée, jamais en quick
 - [Phase 5.1]: Test BIMcollab Zoom V0..V5 : seules V4 (Header/File IFC) et V5 (viewpoint.bcfv/snapshot.png) affichent les deux points de vue ; V1 cadre bien en coordonnées monde. Retenu : coordonnées monde, snapshot.png par vue, Header/File, noms conventionnels, Comment et Index — Verdict utilisateur du 2026-10-21 sur C:\BIM\recherche-5.1\zoom-tests
+- [Phase 05.1]: 07 : maj-5.1.ps1 réinstalle les paquets des plugins (--reinstall-package), non éditables ; Header/File par maquette, caméras monde
 
 ### Roadmap Evolution
 
@@ -154,6 +156,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-21T16:56:19.681Z
-Stopped at: Completed 05.1-06-PLAN.md
+Last session: 2026-10-21T17:02:45.010Z
+Stopped at: Completed 05.1-07-PLAN.md
 Resume file: None
