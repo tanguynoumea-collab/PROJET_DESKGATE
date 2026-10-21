@@ -50,12 +50,16 @@ class _Progress:
 class DeskgateClasher(ifcclash.Clasher):
     """Pré-résout les sélecteurs, ignore l'absence de géométrie, impose check_all=True."""
 
-    def __init__(self, num_threads: int, progress: _Progress) -> None:
+    def __init__(
+        self, num_threads: int, progress: _Progress, include_openings: bool = False
+    ) -> None:
         settings = ifcclash.ClashSettings()
         settings.logger = logging.getLogger("deskgate_bim.clash")
         super().__init__(settings)
         self.num_threads = num_threads
         self.progress = progress
+        self.include_openings = include_openings
+        self.openings_excluded: dict[str, int] = {}
         self.opened: dict[str, Any] = {}
         self._added: set[tuple[int, int]] = set()
         self.selected: dict[str, set[str]] = {}
@@ -74,6 +78,12 @@ class DeskgateClasher(ifcclash.Clasher):
             raise ClashError(
                 "invalid_selector", f"Sélecteur {name.upper()} invalide : {selector!r}"
             ) from exc
+        if not self.include_openings:
+            kept = {e for e in found if not e.is_a("IfcOpeningElement")}
+            self.openings_excluded[name] = (
+                self.openings_excluded.get(name, 0) + len(found) - len(kept)
+            )
+            found = kept
         with_geom = {e for e in found if getattr(e, "Representation", None) is not None}
         self.found[name] = self.found.get(name, 0) + len(found)
         self.with_geom[name] = self.with_geom.get(name, 0) + len(with_geom)
@@ -155,12 +165,16 @@ def _open(path: str) -> Any:
         ) from exc
 
 
-def _warning(name: str, selector: str, found: int, geom: int) -> tuple[str, dict[str, Any]]:
+def _warning(
+    name: str, selector: str, found: int, geom: int, openings: int = 0
+) -> tuple[str, dict[str, Any]]:
     code = f"selection_{name}_empty"
     msg = (
         f"Sélection {name.upper()} vide pour {selector!r} : {found} élément(s) trouvé(s), "
         f"{geom} avec géométrie."
     )
+    if openings:
+        msg += f" ({openings} réservation(s) exclue(s) ; include_openings: true pour les garder)"
     return code, {"code": code, "message": msg}
 
 
@@ -208,7 +222,7 @@ def _run(p: ClashParams, ctx: Any) -> dict[str, Any]:
     progress = _Progress(ctx)
     progress(0, "ouverture des fichiers", force=True)
     threads = p.threads or int(ctx.settings.get("threads", 0)) or min(4, os.cpu_count() or 1)
-    clasher = DeskgateClasher(threads, progress)
+    clasher = DeskgateClasher(threads, progress, include_openings=p.include_openings)
     for path in (p.ifc_a, p.ifc_b):
         if path and path not in clasher.opened:
             clasher.opened[path] = _open(path)
@@ -232,7 +246,11 @@ def _run(p: ClashParams, ctx: Any) -> dict[str, Any]:
     for name, selector in checks:
         if clasher.with_geom.get(name, 0) == 0:
             code, detail = _warning(
-                name, selector, clasher.found.get(name, 0), clasher.with_geom.get(name, 0)
+                name,
+                selector,
+                clasher.found.get(name, 0),
+                clasher.with_geom.get(name, 0),
+                clasher.openings_excluded.get(name, 0),
             )
             warnings.append(code)
             details.append(detail)
@@ -243,8 +261,17 @@ def _run(p: ClashParams, ctx: Any) -> dict[str, Any]:
     sel_b = clasher.selected.get("b", set()) if two_sides else sel_a
     pairs = prepare(clash_set.get("clashes", {}).values(), sel_a, sel_b)
     total = len(pairs)
-    truncated = total > p.max_clashes
-    pairs = pairs[: p.max_clashes]
+    truncated = p.max_clashes is not None and total > p.max_clashes
+    if truncated:
+        pairs = pairs[: p.max_clashes]
+        code = "clashes_truncated"
+        msg = (
+            f"{len(pairs)} conflits gardés sur {total} (plafond max_clashes = {p.max_clashes}) ; "
+            "relancez sans max_clashes pour tout garder."
+        )
+        warnings.append(code)
+        details.append({"code": code, "message": msg})
+        ctx.log(msg)
     groups = build_groups(pairs, p.group_radius, p.mode, p.threshold)
     data: dict[str, Any] = {
         "unit": "m",
@@ -256,8 +283,11 @@ def _run(p: ClashParams, ctx: Any) -> dict[str, Any]:
             "clashes": total,
             "returned": len(pairs),
             "groups": len(groups),
+            "openings_excluded": sum(clasher.openings_excluded.values()),
         },
         "truncated": truncated,
+        "pairs_omitted": False,
+        "groups_omitted": False,
         "groups": groups,
     }
     out = Path(ctx.work_dir) / "clashes.json"
@@ -273,17 +303,49 @@ def _run(p: ClashParams, ctx: Any) -> dict[str, Any]:
         else:
             bcf_topics = _write_bcf(p, ctx, clasher, groups, warnings, details, progress)
     limit = int(ctx.settings.get("data_max_bytes", DATA_MAX_BYTES))
-    if len(json.dumps(data, ensure_ascii=False)) > limit:
+
+    def size() -> int:
+        return len(json.dumps(data, ensure_ascii=False))
+
+    def note(code: str, message: str) -> None:
+        warnings.append(code)
+        details.append({"code": code, "message": message})
+        ctx.log(message)
+
+    if size() > limit:
         for g in data["groups"]:
             g["clashes"] = []
         data["pairs_omitted"] = True
-        data["truncated"] = truncated = True
-        ctx.log("Résultat trop volumineux : paires omises, voir l'artefact clashes.json.")
+        note(
+            "data_pairs_omitted",
+            "Résultat allégé (taille) : paires omises ; clashes.json est complet.",
+        )
+    if size() > limit:
+        all_groups = data["groups"]
+        data["groups"] = []
+        used = size()
+        kept = 0
+        if used <= limit:
+            for g in all_groups:
+                used += len(json.dumps(g, ensure_ascii=False)) + 1
+                if used > limit:
+                    break
+                kept += 1
+        data["groups"] = all_groups[:kept]
+        data["groups_omitted"] = True
+        note(
+            "data_groups_omitted",
+            f"Résultat allégé (taille) : {len(all_groups) - kept} groupe(s) omis ; "
+            "clashes.json est complet.",
+        )
     progress(100, "terminé", force=True)
     summary: dict[str, Any] = {
         "clashes": total,
         "groups": len(groups),
         "truncated": truncated,
+        "pairs_omitted": data["pairs_omitted"],
+        "groups_omitted": data["groups_omitted"],
+        "openings_excluded": data["counts"]["openings_excluded"],
         "warnings": warnings,
         "warning_details": details,
         "mode": p.mode,
