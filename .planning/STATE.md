@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
-status: verifying
+status: executing
 stopped_at: Phase 5.1 context gathered
-last_updated: "2026-10-21T15:20:18.186Z"
-last_activity: 2026-10-21
+last_updated: "2026-10-21T16:29:37.092Z"
+last_activity: 2026-10-21 -- Phase 05.1 execution started
 progress:
   total_phases: 6
   completed_phases: 5
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-20)
 
 **Core value:** n8n délègue une tâche longue au PC Windows et reprend fiablement quand elle se termine, quel que soit le résultat (succès, échec, délai dépassé, annulation, redémarrage du runner).
-**Current focus:** Phase 05 — installation-et-int-gration-n8n
+**Current focus:** Phase 05.1 — bcf-exploitable-dans-bimcollab-et-nommage-des-sujets
 
 ## Current Position
 
-Phase: 05 (installation-et-int-gration-n8n) — EXECUTING
-Plan: 9 of 9
-Status: Phase complete — ready for verification
-Last activity: 2026-10-21
+Phase: 05.1 (bcf-exploitable-dans-bimcollab-et-nommage-des-sujets) — EXECUTING
+Plan: 1 of 8
+Status: Executing Phase 05.1
+Last activity: 2026-10-21 -- Phase 05.1 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
