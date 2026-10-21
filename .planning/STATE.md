@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05-06-PLAN.md
-last_updated: "2026-10-21T09:14:21.925Z"
+stopped_at: Completed 05-07-PLAN.md
+last_updated: "2026-10-21T09:23:22.579Z"
 last_activity: 2026-10-21
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 38
-  completed_plans: 35
+  completed_plans: 36
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 05 (installation-et-int-gration-n8n) — EXECUTING
-Plan: 7 of 9
+Plan: 8 of 9
 Status: Ready to execute
 Last activity: 2026-10-21
 
@@ -81,6 +81,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05 P03 | 25min | 2 tasks | 4 files |
 | Phase 05 P05 | 15min | 2 tasks | 7 files |
 | Phase 05 P04 | 20min | 2 tasks | 4 files |
+| Phase 05 P07 | 25min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -117,6 +118,7 @@ Recent decisions affecting current work:
 - [Phase 5]: 05-02 : journal fichier après le mutex, échec d'ouverture non bloquant ; --version ajouté
 - [Phase 5]: 05-05 : fuseau par défaut du compose en UTC (GENERIC_TIMEZONE)
 - [Phase 5]: 05-06 : Claude (app MSIX) virtualise %LOCALAPPDATA% et %APPDATA% ; l'installation (uv tool install, init, plugins, bloc ifc.clash) est faite par l'utilisateur dans un PowerShell hors Claude, après suppression des copies virtualisées. Les exécuteurs ne font que lire %LOCALAPPDATA%\Deskgate, jamais y écrire — Choix utilisateur (option A) du 2026-10-21, parcours d'installation réel
+- [Phase 05]: Recette: paramètres et preuves sous C:\BIM\recette (MSIX), n8n 2.43.8 sans écart
 
 ### Pending Todos
 
@@ -135,6 +137,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-21T09:14:21.920Z
-Stopped at: Completed 05-06-PLAN.md
+Last session: 2026-10-21T09:23:22.575Z
+Stopped at: Completed 05-07-PLAN.md
 Resume file: None

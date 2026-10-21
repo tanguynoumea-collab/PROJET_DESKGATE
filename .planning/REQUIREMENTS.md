@@ -56,8 +56,8 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 - [x] **INS-01**: `deskgate init` crée `runner.toml`, le dossier `C:\BIM` (`depot`, `travail`, `livrables`) et le jeton, affiché une seule fois
 - [x] **INS-02**: `deskgate init` installe, avec l'accord de l'utilisateur, une tâche du Planificateur qui lance le runner à l'ouverture de session, sans limite de durée et même sur batterie
 - [x] **INS-03**: `n8n/docker-compose.yml` lance n8n 2.43.8 épinglé avec Postgres et `C:\BIM` monté sur `/data`
-- [ ] **INS-04**: Un workflow d'exemple importable (HTTP Request → Wait → test du `status`) déclenche `ifc.clash` et reprend sur le rappel
-- [ ] **INS-05**: Depuis le conteneur n8n, `http://host.docker.internal:8765/health` répond (vérifié sur la machine cible)
+- [x] **INS-04**: Un workflow d'exemple importable (HTTP Request → Wait → test du `status`) déclenche `ifc.clash` et reprend sur le rappel
+- [x] **INS-05**: Depuis le conteneur n8n, `http://host.docker.internal:8765/health` répond (vérifié sur la machine cible)
 
 ### Acceptation
 
@@ -155,8 +155,8 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | INS-01 | Phase 5 | Complete |
 | INS-02 | Phase 5 | Complete |
 | INS-03 | Phase 5 | Complete |
-| INS-04 | Phase 5 | Pending |
-| INS-05 | Phase 5 | Pending |
+| INS-04 | Phase 5 | Complete |
+| INS-05 | Phase 5 | Complete |
 | ACC-01 | Phase 5 | Pending |
 | ACC-02 | Phase 5 | Pending |
 | SOC-01 | Phase 5 | Pending |
