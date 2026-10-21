@@ -22,7 +22,9 @@ from .bcfdoc import build_doc
 from .bcfjob import write_bcf
 from .context import context_guids
 from .grouping import build_groups, prepare
+from .naming import fallback_message, missing_message
 from .params import ClashError, ClashParams, parse_params
+from .spatial import topic_titles
 
 MEMORY_MESSAGE = "Mémoire insuffisante : réduisez la sélection ou augmentez memory_mb."
 DATA_MAX_BYTES = 900_000
@@ -202,6 +204,20 @@ def _write_bcf(
         threads=clasher.num_threads,
         warn=warn,
     )
+    titles: dict[str, str] = {}
+    try:
+        titles, missing, fallbacks = topic_titles(
+            clasher.opened, p.ifc_a, p.ifc_b, groups, p.charter.model_dump()
+        )
+        if missing:
+            warn("charter_missing", missing_message(missing))
+        if fallbacks:
+            warn("label_fallback", fallback_message(fallbacks))
+    except MemoryError:
+        raise
+    except Exception as exc:  # le nommage ne doit jamais arrêter le calcul (D-06)
+        titles = {}
+        warn("naming_unavailable", f"Nommage des sujets indisponible : {exc}")
     names = [Path(f).stem for f in dict.fromkeys(f for f in (p.ifc_a, p.ifc_b) if f)]
     doc = build_doc(
         groups,
@@ -211,6 +227,7 @@ def _write_bcf(
         context=context,
         mode=p.mode,
         threshold=p.threshold,
+        titles=titles,
     )
     progress(96, "écriture du BCF", force=True)
     dst = write_bcf(ctx.settings, doc, ctx.work_dir)

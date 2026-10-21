@@ -123,7 +123,10 @@ def test_camera_pose() -> None:
 
 def test_titres_fournis_et_tri() -> None:
     g1 = group([pair(GUID_A, GUID_B, [0, 0, 0], [0, 0, 0])], [0, 0, 0])
-    g2 = {**group([pair(GUID_C, GUID_D, [0, 0, 0], [0, 0, 0])], [0, 0, 0]), "id": "a" + GROUP_ID[1:]}
+    g2 = {
+        **group([pair(GUID_C, GUID_D, [0, 0, 0], [0, 0, 0])], [0, 0, 0]),
+        "id": "a" + GROUP_ID[1:],
+    }
     d = doc([g1, g2], titles={GROUP_ID: "BaJ/P01/CVC-ARC/Gaine x Mur", g2["id"]: "BaJ/P00/x"})
     assert [t["title"] for t in d["topics"]] == ["BaJ/P00/x", "BaJ/P01/CVC-ARC/Gaine x Mur"]
     assert list(VALIDATOR.iter_errors(d)) == []

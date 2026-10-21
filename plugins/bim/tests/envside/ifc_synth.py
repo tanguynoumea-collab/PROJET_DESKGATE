@@ -48,6 +48,10 @@ def new_model(
     if unit == "MILLIMETRE":
         u = ifcopenshell.api.run("unit.add_si_unit", f, unit_type="LENGTHUNIT", prefix="MILLI")
         ifcopenshell.api.run("unit.assign_unit", f, units=[u])
+    elif version == "IFC2X3":
+        # Le Brep d'IFC2X3 n'est pas mis à l'échelle par l'API : unité explicitement en mètres.
+        u = ifcopenshell.api.run("unit.add_si_unit", f, unit_type="LENGTHUNIT")
+        ifcopenshell.api.run("unit.assign_unit", f, units=[u])
     else:
         ifcopenshell.api.run("unit.assign_unit", f)
     ctx = ifcopenshell.api.run("context.add_context", f, context_type="Model")

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Lecture IFC pour le nommage des sujets : étages, bâtiment, type effectif, titres (D-04 à D-08)."""
+"""Lecture IFC pour le nommage des sujets : étages, bâtiment, type effectif, titres."""
 
 from __future__ import annotations
 
