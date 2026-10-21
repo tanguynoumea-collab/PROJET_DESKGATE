@@ -149,11 +149,11 @@ Plans:
   3. Sur les maquettes réelles, `clashes.json` et le BCF contiennent tous les conflits par défaut, ou la troncature est explicite et signalée ; les réservations sont exclues par défaut
   4. Le workflow d'exemple n8n passe la charte et les réglages de coordination fiable
 **Depends on:** Phase 5
-**Plans:** 2/8 plans executed
+**Plans:** 3/8 plans executed
 
 Plans:
 - [x] 05.1-01-PLAN.md — Pillow et uv.lock, contrat bcf-write-v2 (3 copies), scènes IFC synthétiques
-- [ ] 05.1-02-PLAN.md — deskgate-bcf v2 : snapshots, commentaires, viewpoint.bcfv/snapshot.png, Index, Header/File (verdict Zoom V4/V5)
+- [x] 05.1-02-PLAN.md — deskgate-bcf v2 : snapshots, commentaires, viewpoint.bcfv/snapshot.png, Index, Header/File (verdict Zoom V4/V5)
 - [x] 05.1-03-PLAN.md — naming.py en TDD : table de libellés, étage par cote, technique, titre
 - [ ] 05.1-04-PLAN.md — Volume et réservations : défaut sans plafond, drapeaux distincts, IfcOpeningElement exclus, grille
 - [ ] 05.1-05-PLAN.md — Charte du job, spatial.py, titres des sujets, document BCF v2 trié
