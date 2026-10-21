@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05-03-PLAN.md
-last_updated: "2026-10-21T08:34:45.064Z"
+stopped_at: Completed 05-05-PLAN.md
+last_updated: "2026-10-21T08:39:31.127Z"
 last_activity: 2026-10-21
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 38
-  completed_plans: 32
+  completed_plans: 33
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 05 (installation-et-int-gration-n8n) — EXECUTING
-Plan: 4 of 9
+Plan: 5 of 9
 Status: Ready to execute
 Last activity: 2026-10-21
 
@@ -79,6 +79,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05 P01 | 20min | 2 tasks | 5 files |
 | Phase 05 P02 | 20min | 2 tasks | 6 files |
 | Phase 05 P03 | 25min | 2 tasks | 4 files |
+| Phase 05 P05 | 15min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,7 @@ Recent decisions affecting current work:
 - [Phase 5]: Exécution des plans séquentielle dans l'arbre principal (pas de worktree), un gsd-executor à la fois ; n8n de l'utilisateur (pipelines-n8n, 2.42.5, port 5678) jamais modifié — Report de la passation 2026-10-21T09:41
 - [Phase 5]: scheduler.py autorisé à importer ctypes et subprocess (tests d'architecture)
 - [Phase 5]: 05-02 : journal fichier après le mutex, échec d'ouverture non bloquant ; --version ajouté
+- [Phase 5]: 05-05 : fuseau par défaut du compose en UTC (GENERIC_TIMEZONE)
 
 ### Pending Todos
 
@@ -131,6 +133,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-21T08:34:45.059Z
-Stopped at: Completed 05-03-PLAN.md
+Last session: 2026-10-21T08:39:31.123Z
+Stopped at: Completed 05-05-PLAN.md
 Resume file: None
