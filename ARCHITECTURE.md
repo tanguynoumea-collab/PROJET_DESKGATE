@@ -57,9 +57,14 @@ d'étapes. Une tâche = un appel d'un plugin. L'enchaînement est le rôle de n8
   toutes les routes sauf `/health`, même en local.
 - **Persistance SQLite** (mode WAL) : tâches, journaux de tâche, audit, jetons hachés, état des
   plugins. Au redémarrage, les tâches `running` passent `interrupted` et leur rappel est envoyé.
-- **Démarrage** : tâche du Planificateur de tâches Windows à l'ouverture de session, installée par
-  `deskgate init`. Pas de service Windows : un service ne voit pas le bureau et ne peut pas piloter
-  de logiciel graphique.
+- **Démarrage** : tâche du Planificateur de tâches Windows créée par `schtasks /Create /XML`, sans
+  élévation : ouverture de session, `InteractiveToken`, `LeastPrivilege`, `ExecutionTimeLimit=PT0S`,
+  batterie autorisée, `IgnoreNew`. L'action est `pythonw.exe -m deskgate serve` du venv de l'outil (pas de
+  console, pas de `gui-scripts`) ; le journal `logs\runner.log` est ouvert après le mutex.
+  `RestartOnFailure` ne couvre que les échecs de démarrage : un runner tué reste arrêté jusqu'à
+  `deskgate task run` ou la prochaine ouverture de session. La recovery `interrupted` rend cette relance
+  sûre (constaté : runner tué, relancé, rappel `interrupted` reçu par n8n). Pas de service Windows : un
+  service ne voit pas le bureau et ne peut pas piloter de logiciel graphique.
 - **Configuration** : `runner.toml` (port, racines autorisées, correspondance des chemins,
   concurrence par ressource, dossier des plugins, jetons en v0.1).
 
@@ -211,8 +216,12 @@ jamais les fichiers.
 ## 9. Intégration n8n
 
 - **Version épinglée : `n8nio/n8n:2.43.8`** (digest noté dans le rapport de vérifications).
+  Le compose du dépôt (`n8n/docker-compose.yml`) épingle n8n 2.43.8 et Postgres par digest, publie
+  `127.0.0.1:5679`, monte le dossier partagé sur `/data` et fixe `N8N_WEBHOOK_URL`.
 - **v0.1** : nœuds natifs `HTTP Request` (POST `/jobs`, `callback.url = {{$execution.resumeUrl}}`)
-  puis `Wait` (« On Webhook Call »). Workflows d'exemple fournis.
+  puis `Wait` (« On Webhook Call »). Exemple `n8n/examples/ifc-clash.json` : déclencheurs manuel et
+  webhook, nœud If sur `$json.body?.status` ; à l'échéance du Wait, n8n continue avec l'item d'entrée
+  (sans `body`), qui prend la branche « Echec ou delai ».
 - **v0.3** : nœud communautaire `n8n-nodes-deskgate`, **un seul nœud** qui soumet et attend : un
   nœud communautaire peut se mettre en attente comme `Wait` (webhook `restartWebhook: true`,
   `putExecutionToWait`, méthode `webhook()`), vérifié dans le code de n8n 2.43.8. Liste des
