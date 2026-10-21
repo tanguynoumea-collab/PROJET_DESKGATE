@@ -31,3 +31,4 @@
 {"ts":"2026-10-21T11:00","type":"transition","ref":"quick-261021-e6p","commit":"cbe3e56","note":"fast track CI : setup-uv epingle v10.3.0, verifie, pousse"}
 {"ts":"2026-10-21T11:20","type":"gate","ref":"ci 39568004313","commit":"32ddfc7","note":"CI 3.11 verte, 3.13 rouge (test_audit_parcours), finding ci-e2e-kill-tree ouvert"}
 {"ts":"2026-10-21T12:10","type":"transition","ref":"05-06","commit":"32b9d1c","note":"bloquant : LOCALAPPDATA virtualise par MSIX, decision utilisateur attendue"}
+{"ts":"2026-10-21T12:50","type":"reprise","ref":"05-06","commit":"100f163","note":"installation faite depuis le terminal non virtualise, runner lance par le Planificateur, bloquant leve"}

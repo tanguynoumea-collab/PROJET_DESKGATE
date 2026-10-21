@@ -20,7 +20,7 @@
   },
   "route": "full",
   "phase": "IMPLEMENTATION",
-  "phase_status": "attente_humaine",
+  "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -195,29 +195,7 @@
     }
   ],
   "horizon": null,
-  "pending_bloquant": {
-    "plan": "05-06",
-    "task": 3,
-    "kind": "human-action",
-    "resume_signal": "sorties de la procedure hors Claude : True, task status, /health, doctor",
-    "completed_tasks": [
-      {
-        "task": 1,
-        "nom": "uv tool install, init --yes, tache installee",
-        "commit": null,
-        "fichiers": []
-      },
-      {
-        "task": 2,
-        "nom": "plugins, bloc ifc.clash, maquettes copiees, doctor vert",
-        "commit": null,
-        "fichiers": []
-      }
-    ],
-    "current_task": "runner lance par la tache : echec 0x8007010B, %LOCALAPPDATA% virtualise par le paquet MSIX de Claude",
-    "checkpoint_details": "config, secrets, logs, plugins dans Packages\\Claude_pzs8sxrjxfjjc\\LocalCache ; invisibles du Planificateur",
-    "reponse": "option A choisie le 2026-10-21 : installation par l'utilisateur hors Claude"
-  },
+  "pending_bloquant": null,
   "extension": {
     "web_saas": {
       "contexte_saas": {
@@ -255,6 +233,6 @@
   },
   "maj": {
     "le": "2026-10-21",
-    "commit": "32ddfc7"
+    "commit": "100f163"
   }
 }
