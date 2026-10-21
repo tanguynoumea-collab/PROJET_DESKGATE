@@ -85,8 +85,17 @@ def test_parametres_par_defaut(wf: dict[str, Any]) -> None:
         "/data/depot/PIC_REV_HRS_ARC_MNQ_BaJ_SUP_30400.ifc",
         "mode: 'hard'",
         "bcf: true",
+        "tolerance: 0.01",
+        "charter: {",
+        "Jura: 'BaJ'",
+        "Tour: 'BaT'",
+        "J_11_P01: 'P01'",
+        "J_18_P08: 'P08'",
+        "trades: { a: 'CVC', b: 'ARC' }",
+        "! IfcFurnishingElement",
     ):
         assert attendu in sortie
+    assert "max_clashes" not in sortie
 
 
 def test_aucun_jeton(texte: str) -> None:

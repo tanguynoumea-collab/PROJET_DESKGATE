@@ -23,7 +23,10 @@ refusé (`invalid_params`).
 | `tolerance` | nombre (m, 0 à 1) | obligatoire en `hard` | Pénétration ignorée en dessous |
 | `clearance` | nombre (m, > 0 à 10) | obligatoire en `clearance` | Distance minimale exigée |
 | `group_radius` | nombre (m) | 2.0 | Rayon de regroupement des conflits voisins (0 : aucun regroupement) |
-| `max_clashes` | entier | 1000 | Nombre maximal de paires conservées |
+| `max_clashes` | entier | aucun (illimité) | Plafond optionnel de paires conservées ; s'il est atteint, `truncated` vaut vrai |
+| `include_openings` | booléen | `false` | `false` : les réservations `IfcOpeningElement` sont exclues des deux sélections |
+| `snapshots` | booléen | `true` | Génère une image PNG par point de vue du BCF |
+| `charter` | objet | vide | Charte de nommage des sujets (voir « Charte de nommage ») |
 | `threads` | entier | settings, sinon min(4, CPU) | Threads de calcul de la géométrie |
 | `bcf` | booléen | `false` | Produit `conflits.bcf` |
 | `bcf_author` | texte | `deskgate` | Auteur des sujets BCF |
@@ -33,6 +36,34 @@ refusé (`invalid_params`).
 | `max_context` | entier | 500 | Éléments de contexte au plus par sujet (0 : aucun contexte) |
 
 En `hard`, `distance` est la profondeur de pénétration. En `clearance`, un contact est une distance 0.
+
+## Charte de nommage
+
+Le titre de chaque sujet BCF est `<trigramme>/<étage>/<techniques>/<sujet>`, par exemple
+`BaJ/P01/CVC-ARC/Gaine x Faux-plafond`. La charte du projet est passée en paramètre `charter` :
+
+- `buildings` : nom de bâtiment IFC vers trigramme ;
+- `levels` : nom d'étage IFC vers code court ;
+- `trades.a` et `trades.b` : code technique des côtés A et B ;
+- `labels` : libellé du sujet par classe IFC, clé `Classe` ou `Classe/TYPE`.
+
+Bornes : 500 entrées au plus par table, codes de 32 caractères au plus. L'appariement est d'abord exact,
+puis insensible à la casse. L'étage est celui de la cote du point de conflit ; le bâtiment est celui de
+l'élément principal du côté A. Une technique absente de la charte est déduite du nom de fichier (codes
+de `TRADE_CODES`), à défaut du nom tronqué. Le titre ne porte pas de « (+N) ». Une entrée absente de la
+charte garde sa valeur IFC brute et ajoute l'avertissement `charter_missing`.
+
+Exemple (projet pilote) :
+
+```json
+{
+  "charter": {
+    "buildings": { "Jura": "BaJ", "Tour": "BaT" },
+    "levels": { "J_10_P00": "P00", "J_11_P01": "P01", "J_12_P02": "P02" },
+    "trades": { "a": "CVC", "b": "ARC" }
+  }
+}
+```
 
 ## Sélecteurs
 
@@ -47,13 +78,19 @@ géométrie n'est pas une erreur : un avertissement `selection_a_empty` ou `sele
 
 ## Sortie
 
-- `summary` : `clashes`, `groups`, `truncated`, `warnings`, `warning_details`, `mode`, `unit`, seuil
+- `summary` : `clashes`, `groups`, `truncated` (vrai seulement si le plafond `max_clashes` est atteint),
+  `pairs_omitted`, `groups_omitted`, `warnings`, `warning_details`, `mode`, `unit`, seuil
   (`tolerance` ou `clearance`), `ifcopenshell`, `bcf` (booléen) et `bcf_topics` (entier).
 - `data` : `counts`, `truncated`, puis `groups` (`id`, `centre`, `count`, `clashes` = paires). L'`id`
   d'un groupe est un UUID v5 déterministe. Si le résultat dépasse la taille du rappel, les paires sont
-  omises (`pairs_omitted`) et l'artefact porte tout.
+  omises (`pairs_omitted`, puis `groups_omitted` si les groupes eux-mêmes sont retirés) et l'artefact
+  porte tout. `counts.openings_excluded` compte les réservations exclues.
 - Artefacts : `clashes.json` (`kind: clashes`, toujours) et `conflits.bcf` (`kind: bcf`, si `bcf: true`
   et au moins un conflit). Sans conflit, l'avertissement `bcf_skipped_no_clash` est ajouté.
+
+Avertissements possibles : `clashes_truncated`, `data_pairs_omitted`, `data_groups_omitted`,
+`charter_missing`, `label_fallback`, `naming_unavailable`, `snapshots_unavailable`,
+`selection_a_empty`, `selection_b_empty`, `context_unavailable`, `bcf_skipped_no_clash`.
 
 ## Conventions BCF
 
@@ -67,6 +104,13 @@ en perspective cadrée sur le centre du groupe. Chaque sujet a deux points de vu
 Les couleurs sont au format ARGB. Le contexte est calculé par un arbre géométrique et `select_box`
 autour des éléments du conflit (`context_radius`) ; s'il échoue, l'avertissement `context_unavailable`
 est ajouté et la vue 2 ne colore que le conflit.
+
+Contrat d'écriture v2 : un PNG et un commentaire par point de vue ; le premier point de vue s'écrit
+`viewpoint.bcfv` / `snapshot.png` (noms conventionnels lus par BIMcollab Zoom), les suivants
+`<guid>.bcfv` / `<guid>.png`. Chaque `markup.bcf` porte un `Header` avec un `File` par maquette
+distincte : `Filename` = nom du fichier IFC (jamais le chemin), `IfcProject` = GlobalId de son
+`IfcProject`. Les caméras sont en coordonnées monde IFC. Les images sont rendues par logiciel (Pillow
+et numpy) ; leur taille se règle par `settings.snapshot_size` de la capacité (défaut `[800, 450]`).
 
 ## Erreurs classées
 

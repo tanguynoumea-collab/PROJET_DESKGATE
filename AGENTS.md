@@ -125,6 +125,15 @@ Consignes :
 - toujours définir `UV_PROJECT_ENVIRONMENT` avant `uv sync --package ...`, sinon l'environnement du
   dépôt est modifié ; le restaurer avec `uv sync --locked`.
 
+### Mettre à jour les plugins
+
+Les paquets des plugins sont installés par un `uv sync` ordinaire, **pas en mode éditable** : toute
+nouvelle dépendance (par exemple Pillow en phase 5.1) comme tout changement de code d'un plugin exige de
+relancer les deux `uv sync --locked --package ... --no-dev` de la section précédente, avec
+`UV_PROJECT_ENVIRONMENT` et `UV_PYTHON` définis, depuis un terminal hors application MSIX (qui
+virtualise `%LOCALAPPDATA%`). Aucun redémarrage du runner n'est nécessaire : le plugin est lancé à
+chaque tâche.
+
 ## 5. Brancher n8n
 
 Le compose du dépôt publie n8n 2.43.8 (et Postgres) sur `127.0.0.1:5679`, `C:\BIM` monté sur `/data`.
@@ -155,7 +164,10 @@ Le nœud communautaire `n8n-nodes-deskgate` n'arrive qu'en v0.3.
 
 Déposer un IFC d'exemple dans `C:\BIM\depot\`, puis `POST http://127.0.0.1:5679/webhook/deskgate-ifc-clash`
 (corps `{"params": {...}, "timeout": 14400}` ; un 404 juste après la publication : réessayer), ou lancer
-`uv run python scripts/recette/recette.py smoke`. Le workflow se met en attente puis reprend avec un
+`uv run python scripts/recette/recette.py smoke`. Exemple de corps avec charte de nommage (détails : [`plugins/bim/README.md`](plugins/bim/README.md)) :
+`{"params": {"ifc_a": "...", "selector_a": "IfcWall", "mode": "hard", "tolerance": 0.01, "bcf": true,
+"charter": {"buildings": {"Jura": "BaJ"}, "levels": {"J_11_P01": "P01"}, "trades": {"a": "CVC", "b": "ARC"}}}}`.
+Le workflow se met en attente puis reprend avec un
 résumé et le chemin d'un BCF. Si `recette.py` tourne dans un contexte virtualisé, donner `--out`
 explicitement (dossier hors `%LOCALAPPDATA%`, par exemple sous `C:\BIM\recette`).
 
