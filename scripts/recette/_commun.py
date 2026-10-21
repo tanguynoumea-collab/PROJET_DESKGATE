@@ -177,9 +177,15 @@ def provenance(pid: int | None) -> list[dict[str, Any]]:
         proc = None
     while proc is not None:
         try:
-            chain.append(
-                {"pid": proc.pid, "name": proc.name(), "cmdline": " ".join(proc.cmdline())}
-            )
+            name = proc.name()
+        except psutil.Error:
+            name = "?"
+        try:
+            cmdline = " ".join(proc.cmdline())
+        except psutil.Error:
+            cmdline = ""  # processus système : ligne de commande inaccessible
+        chain.append({"pid": proc.pid, "name": name, "cmdline": cmdline})
+        try:
             proc = proc.parent()
         except psutil.Error:
             break

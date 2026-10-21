@@ -222,7 +222,8 @@ def run(scenario: str, args: argparse.Namespace) -> int:
             except (TypeError, ValueError):
                 proof["duration_s"] = None
         artefacts = output.get("artefacts") if isinstance(output, dict) else None
-        bcf = next((a for a in (artefacts or []) if str(a).endswith("conflits.bcf")), None)
+        chemins = [str(a.get("path") if isinstance(a, dict) else a) for a in (artefacts or [])]
+        bcf = next((c for c in chemins if c.endswith("conflits.bcf")), None)
         if bcf:
             host = Path("C:/BIM") / str(bcf).removeprefix("/data/")
             proof["bcf_host_path"] = host.as_posix()
