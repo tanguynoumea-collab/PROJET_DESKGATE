@@ -142,14 +142,14 @@
     {
       "id": "remote-ci",
       "type": "decision",
-      "titre": "Depot sans remote : CI windows-latest jamais executee, Python 3.12/3.13 non testes",
+      "titre": "Remote origin cree et pousse le 2026-10-21 ; CI windows-latest (3.11, 3.13) jamais constatee verte",
       "gravite": "majeur",
-      "statut": "en_attente_decision",
-      "proprietaire": "humain",
+      "statut": "ouvert",
+      "proprietaire": "ia",
       "ouvert_le": "2026-10-21",
       "source": "passation 2026-10-21T09:41",
-      "ref": null,
-      "condition_levee": "remote cree et CI verte, ou report consigne avant CLOTURE_MILESTONE"
+      "ref": "github.com/tanguynoumea-collab/PROJET_DESKGATE",
+      "condition_levee": "premier run ci.yml vert sur main, ou echecs corriges avant CLOTURE_MILESTONE"
     }
   ],
   "livraisons": [],
