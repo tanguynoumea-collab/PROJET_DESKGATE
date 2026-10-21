@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
-stopped_at: Completed 05-09-PLAN.md
-last_updated: "2026-10-21T14:03:09.775Z"
+stopped_at: Phase 5.1 context gathered
+last_updated: "2026-10-21T14:16:46.646Z"
 last_activity: 2026-10-21
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 5
   total_plans: 38
   completed_plans: 38
@@ -147,6 +147,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-21T11:28:42.319Z
-Stopped at: Completed 05-09-PLAN.md
-Resume file: None
+Last session: 2026-10-21T14:16:46.642Z
+Stopped at: Phase 5.1 context gathered
+Resume file: .planning/phases/05.1-bcf-exploitable-dans-bimcollab-et-nommage-des-sujets/05.1-CONTEXT.md
