@@ -31,7 +31,8 @@ class ClashParams(BaseModel):
     tolerance: float | None = Field(default=None, ge=0, le=1)
     clearance: float | None = Field(default=None, gt=0, le=10)
     group_radius: float = Field(default=2.0, ge=0, le=1000)
-    max_clashes: int = Field(default=1000, ge=1, le=100_000)
+    max_clashes: int | None = Field(default=None, ge=1, le=1_000_000)
+    include_openings: bool = False
     threads: int | None = Field(default=None, ge=1, le=64)
     bcf: bool = False
     bcf_author: str = Field(default="deskgate", min_length=1, max_length=256)

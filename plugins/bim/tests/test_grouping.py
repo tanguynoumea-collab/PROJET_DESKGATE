@@ -143,7 +143,7 @@ def _reference_group_clashes(clashes: list[dict], radius: float) -> list[list[di
 
 @pytest.mark.parametrize("radius", [0.5, 2.0, 7.3])
 def test_grille_equivalente(radius: float):
-    rng = random.Random(0)
+    rng = random.Random(0)  # noqa: S311 - jeu de test déterministe
     cl = []
     for i in range(5000):
         c = clash(f"A{i:05d}", f"B{i:05d}")
