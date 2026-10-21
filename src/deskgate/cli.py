@@ -12,6 +12,7 @@ from typing import Annotated
 import typer
 
 from deskgate import __version__, installer, runtime, scheduler
+from deskgate import doctor as doctor_mod
 from deskgate.core.tokens import generate_token, hash_token
 from deskgate.locations import resolve_home
 from deskgate.scheduler import TASK_NAME, SchedulerError
@@ -69,6 +70,18 @@ def dev_token() -> None:
         "et n'est écrit nulle part.",
         err=True,
     )
+
+
+@app.command()
+def doctor(
+    config: Annotated[Path | None, typer.Option("--config", help="Chemin de runner.toml")] = None,
+) -> None:
+    """Vérifie l'installation (configuration, dossiers, jeton, tâche, port, plugins)."""
+    checks = doctor_mod.run_all(resolve_home(), config)
+    for check in checks:
+        label = "échec" if check.level == "echec" else check.level
+        typer.echo(f"[{label}] {check.name} : {check.message}")
+    raise typer.Exit(doctor_mod.exit_code(checks))
 
 
 def _err(message: str) -> None:
