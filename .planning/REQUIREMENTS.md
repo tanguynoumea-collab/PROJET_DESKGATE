@@ -61,7 +61,7 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 
 ### Acceptation
 
-- [x] **ACC-01**: Un calcul de plus de 10 minutes lancé depuis n8n, avec le runner démarré par la tâche planifiée, reprend dans n8n avec le résumé et le chemin du BCF
+- [x] **ACC-01**: Un calcul de coordination réel et complet (maquettes réelles, aucun conflit tronqué) lancé depuis n8n, avec le runner démarré par la tâche planifiée, reprend dans n8n avec le résumé et le chemin du BCF (critère revu le 2026-10-21 : la durée de 10 minutes n'est plus un objectif, décision STATE.md)
 - [x] **ACC-02**: Un arrêt brutal du runner pendant une tâche produit, au redémarrage, un rappel `interrupted` reçu par n8n
 
 ### Socle ARTHEMIS
