@@ -116,18 +116,6 @@
       "condition_levee": "motif ecrit dans le journal de gate"
     },
     {
-      "id": "01-D1",
-      "type": "uat",
-      "titre": "Spike host.docker.internal vers 127.0.0.1 (Docker Desktop a demarrer), differe, bloque la phase 5",
-      "gravite": "majeur",
-      "statut": "ouvert",
-      "proprietaire": "humain",
-      "ouvert_le": "2026-10-20",
-      "source": ".planning/phases/01-fondations-testables/01-HUMAN-UAT.md",
-      "ref": "INS-05",
-      "condition_levee": "resultat saisi dans 01-HUMAN-UAT.md"
-    },
-    {
       "id": "04-D1",
       "type": "uat",
       "titre": "Rendu du BCF ifc.clash dans BIMcollab Zoom (2 vues, contexte gris, couleurs), differe, bloque la phase 5",
@@ -195,6 +183,6 @@
   },
   "maj": {
     "le": "2026-10-21",
-    "commit": "2f868b1"
+    "commit": "b9e8a8c"
   }
 }

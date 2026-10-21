@@ -24,3 +24,4 @@
 {"ts":"2026-10-21T09:00:00","type":"rapport","ref":".planning/phases/04-capacit-s-v0-1","commit":"e4f7ae9","note":"phase 4 planifiee : 7 plans autonomes en 3 vagues, horizon nul, item differe 04-D1"}
 {"ts":"2026-10-21T15:00:00","type":"gate","ref":".arthemis/reports/gate-1-04.log","commit":"2f868b1","note":"gate D-12 vert apres phase 4 : 7/7, 615+26 tests, 1 skip symlink"}
 {"ts":"2026-10-21T15:00:00","type":"rapport","ref":".planning/phases/04-capacit-s-v0-1/04-VERIFICATION.md","commit":"2f868b1","note":"phase 4 human_needed 4/4, CAP-01..05 cochees, 04-D1 differe"}
+{"ts":"2026-10-21T09:30:00","type":"fermeture","ref":"01-D1","commit":"b9e8a8c","note":"host.docker.internal vers 127.0.0.1 verifie depuis le n8n de l'utilisateur"}
