@@ -39,7 +39,7 @@
       "4",
       "5"
     ],
-    "quick_ids": [],
+    "quick_ids": ["261021-e6p"],
     "config_attendue": {
       "commit_docs": true,
       "ui_phase": false,
@@ -207,6 +207,6 @@
   },
   "maj": {
     "le": "2026-10-21",
-    "commit": "82c5a38"
+    "commit": "32ddfc7"
   }
 }

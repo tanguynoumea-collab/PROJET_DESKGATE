@@ -28,3 +28,4 @@
 {"ts":"2026-10-21T09:41:00","type":"rapport","ref":".arthemis/PASSATION.md","commit":"ff5cba0","note":"passation preparee, phase 5 recherchee, prochaine etape planification"}
 {"ts":"2026-10-21T10:00","type":"reprise","ref":"passation 2026-10-21T09:41","commit":"6cc98d0","note":"decisions reportees ecrites ; items uv-pythons et remote-ci ouverts"}
 {"ts":"2026-10-21T10:40","type":"rapport","ref":"phase 5","commit":"82c5a38","note":"9 plans en 7 vagues, plan-checker passe (2 avertissements mineurs), aucun bloquant, horizon null"}
+{"ts":"2026-10-21T11:00","type":"transition","ref":"quick-261021-e6p","commit":"cbe3e56","note":"fast track CI : setup-uv epingle v10.3.0, verifie, pousse"}
