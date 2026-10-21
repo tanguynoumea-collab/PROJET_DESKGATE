@@ -39,7 +39,9 @@
       "4",
       "5"
     ],
-    "quick_ids": ["261021-e6p"],
+    "quick_ids": [
+      "261021-e6p"
+    ],
     "config_attendue": {
       "commit_docs": true,
       "ui_phase": false,
@@ -142,14 +144,26 @@
     {
       "id": "remote-ci",
       "type": "decision",
-      "titre": "Remote origin cree et pousse le 2026-10-21 ; CI windows-latest (3.11, 3.13) jamais constatee verte",
+      "titre": "CI run 39568004313 : 3.11 vert ; 3.13 rouge sur test_audit_parcours (disk I/O SQLite)",
       "gravite": "majeur",
       "statut": "ouvert",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-21",
       "source": "passation 2026-10-21T09:41",
       "ref": "github.com/tanguynoumea-collab/PROJET_DESKGATE",
-      "condition_levee": "premier run ci.yml vert sur main, ou echecs corriges avant CLOTURE_MILESTONE"
+      "condition_levee": "premier run ci.yml vert sur main (3.11 et 3.13)"
+    },
+    {
+      "id": "ci-e2e-kill-tree",
+      "type": "finding",
+      "titre": "kill_tree attend le lanceur du venv, pas le runner enfant : base WAL relue trop tot (test_audit_parcours, 3.13)",
+      "gravite": "majeur",
+      "statut": "ouvert",
+      "proprietaire": "ia",
+      "ouvert_le": "2026-10-21",
+      "source": "CI run 39568004313",
+      "ref": "tests/e2e/conftest.py:109",
+      "condition_levee": "correctif en quick --full et CI 3.13 verte"
     }
   ],
   "livraisons": [],
