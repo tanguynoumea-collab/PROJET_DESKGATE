@@ -37,7 +37,8 @@
       "2",
       "3",
       "4",
-      "5"
+      "5",
+      "5.1"
     ],
     "quick_ids": [
       "261021-e6p"
@@ -120,14 +121,14 @@
     {
       "id": "04-D1",
       "type": "uat",
-      "titre": "Rendu du BCF ifc.clash dans BIMcollab Zoom (2 vues, contexte gris, couleurs), differe, bloque la phase 5",
-      "gravite": "mineur",
+      "titre": "04-D1 en echec le 2026-10-21 : points de vue absents dans BIMcollab Zoom ; repris en phase 5.1 (CAP-02)",
+      "gravite": "majeur",
       "statut": "ouvert",
-      "proprietaire": "humain",
+      "proprietaire": "ia",
       "ouvert_le": "2026-10-21",
       "source": ".planning/phases/04-capacit-s-v0-1/04-HUMAN-UAT.md",
       "ref": "CAP-02",
-      "condition_levee": "resultat saisi dans 04-HUMAN-UAT.md"
+      "condition_levee": "BCF de la phase 5.1 valide par l'utilisateur dans BIMcollab Zoom"
     },
     {
       "id": "uv-pythons",
@@ -180,9 +181,9 @@
     {
       "id": "acc01-duree",
       "type": "decision",
-      "titre": "ACC-01 : critere revu (coordination fiable, duree indifferente), palier 4 en cours",
+      "titre": "ACC-01 constate (critere revu) palier 4 complet ; certification a la DoD",
       "gravite": "majeur",
-      "statut": "ouvert",
+      "statut": "corrige_non_certifie",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-21",
       "source": "05-08-SUMMARY.md",
@@ -199,7 +200,7 @@
       "ouvert_le": "2026-10-21",
       "source": "recette ACC-01 palier 3",
       "ref": "plugins/bim/src/deskgate_bim/params.py:34",
-      "condition_levee": "phase inseree : defaut sans perte ou avertissement explicite, exemple n8n ajuste, teste"
+      "condition_levee": "phase 5.1 (CAP-07) executee et verifiee"
     },
     {
       "id": "clash-reservations",
@@ -211,7 +212,7 @@
       "ouvert_le": "2026-10-21",
       "source": "recette ACC-01 palier 3 (1490 reservations ARC)",
       "ref": "plugins/bim/src/deskgate_bim/clash.py",
-      "condition_levee": "phase inseree : reservations exclues par defaut ou documentees, teste"
+      "condition_levee": "phase 5.1 (CAP-07) executee et verifiee"
     }
   ],
   "livraisons": [],
@@ -269,6 +270,6 @@
   },
   "maj": {
     "le": "2026-10-21",
-    "commit": "100f163"
+    "commit": "3df7334"
   }
 }
