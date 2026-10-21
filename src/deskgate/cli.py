@@ -11,10 +11,10 @@ from typing import Annotated
 
 import typer
 
-from deskgate import __version__, installer, runtime
+from deskgate import __version__, installer, runtime, scheduler
 from deskgate.core.tokens import generate_token, hash_token
 from deskgate.locations import resolve_home
-from deskgate.scheduler import SchedulerError
+from deskgate.scheduler import TASK_NAME, SchedulerError
 
 # cp1252 par défaut sous Windows ; sous pythonw le flux vaut None (isinstance l'écarte).
 for _stream in (sys.stdout, sys.stderr):
@@ -145,3 +145,84 @@ def init(
         if outcome == "conforme"
         else "Tâche « Deskgate » installée."
     )
+
+
+task_app = typer.Typer(
+    no_args_is_help=True,
+    help="Tâche du Planificateur « Deskgate » (démarrage à l'ouverture de session).",
+)
+app.add_typer(task_app, name="task")
+
+
+@task_app.command("install")
+def task_install(
+    yes: Annotated[
+        bool, typer.Option("--yes", "-y", help="Installe sans poser la question.")
+    ] = False,
+) -> None:
+    """Installe (ou vérifie) la tâche du Planificateur."""
+    try:
+        if not _confirm_task(yes):
+            _err("Tâche non installée.")
+            return
+        outcome = installer.install_task(resolve_home())
+    except (installer.InitError, SchedulerError) as exc:
+        _err(exc.message)
+        raise typer.Exit(2) from exc
+    typer.echo("Tâche déjà conforme." if outcome == "conforme" else "Tâche installée.")
+
+
+@task_app.command("remove")
+def task_remove() -> None:
+    """Arrête puis supprime la tâche ; les données sont conservées."""
+    try:
+        scheduler.end_task(TASK_NAME)
+        deleted = scheduler.delete_task(TASK_NAME)
+    except SchedulerError as exc:
+        _err(exc.message)
+        raise typer.Exit(2) from exc
+    if not deleted:
+        _err("Impossible de supprimer la tâche « Deskgate » (absente ou refusée).")
+        raise typer.Exit(1)
+    typer.echo("Tâche supprimée. C:\\BIM, la configuration et la base sont conservés.")
+
+
+@task_app.command("status")
+def task_status() -> None:
+    """Relit la tâche et vérifie ses réglages."""
+    try:
+        xml = scheduler.query_task_xml(TASK_NAME)
+    except SchedulerError as exc:
+        _err(exc.message)
+        raise typer.Exit(2) from exc
+    if xml is None:
+        typer.echo("Tâche « Deskgate » absente (deskgate task install).")
+        raise typer.Exit(1)
+    settings = scheduler.read_settings(scheduler.parse_task_xml(xml))
+    findings = scheduler.audit_settings(settings)
+    for level, message in findings:
+        label = "echec" if level == "echec" else "avertissement"
+        typer.echo(f"[{label}] {message}")
+    typer.echo(f"Commande : {settings.command} {settings.arguments}")
+    failed = any(level == "echec" for level, _ in findings)
+    if failed:
+        raise typer.Exit(1)
+    typer.echo("Tâche conforme.")
+
+
+@task_app.command("run")
+def task_run() -> None:
+    """Démarre le runner par le Planificateur."""
+    if not scheduler.run_task(TASK_NAME):
+        _err("Le Planificateur n'a pas pu démarrer la tâche « Deskgate ».")
+        raise typer.Exit(1)
+    typer.echo("Runner démarré par le Planificateur.")
+
+
+@task_app.command("end")
+def task_end() -> None:
+    """Arrête la tâche en cours."""
+    if not scheduler.end_task(TASK_NAME):
+        _err("Le Planificateur n'a pas pu arrêter la tâche « Deskgate » (déjà arrêtée ?).")
+        raise typer.Exit(1)
+    typer.echo("Tâche arrêtée.")
