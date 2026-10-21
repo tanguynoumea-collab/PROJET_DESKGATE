@@ -58,4 +58,6 @@ markers = [
   "e2e: deskgate serve en sous-processus",
   "bim: exige les environnements uv des plugins (deskgate-bim, deskgate-bcf)",
   "mcp: serveur MCP réel en sous-processus",
+  "scheduler: crée une vraie tâche du Planificateur Windows (supprimée en fin de test)",
+  "docker: exige Docker Desktop et docker compose (échec explicite sans Docker)",
 ]
