@@ -1,4 +1,4 @@
-"""Le contrat bcf-write-v1 et ses deux copies sont identiques octet par octet."""
+"""Les contrats bcf-write-v1 et v2 et leurs copies sont identiques octet par octet."""
 
 from __future__ import annotations
 
@@ -11,18 +11,40 @@ from _support.plugin_envs import REPO
 
 pytestmark = pytest.mark.unit
 
-SOURCE = REPO / "docs" / "contrats" / "bcf-write-v1.json"
-COPIES = [
-    REPO / "plugins" / "bim" / "src" / "deskgate_bim" / "contracts" / "bcf-write-v1.json",
-    REPO / "plugins" / "bim" / "bcf" / "src" / "deskgate_bcf" / "schemas" / "bcf-write-v1.json",
-]
+VERSIONS = ("v1", "v2")
 
 
-@pytest.mark.parametrize("copie", COPIES, ids=lambda p: p.parent.parent.name)
-def test_copie_identique(copie: Path) -> None:
-    assert copie.read_bytes() == SOURCE.read_bytes()
+def _source(version: str) -> Path:
+    return REPO / "docs" / "contrats" / f"bcf-write-{version}.json"
+
+
+def _copies(version: str) -> list[Path]:
+    nom = f"bcf-write-{version}.json"
+    return [
+        REPO / "plugins" / "bim" / "src" / "deskgate_bim" / "contracts" / nom,
+        REPO / "plugins" / "bim" / "bcf" / "src" / "deskgate_bcf" / "schemas" / nom,
+    ]
+
+
+COUPLES = [(v, c) for v in VERSIONS for c in _copies(v)]
+
+
+@pytest.mark.parametrize(
+    ("version", "copie"), COUPLES, ids=lambda x: x if isinstance(x, str) else x.parent.parent.name
+)
+def test_copie_identique(version: str, copie: Path) -> None:
+    assert copie.read_bytes() == _source(version).read_bytes()
 
 
 def test_schema_version_1() -> None:
-    schema = json.loads(SOURCE.read_text(encoding="utf-8"))
+    schema = json.loads(_source("v1").read_text(encoding="utf-8"))
     assert schema["properties"]["schema_version"]["const"] == 1
+
+
+def test_schema_version_2() -> None:
+    schema = json.loads(_source("v2").read_text(encoding="utf-8"))
+    assert schema["properties"]["schema_version"]["const"] == 2
+    assert schema["properties"]["topics"]["maxItems"] == 100000
+    assert "snapshots" in schema["$defs"]["topic"]["properties"]
+    assert "header_files" in schema["properties"]
+    assert "origin_offset" not in json.dumps(schema)

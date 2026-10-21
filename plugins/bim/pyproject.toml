@@ -5,7 +5,7 @@ description = "Capacités BIM de Deskgate (ifc.clash)"
 requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICENSE"]
-dependencies = ["ifcopenshell==0.9.0.post1", "ifcclash==0.9.0", "pydantic>=2.14,<3"]
+dependencies = ["ifcopenshell==0.9.0.post1", "ifcclash==0.9.0", "pydantic>=2.14,<3", "pillow==13.0.0"]
 
 [build-system]
 requires = ["hatchling>=1.32"]
