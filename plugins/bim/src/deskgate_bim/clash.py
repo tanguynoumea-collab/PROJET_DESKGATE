@@ -25,7 +25,7 @@ from .context import context_guids
 from .grouping import build_groups, prepare
 from .naming import fallback_message, missing_message
 from .params import ClashError, ClashParams, parse_params
-from .spatial import topic_titles
+from .spatial import project_refs, topic_titles
 
 MEMORY_MESSAGE = "Mémoire insuffisante : réduisez la sélection ou augmentez memory_mb."
 DATA_MAX_BYTES = 900_000
@@ -220,6 +220,7 @@ def _write_bcf(
         titles = {}
         warn("naming_unavailable", f"Nommage des sujets indisponible : {exc}")
     names = [Path(f).stem for f in dict.fromkeys(f for f in (p.ifc_a, p.ifc_b) if f)]
+    refs = project_refs(clasher.opened, [p.ifc_a, *([p.ifc_b] if p.ifc_b else [])])
     doc = build_doc(
         groups,
         project=p.bcf_project or " ".join(["ifc.clash", *names]),
@@ -229,6 +230,7 @@ def _write_bcf(
         mode=p.mode,
         threshold=p.threshold,
         titles=titles,
+        header_files=refs or None,
     )
     if p.snapshots:
         progress(93, "rendu des images", force=True)

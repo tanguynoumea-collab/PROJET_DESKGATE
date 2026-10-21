@@ -3,8 +3,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from pathlib import Path
+from collections.abc import Mapping, Sequence
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 import ifcopenshell.ifcopenshell_wrapper as wrapper
@@ -161,3 +161,20 @@ def topic_titles(
                 missing.append(f"bâtiment : {name}")
         titles[g["id"]] = build_title(building_code, storey_code, trade_a, trade_b, lib_a, lib_b)
     return titles, missing, fallbacks
+
+
+def project_refs(files: Mapping[str, Any], paths: Sequence[str]) -> list[dict[str, str]]:
+    """Références Header/File des maquettes : nom de fichier seul et GlobalId de l'IfcProject."""
+    refs: list[dict[str, str]] = []
+    for path in dict.fromkeys(paths):
+        f = files.get(path)
+        if f is None:
+            continue
+        projects = f.by_type("IfcProject")
+        if not projects:
+            continue
+        guid = getattr(projects[0], "GlobalId", None)
+        if not isinstance(guid, str) or len(guid) != 22:
+            continue
+        refs.append({"filename": PurePosixPath(path.replace("\\", "/")).name, "ifc_project": guid})
+    return refs
