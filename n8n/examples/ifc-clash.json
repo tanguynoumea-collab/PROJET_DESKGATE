@@ -1,0 +1,152 @@
+{
+  "id": "DeskgateClash0001",
+  "name": "Deskgate - ifc.clash (soumettre puis attendre le rappel)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "11111111-1111-4111-8111-111111111101",
+      "name": "Lancement manuel",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 160]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "deskgate-ifc-clash",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "11111111-1111-4111-8111-111111111102",
+      "name": "Lancement par webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 400],
+      "webhookId": "5b1c0f0e-8a52-4c3a-9d55-2f0f6b6a0a01"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { capability: $json.body?.capability ?? 'ifc.clash', params: $json.body?.params ?? { ifc_a: '/data/depot/PIC-EXE-AW-CVC-MNQ-BaJ-SUP-30701-IFC4.ifc', selector_a: 'IfcFlowSegment, IfcFlowFitting', ifc_b: '/data/depot/PIC_REV_HRS_ARC_MNQ_BaJ_SUP_30400.ifc', selector_b: 'IfcWall, IfcSlab, IfcBeam, IfcColumn', mode: 'hard', tolerance: 0.01, bcf: true }, timeout: $json.body?.timeout ?? 14400 } }}",
+        "options": {}
+      },
+      "id": "11111111-1111-4111-8111-111111111103",
+      "name": "Parametres",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [260, 280]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8765/jobs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ capability: $json.capability, params: $json.params, timeout: $json.timeout, callback: { url: $execution.resumeUrl } }) }}",
+        "options": { "timeout": 30000 }
+      },
+      "id": "11111111-1111-4111-8111-111111111104",
+      "name": "Soumettre a Deskgate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 280],
+      "credentials": {
+        "httpHeaderAuth": { "id": "DeskgateToken0001", "name": "Deskgate" }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "POST",
+        "limitWaitTime": true,
+        "limitType": "afterTimeInterval",
+        "resumeAmount": 6,
+        "resumeUnit": "hours",
+        "options": {}
+      },
+      "id": "11111111-1111-4111-8111-111111111105",
+      "name": "Attendre le rappel",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [780, 280],
+      "webhookId": "5b1c0f0e-8a52-4c3a-9d55-2f0f6b6a0a02"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.body?.status }}",
+              "rightValue": "succeeded",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "11111111-1111-4111-8111-111111111106",
+      "name": "Succes ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1040, 280]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { resultat: 'succes', job_id: $json.body.job_id, duree_s: $json.body.duration_s, resume: $json.body.summary, artefacts: $json.body.artifacts } }}",
+        "options": {}
+      },
+      "id": "11111111-1111-4111-8111-111111111107",
+      "name": "Succes",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1300, 180]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { resultat: $json.body?.status ?? 'delai_depasse_sans_rappel', job_id: $json.body?.job_id ?? null, erreur: $json.body?.error ?? null } }}",
+        "options": {}
+      },
+      "id": "11111111-1111-4111-8111-111111111108",
+      "name": "Echec ou delai",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1300, 400]
+    }
+  ],
+  "connections": {
+    "Lancement manuel": {
+      "main": [[{ "node": "Parametres", "type": "main", "index": 0 }]]
+    },
+    "Lancement par webhook": {
+      "main": [[{ "node": "Parametres", "type": "main", "index": 0 }]]
+    },
+    "Parametres": {
+      "main": [[{ "node": "Soumettre a Deskgate", "type": "main", "index": 0 }]]
+    },
+    "Soumettre a Deskgate": {
+      "main": [[{ "node": "Attendre le rappel", "type": "main", "index": 0 }]]
+    },
+    "Attendre le rappel": {
+      "main": [[{ "node": "Succes ?", "type": "main", "index": 0 }]]
+    },
+    "Succes ?": {
+      "main": [
+        [{ "node": "Succes", "type": "main", "index": 0 }],
+        [{ "node": "Echec ou delai", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}
