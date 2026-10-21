@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import uuid
 import zipfile
 from pathlib import Path
 from xml.etree import ElementTree as ET
@@ -101,3 +102,106 @@ def test_determinisme_des_membres(ecrire, doc_valide, tmp_path):
         assert sorted(za.namelist()) == sorted(zb.namelist())
         for n in za.namelist():
             assert za.read(n) == zb.read(n), n
+
+
+def _markup(z: zipfile.ZipFile, guid: str) -> ET.Element:
+    return ET.fromstring(z.read(f"{guid}/markup.bcf"))  # noqa: S314
+
+
+def _g2(topic: dict) -> str:
+    return str(uuid.uuid5(uuid.UUID(topic["guid"]), "viewpoint-2-context"))
+
+
+def test_v2_snapshots_dans_le_zip(ecrire, doc_v2, tmp_path):
+    assert ecrire(doc_v2).returncode == 0
+    t = doc_v2["topics"][0]
+    g, g2 = t["guid"], _g2(t)
+    with zipfile.ZipFile(tmp_path / "out.bcf") as z:
+        noms = set(z.namelist())
+        for n in ("viewpoint.bcfv", "snapshot.png", f"{g2}.bcfv", f"{g2}.png"):
+            assert f"{g}/{n}" in noms, n
+        assert z.read(f"{g}/snapshot.png") == (tmp_path / "snapshots" / "s1-1.png").read_bytes()
+        assert z.read(f"{g}/{g2}.png") == (tmp_path / "snapshots" / "s1-2.png").read_bytes()
+        vps = [e for e in _markup(z, g).iter() if _tag(e) == "Viewpoints"]
+        assert len(vps) == 2
+        assert all(any(_tag(c) == "Snapshot" for c in v) for v in vps)
+        index = [next(c.text for c in v if _tag(c) == "Index") for v in vps]
+        assert sorted(index) == ["0", "1"]
+
+
+def test_v2_sujet_sans_snapshot(ecrire, doc_v2, tmp_path):
+    assert ecrire(doc_v2).returncode == 0
+    g = doc_v2["topics"][1]["guid"]
+    with zipfile.ZipFile(tmp_path / "out.bcf") as z:
+        assert not [n for n in z.namelist() if n.startswith(g + "/") and n.endswith(".png")]
+        assert f"{g}/viewpoint.bcfv" in z.namelist()
+        m = _markup(z, g)
+        assert "Snapshot" not in {_tag(e) for e in m.iter()}
+        assert len([e for e in m if _tag(e) == "Comment"]) == 2
+
+
+def test_v2_commentaires(ecrire, doc_v2, tmp_path):
+    assert ecrire(doc_v2).returncode == 0
+    with zipfile.ZipFile(tmp_path / "out.bcf") as z:
+        for t in doc_v2["topics"]:
+            m = _markup(z, t["guid"])
+            vp_guids = {e.get("Guid") for e in m.iter() if _tag(e) == "Viewpoints"}
+            comments = [e for e in m if _tag(e) == "Comment"]
+            assert len(comments) == 2
+            for c in comments:
+                ref = next(e for e in c if _tag(e) == "Viewpoint")
+                assert ref.get("Guid") in vp_guids
+
+
+def test_v2_header(ecrire, doc_v2, tmp_path):
+    assert ecrire(doc_v2).returncode == 0
+    with zipfile.ZipFile(tmp_path / "out.bcf") as z:
+        for t in doc_v2["topics"]:
+            files = [e for e in _markup(z, t["guid"]).iter() if _tag(e) == "File"]
+            assert [f.get("IfcProject") for f in files] == [
+                "1AAAAAAAAAAAAAAAAAAAAA",
+                "1BBBBBBBBBBBBBBBBBBBBB",
+            ]
+            fn = [next(c.text for c in f if _tag(c) == "Filename") for f in files]
+            assert fn == ["CVC.ifc", "ARC.ifc"]
+
+
+def test_v2_sans_header_files(ecrire, doc_v2, tmp_path):
+    del doc_v2["header_files"]
+    assert ecrire(doc_v2).returncode == 0
+    with zipfile.ZipFile(tmp_path / "out.bcf") as z:
+        for t in doc_v2["topics"]:
+            assert "Header" not in {_tag(e) for e in _markup(z, t["guid"]).iter()}
+
+
+def test_v2_camera_monde(ecrire, doc_v2, tmp_path):
+    assert ecrire(doc_v2).returncode == 0
+    t = doc_v2["topics"][0]
+    with zipfile.ZipFile(tmp_path / "out.bcf") as z:
+        racine = ET.fromstring(z.read(f"{t['guid']}/viewpoint.bcfv"))  # noqa: S314
+    pt = next(e for e in racine.iter() if _tag(e) == "CameraViewPoint")
+    xyz = [float(next(c.text for c in pt if _tag(c) == k)) for k in ("X", "Y", "Z")]
+    assert xyz == pytest.approx([10.0, 20.0, 30.0], abs=1e-9)
+
+
+def test_v2_determinisme(ecrire, doc_v2, tmp_path):
+    assert ecrire(doc_v2, nom="a.bcf").returncode == 0
+    assert ecrire(doc_v2, nom="b.bcf").returncode == 0
+    with zipfile.ZipFile(tmp_path / "a.bcf") as za, zipfile.ZipFile(tmp_path / "b.bcf") as zb:
+        assert sorted(za.namelist()) == sorted(zb.namelist())
+        for n in za.namelist():
+            assert za.read(n) == zb.read(n), n
+
+
+def test_v2_relecture_bcf_client(ecrire, doc_v2, plugin_envs, tmp_path):
+    assert ecrire(doc_v2).returncode == 0
+    res = run_json(plugin_envs["bcf"], SONDE, str(tmp_path / "out.bcf"))
+    assert isinstance(res, dict)
+    par_guid = {t["guid"]: t for t in res["topics"]}
+    t1 = par_guid[doc_v2["topics"][0]["guid"]]
+    assert len(t1["viewpoints"]) == 2
+    assert not any(v["has_selection"] for v in t1["viewpoints"])
+    vue0 = next(v for v in t1["viewpoints"] if v["index"] == 0)
+    assert vue0["snapshot"] == "snapshot.png"
+    assert vue0["file"] == "viewpoint.bcfv"
+    assert len(t1["comments"]) == 2

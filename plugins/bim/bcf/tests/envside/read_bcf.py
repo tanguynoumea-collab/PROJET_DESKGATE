@@ -29,6 +29,9 @@ def _viewpoint(vh) -> dict:
     sel = comps.selection if comps else None
     return {
         "guid": vi.guid,
+        "snapshot": None,
+        "file": None,
+        "index": None,
         "camera": camera,
         "default_visibility": vis.default_visibility if vis else None,
         "exceptions": _guids(exc),
@@ -42,7 +45,23 @@ def main() -> None:
     topics = []
     for guid, th in sorted(bcf.topics.items()):
         vps = sorted((_viewpoint(v) for v in th.viewpoints.values()), key=lambda d: d["guid"])
-        topics.append({"guid": guid, "title": th.topic.title, "viewpoints": vps})
+        par_guid = {v["guid"]: v for v in vps}
+        for ref in th.markup.viewpoints:
+            v = par_guid.get(ref.guid)
+            if v is not None:
+                v["snapshot"] = ref.snapshot
+                v["file"] = ref.viewpoint
+                v["index"] = ref.index
+        comments = sorted(
+            (
+                {"guid": c.guid, "viewpoint": c.viewpoint.guid if c.viewpoint else None}
+                for c in th.markup.comment
+            ),
+            key=lambda d: d["guid"],
+        )
+        topics.append(
+            {"guid": guid, "title": th.topic.title, "viewpoints": vps, "comments": comments}
+        )
     out = {
         "version": bcf.version.version_id,
         "project": bcf.project_info.project.name,

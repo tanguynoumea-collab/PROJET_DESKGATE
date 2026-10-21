@@ -61,6 +61,35 @@ def _camera(cam: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _camera_v2(cam: dict[str, Any]) -> dict[str, Any]:
+    """Caméra v2 : position, direction et up en repère monde, écrits tels que reçus."""
+    p = cam["position"]
+    d = cam["direction"]
+    u = cam["up"]
+    kw: dict[str, Any] = {
+        "camera_view_point": mdl.Point(x=float(p[0]), y=float(p[1]), z=float(p[2])),
+        "camera_direction": mdl.Direction(x=float(d[0]), y=float(d[1]), z=float(d[2])),
+        "camera_up_vector": mdl.Direction(x=float(u[0]), y=float(u[1]), z=float(u[2])),
+    }
+    if cam["type"] == "orthogonal":
+        return {
+            "orthogonal_camera": mdl.OrthogonalCamera(
+                view_to_world_scale=float(cam.get("view_to_world_scale", 1.0)), **kw
+            )
+        }
+    return {
+        "perspective_camera": mdl.PerspectiveCamera(
+            field_of_view=float(cam.get("field_of_view", 60.0)), **kw
+        )
+    }
+
+
+TEXTE = {
+    1: "Point de vue 1 : objets du conflit seuls.",
+    2: "Point de vue 2 : objets du conflit dans leur contexte gris transparent.",
+}
+
+
 def _only(t: dict[str, Any], c: dict[str, str]) -> mdl.Components:
     return mdl.Components(
         visibility=mdl.ComponentVisibility(
@@ -92,7 +121,8 @@ def _context(t: dict[str, Any], c: dict[str, str]) -> mdl.Components:
     )
 
 
-def _build(doc: dict[str, Any], target: Path) -> None:
+def _build(doc: dict[str, Any], target: Path, base: Path | None = None) -> None:
+    v2 = doc["schema_version"] == 2
     created = XmlDateTime.from_datetime(datetime.datetime.fromisoformat(doc["created_at"]))
     bcf = BcfXml.create_new(doc["project"])
     bcf.project_info.project.project_id = str(
@@ -111,23 +141,51 @@ def _build(doc: dict[str, Any], target: Path) -> None:
         th.topic.creation_date = created
         th._topic_dir = Path(t["guid"])
         bcf.topics[t["guid"]] = th
+        if v2 and doc.get("header_files"):
+            th.markup.header = mdl.Header(
+                file=[
+                    mdl.HeaderFile(
+                        filename=h["filename"], ifc_project=h["ifc_project"], is_external=True
+                    )
+                    for h in doc["header_files"]
+                ]
+            )
         for i, (make, label) in enumerate(((_only, "only"), (_context, "context")), 1):
             g = str(uuid.uuid5(uuid.UUID(t["guid"]), f"viewpoint-{i}-{label}"))
-            th.add_visinfo_handler(
-                VisualizationInfoHandler(
-                    mdl.VisualizationInfo(
-                        guid=g, components=make(t, doc["colors"]), **_camera(t["camera"])
-                    )
+            cam = _camera_v2(t["camera"]) if v2 else _camera(t["camera"])
+            octets: bytes | None = None
+            if v2 and t.get("snapshots") and base is not None:
+                octets = (base / t["snapshots"][label]).read_bytes()
+            vh = VisualizationInfoHandler(
+                mdl.VisualizationInfo(guid=g, components=make(t, doc["colors"]), **cam),
+                snapshot=octets,
+            )
+            if not v2:
+                th.add_visinfo_handler(vh)
+                continue
+            nom = ("snapshot.png" if i == 1 else f"{g}.png") if octets is not None else None
+            vp = th.add_visinfo_handler(vh, snapshot_filename=nom)
+            if i == 1:
+                th.viewpoints["viewpoint.bcfv"] = th.viewpoints.pop(g + ".bcfv")
+                vp.viewpoint = "viewpoint.bcfv"
+            vp.index = i - 1
+            th.markup.comment.append(
+                mdl.Comment(
+                    guid=str(uuid.uuid5(uuid.UUID(t["guid"]), f"comment-{i}")),
+                    date=created,
+                    author=doc["author"],
+                    comment=TEXTE[i],
+                    viewpoint=mdl.CommentViewpoint(guid=g),
                 )
             )
     bcf.save(target)
 
 
-def write(doc: dict[str, Any], out: Path) -> None:
+def write(doc: dict[str, Any], out: Path, base: Path | None = None) -> None:
     """Écrit le BCF dans un fichier temporaire voisin puis le renomme."""
     tmp = out.with_name(out.stem + ".tmp.bcf")
     try:
-        _build(doc, tmp)
+        _build(doc, tmp, base)
         os.replace(tmp, out)
     except BaseException:
         with contextlib.suppress(OSError):
