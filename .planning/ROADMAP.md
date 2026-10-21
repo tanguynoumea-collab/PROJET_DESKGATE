@@ -16,7 +16,8 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
  (completed 2026-10-20)
 - [x] **Phase 3: Rappel fiable** - Outbox de rappels, politique par réponse n8n, plafond de taille, masquage de la signature, audit
  (completed 2026-10-20)
-- [x] **Phase 4: Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call` (completed 2026-10-20)
+- [x] **Phase 4: Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call`
+ (completed 2026-10-20)
 - [ ] **Phase 5: Installation et intégration n8n** - `deskgate init`, tâche planifiée, docker-compose n8n, workflow d'exemple, acceptation
 
 ## Phase Details
@@ -115,7 +116,17 @@ Plans:
   3. Le workflow d'exemple importé (HTTP Request, Wait, test du `status`) déclenche `ifc.clash` et reprend sur le rappel
   4. Acceptation : un calcul de plus de 10 minutes, runner démarré par la tâche planifiée, reprend dans n8n avec le résumé et le chemin du BCF
   5. Acceptation : un arrêt brutal du runner pendant une tâche produit, au redémarrage, un rappel `interrupted` reçu par n8n
-**Plans**: TBD
+**Plans:** 9 plans
+Plans:
+- [ ] 05-01-PLAN.md — Module scheduler : XML de tâche D-03, relecture, enveloppe schtasks, marqueurs (vague 1)
+- [ ] 05-02-PLAN.md — Journal fichier après le mutex (pythonw) et deskgate --version (vague 1)
+- [ ] 05-03-PLAN.md — deskgate init et deskgate task install|remove|status|run|end (vague 2)
+- [ ] 05-05-PLAN.md — Compose n8n 2.43.8 + Postgres, workflow d'exemple ifc-clash.json, tests statiques (vague 2)
+- [ ] 05-04-PLAN.md — deskgate doctor (configuration, dossiers, jeton, tâche, port, plugins) (vague 3)
+- [ ] 05-06-PLAN.md — Installation sur la machine : outil uv, init --yes, plugins, maquettes, runner lancé par la tâche (vague 4)
+- [ ] 05-07-PLAN.md — Scripts de recette, compose démarré, import, INS-05, calcul court INS-04 sur 2.43.8 (vague 5)
+- [ ] 05-08-PLAN.md — Acceptation ACC-01 (calcul long) et ACC-02 (arrêt brutal), 05-ACCEPTANCE.md (vague 6)
+- [ ] 05-09-PLAN.md — AGENTS.md, ARCHITECTURE.md, README d'après l'installation réelle (vague 7)
 **Note de recherche**: spikes nécessaires : Planificateur de tâches sans élévation (XML `schtasks`, repli `HKCU\Run`) ; `gui-scripts` sous uv ; sortie du Wait à l'échéance.
 
 ## Progress
