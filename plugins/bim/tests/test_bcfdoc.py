@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Document bcf-write-v1 (bcfdoc.py) : chargé par chemin, validé contre le contrat JSON."""
+"""Document bcf-write-v2 (bcfdoc.py) : chargé par chemin, validé contre le contrat JSON."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from jsonschema import Draft202012Validator
 pytestmark = pytest.mark.unit
 
 SRC = Path(__file__).resolve().parents[1] / "src" / "deskgate_bim" / "bcfdoc.py"
-SCHEMA = Path(__file__).resolve().parents[3] / "docs" / "contrats" / "bcf-write-v1.json"
+SCHEMA = Path(__file__).resolve().parents[3] / "docs" / "contrats" / "bcf-write-v2.json"
 GUID_A = "0AAAAAAAAAAAAAAAAAAAAA"
 GUID_B = "0BBBBBBBBBBBBBBBBBBBBB"
 GUID_C = "0CCCCCCCCCCCCCCCCCCCCC"
@@ -74,7 +74,7 @@ def test_document_valide_contre_le_contrat() -> None:
     g = group([pair(GUID_A, GUID_B, [0, 0, 0], [0, 0.2, 0])], [0, 0.1, 0])
     d = doc([g], context={GROUP_ID: [GUID_C]})
     assert list(VALIDATOR.iter_errors(d)) == []
-    assert d["schema_version"] == 1 and d["colors"] == m.DEFAULT_COLORS
+    assert d["schema_version"] == 2 and d["colors"] == m.DEFAULT_COLORS
 
 
 def test_un_sujet_par_groupe_et_champs_du_sujet() -> None:
@@ -85,10 +85,10 @@ def test_un_sujet_par_groupe_et_champs_du_sujet() -> None:
     assert (
         "hard" in t["description"] and "0.002" in t["description"] and "1 paire" in t["description"]
     )
-    assert t["camera"]["type"] == "perspective" and t["camera"]["target"] == [0, 0.1, 0]
+    assert t["camera"] == m.camera_pose([0, 0.1, 0], 1.0)
 
 
-def test_guids_tries_uniques_et_titre_avec_surplus() -> None:
+def test_guids_tries_uniques_et_titre_sans_surplus() -> None:
     pairs = [
         pair(GUID_B, GUID_D, [0, 0, 0], [0, 0, 0]),
         pair(GUID_A, GUID_D, [0, 0, 0], [0, 0, 0]),
@@ -97,7 +97,7 @@ def test_guids_tries_uniques_et_titre_avec_surplus() -> None:
     (t,) = doc([group(pairs, [0, 0, 0])])["topics"]
     assert t["guids_a"] == [GUID_A, GUID_B]
     assert t["guids_b"] == [GUID_C, GUID_D]
-    assert t["title"].endswith("(+2)")
+    assert t["title"] == "Mur1 x Gaine1"
 
 
 def test_titre_replie_sur_la_classe_ifc_si_nom_vide() -> None:
@@ -107,12 +107,33 @@ def test_titre_replie_sur_la_classe_ifc_si_nom_vide() -> None:
 
 def test_rayon_de_camera() -> None:
     near = group([pair(GUID_A, GUID_B, [0, 0, 0], [0, 0, 0])], [0, 0, 0])
-    assert doc([near])["topics"][0]["camera"]["radius"] == 1.0
+    assert m._radius(near) == 1.0
     far = group(
         [pair(GUID_A, GUID_B, [0, 0, 0], [0, 0, 0]), pair(GUID_C, GUID_D, [10, 0, 0], [10, 0, 0])],
         [0, 0, 0],
     )
-    assert doc([far])["topics"][0]["camera"]["radius"] == pytest.approx(10.5)
+    assert m._radius(far) == pytest.approx(10.5)
+
+
+def test_camera_pose() -> None:
+    c = m.camera_pose([0, 0, 0], 1.0)
+    assert c["position"] == [1.846372, -1.846372, 1.477098]
+    assert c["up"][2] > 0 and c["field_of_view"] == 60.0
+
+
+def test_titres_fournis_et_tri() -> None:
+    g1 = group([pair(GUID_A, GUID_B, [0, 0, 0], [0, 0, 0])], [0, 0, 0])
+    g2 = {**group([pair(GUID_C, GUID_D, [0, 0, 0], [0, 0, 0])], [0, 0, 0]), "id": "a" + GROUP_ID[1:]}
+    d = doc([g1, g2], titles={GROUP_ID: "BaJ/P01/CVC-ARC/Gaine x Mur", g2["id"]: "BaJ/P00/x"})
+    assert [t["title"] for t in d["topics"]] == ["BaJ/P00/x", "BaJ/P01/CVC-ARC/Gaine x Mur"]
+    assert list(VALIDATOR.iter_errors(d)) == []
+
+
+def test_header_files() -> None:
+    g = group([pair(GUID_A, GUID_B, [0, 0, 0], [0, 0, 0])], [0, 0, 0])
+    hf = [{"filename": "A.ifc", "ifc_project": GUID_A}]
+    assert doc([g], header_files=hf)["header_files"] == hf
+    assert "header_files" not in doc([g])
 
 
 def test_contexte_ne_contient_pas_le_conflit() -> None:

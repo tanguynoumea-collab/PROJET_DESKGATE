@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: MIT
-"""Document du contrat bcf-write-v1 construit depuis les groupes de conflits (stdlib seule)."""
+"""Document du contrat bcf-write-v2 construit depuis les groupes de conflits (stdlib seule)."""
 
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 DEFAULT_COLORS: dict[str, str] = {"a": "FFE53935", "b": "FF1E88E5", "context": "40B0B0B0"}
@@ -22,10 +23,7 @@ def _midpoint(pair: dict[str, Any]) -> list[float]:
 
 def _title(pairs: list[dict[str, Any]]) -> str:
     first = pairs[0]
-    title = f"{_label(first, 'a')} x {_label(first, 'b')}"
-    if len(pairs) > 1:
-        title += f" (+{len(pairs) - 1})"
-    return title[:TITLE_MAX]
+    return f"{_label(first, 'a')} x {_label(first, 'b')}"[:TITLE_MAX]
 
 
 def _description(pairs: list[dict[str, Any]], mode: str, threshold: float) -> str:
@@ -46,6 +44,39 @@ def _radius(group: dict[str, Any]) -> float:
     return max(1.0, round(far + 0.5, 6))
 
 
+def _unit(v: Sequence[float]) -> list[float]:
+    n = math.sqrt(sum(x * x for x in v))
+    return [x / n for x in v] if n else list(v)
+
+
+def _cross(a: Sequence[float], b: Sequence[float]) -> list[float]:
+    return [
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0],
+    ]
+
+
+def camera_pose(
+    target: Sequence[float], radius: float, direction: Sequence[float] | None = None
+) -> dict[str, Any]:
+    """Pose de caméra perspective en coordonnées monde (même calcul que le writer v1)."""
+    d = _unit(list(direction) if direction else [-1.0, 1.0, -0.8])
+    r = max(radius, 1.0)
+    pos = [t - c * 3 * r for t, c in zip(target, d, strict=True)]
+    right = _cross([0.0, 0.0, 1.0], d)
+    n = math.sqrt(sum(x * x for x in right)) or 1.0
+    right = [x / n for x in right]
+    up = _cross(d, right)
+    return {
+        "type": "perspective",
+        "position": [round(x, 6) for x in pos],
+        "direction": [round(x, 6) for x in d],
+        "up": [round(x, 6) for x in up],
+        "field_of_view": 60.0,
+    }
+
+
 def build_doc(
     groups: list[dict[str, Any]],
     *,
@@ -56,6 +87,8 @@ def build_doc(
     mode: str,
     threshold: float,
     colors: dict[str, str] | None = None,
+    titles: Mapping[str, str] | None = None,
+    header_files: Sequence[Mapping[str, str]] | None = None,
 ) -> dict[str, Any]:
     """Un sujet par groupe ; les GUID de sujet sont ceux des groupes (UUID v5, déterministes)."""
     topics: list[dict[str, Any]] = []
@@ -64,25 +97,27 @@ def build_doc(
         topics.append(
             {
                 "guid": g["id"],
-                "title": _title(pairs),
+                "title": ((titles or {}).get(g["id"]) or _title(pairs))[:TITLE_MAX],
                 "description": _description(pairs, mode, threshold),
                 "type": "Clash",
                 "status": "Open",
                 "guids_a": sorted({c["a_global_id"] for c in pairs}),
                 "guids_b": sorted({c["b_global_id"] for c in pairs}),
                 "context_guids": list(context.get(g["id"], [])),
-                "camera": {
-                    "type": "perspective",
-                    "target": list(g["centre"]),
-                    "radius": _radius(g),
-                },
+                "camera": camera_pose(g["centre"], _radius(g)),
             }
         )
-    return {
-        "schema_version": 1,
+    topics.sort(key=lambda t: (t["title"], t["guid"]))
+    doc: dict[str, Any] = {
+        "schema_version": 2,
         "project": project,
         "author": author,
         "created_at": created_at,
         "colors": dict(colors or DEFAULT_COLORS),
         "topics": topics,
     }
+    if header_files is not None:
+        doc["header_files"] = [
+            {"filename": h["filename"], "ifc_project": h["ifc_project"]} for h in header_files
+        ]
+    return doc
