@@ -125,7 +125,7 @@ Plans:
 - [x] 05-04-PLAN.md — deskgate doctor (configuration, dossiers, jeton, tâche, port, plugins) (vague 3)
 - [x] 05-06-PLAN.md — Installation sur la machine : outil uv, init --yes, plugins, maquettes, runner lancé par la tâche (vague 4)
 - [x] 05-07-PLAN.md — Scripts de recette, compose démarré, import, INS-05, calcul court INS-04 sur 2.43.8 (vague 5)
-- [ ] 05-08-PLAN.md — Acceptation ACC-01 (calcul long) et ACC-02 (arrêt brutal), 05-ACCEPTANCE.md (vague 6)
+- [x] 05-08-PLAN.md — Acceptation ACC-01 (calcul long) et ACC-02 (arrêt brutal), 05-ACCEPTANCE.md (vague 6)
 - [ ] 05-09-PLAN.md — AGENTS.md, ARCHITECTURE.md, README d'après l'installation réelle (vague 7)
 **Note de recherche**: spikes nécessaires : Planificateur de tâches sans élévation (XML `schtasks`, repli `HKCU\Run`) ; `gui-scripts` sous uv ; sortie du Wait à l'échéance.
 
