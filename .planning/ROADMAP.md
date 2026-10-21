@@ -138,3 +138,18 @@ Plans:
 | 3. Rappel fiable | 0/0 | Complete    | 2026-10-20 |
 | 4. Capacités v0.1 | 0/0 | Complete    | 2026-10-20 |
 | 5. Installation et intégration n8n | 6/9 | In Progress|  |
+
+### Phase 05.1: BCF exploitable dans BIMcollab et nommage des sujets (INSERTED)
+
+**Goal:** Le BCF d'`ifc.clash` s'ouvre dans BIMcollab Zoom avec ses deux points de vue par sujet, chaque sujet est titré selon la convention de tri du projet, et aucun conflit n'est perdu ni inventé par les réservations.
+**Requirements**: CAP-02, CAP-06, CAP-07
+**Success Criteria** (what must be TRUE):
+  1. Le BCF du calcul réel CVC × ARC, ouvert dans BIMcollab Zoom avec les deux maquettes, montre pour chaque sujet ses deux points de vue (objets seuls ; contexte gris transparent), cadrés sur le conflit (04-D1)
+  2. Les sujets sont titrés « <trigramme bâtiment>/<étage>/<techniques>/<sujet> » d'après la charte du job ; une entrée manquante donne la valeur IFC brute et un avertissement
+  3. Sur les maquettes réelles, `clashes.json` et le BCF contiennent tous les conflits par défaut, ou la troncature est explicite et signalée ; les réservations sont exclues par défaut
+  4. Le workflow d'exemple n8n passe la charte et les réglages de coordination fiable
+**Depends on:** Phase 5
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 05.1 to break down)

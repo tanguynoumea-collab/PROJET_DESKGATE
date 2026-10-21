@@ -46,10 +46,12 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 ### Capacités
 
 - [x] **CAP-01**: La capacité `ifc.clash` détecte les conflits entre deux sélections IFC en modes `hard` et `clearance` (tolérance explicite), regroupe les résultats et renvoie un JSON avec les GlobalId de chaque paire
-- [x] **CAP-02**: `ifc.clash` produit sur demande un BCF 2.1 avec deux points de vue par sujet (objets du conflit seuls ; contexte gris transparent), couleurs ARGB, sans sélection enregistrée
+- [ ] **CAP-02**: `ifc.clash` produit sur demande un BCF 2.1 avec deux points de vue par sujet (objets du conflit seuls ; contexte gris transparent), couleurs ARGB, sans sélection enregistrée ; les points de vue s'affichent dans BIMcollab Zoom (04-D1, rouvert le 2026-10-21)
 - [x] **CAP-03**: `ifc.clash` traite une sélection vide comme un succès à 0 conflit avec avertissement
 - [x] **CAP-04**: La capacité `mcp.call` appelle un outil d'un serveur MCP stdio déclaré dans la configuration, sans LLM, dans le Job Object de la tâche, et renvoie son résultat
 - [x] **CAP-05**: Le paquet `deskgate-bcf` (GPL-3) écrit un BCF 2.1 à partir d'un fichier JSON versionné, appelé en sous-processus ; aucun autre paquet n'importe `bcf-client` ni `deskgate-bcf` (vérifié par un test)
+- [ ] **CAP-06**: Chaque sujet BCF d'`ifc.clash` est titré « <trigramme bâtiment>/<étage>/<techniques>/<sujet> » (ex. « BaJ/P01/CVC-ARC/Gaine x Faux-plafond ») d'après une charte passée en paramètre du job ; une entrée absente de la charte prend la valeur IFC brute et produit un avertissement
+- [ ] **CAP-07**: `ifc.clash` ne perd aucun conflit en silence (troncature explicite et signalée, défaut sans perte sur des maquettes réelles) et exclut par défaut les réservations (`IfcOpeningElement`) des sélections
 
 ### Installation et intégration
 
@@ -148,10 +150,12 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | SEC-05 | Phase 3 | Complete |
 | SEC-06 | Phase 3 | Complete |
 | CAP-01 | Phase 4 | Complete |
-| CAP-02 | Phase 4 | Complete |
+| CAP-02 | Phase 5.1 | Pending |
 | CAP-03 | Phase 4 | Complete |
 | CAP-04 | Phase 4 | Complete |
 | CAP-05 | Phase 4 | Complete |
+| CAP-06 | Phase 5.1 | Pending |
+| CAP-07 | Phase 5.1 | Pending |
 | INS-01 | Phase 5 | Complete |
 | INS-02 | Phase 5 | Complete |
 | INS-03 | Phase 5 | Complete |
@@ -172,7 +176,7 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | PUB-05 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 47 total (dont 11 de socle ARTHEMIS, cochés par requirements mark-complete, hors ligne Requirements du ROADMAP)
+- v1 requirements: 49 total (dont 11 de socle ARTHEMIS, cochés par requirements mark-complete, hors ligne Requirements du ROADMAP)
 - Mapped to phases: 47
 - Unmapped: 0 ✓
 

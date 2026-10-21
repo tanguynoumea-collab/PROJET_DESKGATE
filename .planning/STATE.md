@@ -126,6 +126,10 @@ Recent decisions affecting current work:
 - [Phase 5]: Titre des sujets BCF : « <trigramme bâtiment>/<étage>/<techniques>/<sujet> », ex. « BaJ/P01/CVC-ARC/Gaine x Faux-plafond » ; trigramme et code étage tirés d'une charte passée en paramètre du job (bâtiment IFC → trigramme, ex. Jura → BaJ, Tour → BaT ; niveau → code court) ; sujet = types des deux objets principaux ; entrée absente de la charte → valeur IFC brute + avertissement dans le résumé — Décision utilisateur du 2026-10-21 (04-D1) : trier facilement les sujets
 - [Phase 5]: Phase insérée 5.1 : BCF exploitable dans BIMcollab Zoom (points de vue absents, 04-D1), nommage des sujets, findings clash-troncature et clash-reservations — 04-D1 en échec le 2026-10-21 ; findings d'audit corrigés par phase insérée, jamais en quick
 
+### Roadmap Evolution
+
+- Phase 05.1 inserted after Phase 5: BCF exploitable dans BIMcollab et nommage des sujets (URGENT)
+
 ### Pending Todos
 
 None yet.
