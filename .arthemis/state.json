@@ -20,7 +20,7 @@
   },
   "route": "full",
   "phase": "IMPLEMENTATION",
-  "phase_status": "en_cours",
+  "phase_status": "attente_humaine",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -164,6 +164,18 @@
       "source": "CI run 39568004313",
       "ref": "tests/e2e/conftest.py:109",
       "condition_levee": "correctif en quick --full et CI 3.13 verte"
+    },
+    {
+      "id": "05-06-msix",
+      "type": "finding",
+      "titre": "init lance depuis une app MSIX ecrit dans le stockage virtualise du paquet ; doctor ne le detecte pas",
+      "gravite": "majeur",
+      "statut": "ouvert",
+      "proprietaire": "ia",
+      "ouvert_le": "2026-10-21",
+      "source": "execution 05-06 tache 3",
+      "ref": "src/deskgate/doctor.py",
+      "condition_levee": "doctor detecte ou init refuse un home virtualise ; teste"
     }
   ],
   "livraisons": [],
@@ -183,7 +195,29 @@
     }
   ],
   "horizon": null,
-  "pending_bloquant": null,
+  "pending_bloquant": {
+    "plan": "05-06",
+    "task": 3,
+    "kind": "decision",
+    "resume_signal": "choix A (terminal hors Claude), B (DESKGATE_HOME reel) ou C (sandbox desactive)",
+    "completed_tasks": [
+      {
+        "task": 1,
+        "nom": "uv tool install, init --yes, tache installee",
+        "commit": null,
+        "fichiers": []
+      },
+      {
+        "task": 2,
+        "nom": "plugins, bloc ifc.clash, maquettes copiees, doctor vert",
+        "commit": null,
+        "fichiers": []
+      }
+    ],
+    "current_task": "runner lance par la tache : echec 0x8007010B, %LOCALAPPDATA% virtualise par le paquet MSIX de Claude",
+    "checkpoint_details": "config, secrets, logs, plugins dans Packages\\Claude_pzs8sxrjxfjjc\\LocalCache ; invisibles du Planificateur",
+    "reponse": null
+  },
   "extension": {
     "web_saas": {
       "contexte_saas": {
