@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
 stopped_at: Completed 05-09-PLAN.md
-last_updated: "2026-10-21T12:22:33.857Z"
+last_updated: "2026-10-21T14:03:09.775Z"
 last_activity: 2026-10-21
 progress:
   total_phases: 5
@@ -123,6 +123,8 @@ Recent decisions affecting current work:
 - [Phase 05]: Recette: paramètres et preuves sous C:\BIM\recette (MSIX), n8n 2.43.8 sans écart
 - [Phase 05]: ACC-01 non marqué complet : durée max 281 s < 600 s après paliers D-09; ACC-02 constaté
 - [Phase 5]: ACC-01 : la durée n'est pas un objectif ; le critère retenu est un calcul de coordination réel et complet (maquettes réelles, aucun conflit tronqué, réservations exclues, mode hard 1 cm) lancé depuis n8n, runner démarré par la tâche, repris avec résumé et chemin du BCF — Décision utilisateur du 2026-10-21 : « peu importe le temps de calcul, la coordination la plus fiable »
+- [Phase 5]: Titre des sujets BCF : « <trigramme bâtiment>/<étage>/<techniques>/<sujet> », ex. « BaJ/P01/CVC-ARC/Gaine x Faux-plafond » ; trigramme et code étage tirés d'une charte passée en paramètre du job (bâtiment IFC → trigramme, ex. Jura → BaJ, Tour → BaT ; niveau → code court) ; sujet = types des deux objets principaux ; entrée absente de la charte → valeur IFC brute + avertissement dans le résumé — Décision utilisateur du 2026-10-21 (04-D1) : trier facilement les sujets
+- [Phase 5]: Phase insérée 5.1 : BCF exploitable dans BIMcollab Zoom (points de vue absents, 04-D1), nommage des sujets, findings clash-troncature et clash-reservations — 04-D1 en échec le 2026-10-21 ; findings d'audit corrigés par phase insérée, jamais en quick
 
 ### Pending Todos
 
