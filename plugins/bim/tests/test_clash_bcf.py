@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import uuid
 import zipfile
 from pathlib import Path
 from typing import Any
@@ -26,6 +27,7 @@ BASE: dict[str, Any] = {
     "created_at": CREATED,
 }
 CONTEXT_COLOR = "40B0B0B0"
+PNG = bytes.fromhex("89504e470d0a1a0a")
 
 
 @pytest.fixture
@@ -72,6 +74,14 @@ def test_bcf_mur_gaine_de_bout_en_bout(
     assert objets["has_selection"] is False and contexte["has_selection"] is False
     assert colored(objets, "FFE53935") == [g["Mur1"]]
     assert colored(objets, "FF1E88E5") == [g["Gaine1"]]
+    membres = _members(clash_env.work_dir / "conflits.bcf")
+    g2 = str(uuid.uuid5(uuid.UUID(topic["guid"]), "viewpoint-2-context"))
+    for nom in (f"{topic['guid']}/viewpoint.bcfv", f"{topic['guid']}/snapshot.png"):
+        assert nom in membres
+    assert membres[f"{topic['guid']}/snapshot.png"].startswith(PNG)
+    assert membres[f"{topic['guid']}/{g2}.png"].startswith(PNG)
+    assert membres[f"{topic['guid']}/markup.bcf"].count(b"<Comment ") == 2
+    assert "snapshots_unavailable" not in res["summary"]["warnings"]
 
 
 def test_cinq_gaines_rayon_1_puis_10(
@@ -128,6 +138,26 @@ def test_deux_executions_identiques(clash_env: ClashEnv, settings: dict[str, Any
     second = _members(clash_env.work_dir / "conflits.bcf")
     assert first.keys() == second.keys()
     assert first == second
+
+
+def test_sans_images(clash_env: ClashEnv, settings: dict[str, Any]) -> None:
+    clash_env.place("mur_gaine.ifc")
+    p = {**BASE, "ifc_a": "/data/depot/mur_gaine.ifc", "snapshots": False}
+    row, _ = clash_env.run(p, settings=settings)
+    assert row.status == "succeeded", row.error_message
+    noms = _members(clash_env.work_dir / "conflits.bcf").keys()
+    assert not [n for n in noms if n.endswith(".png")]
+    assert len([n for n in noms if n.endswith(".bcfv")]) == 2
+
+
+def test_rendu_impossible(clash_env: ClashEnv, settings: dict[str, Any]) -> None:
+    clash_env.place("mur_gaine.ifc")
+    p = {**BASE, "ifc_a": "/data/depot/mur_gaine.ifc"}
+    row, res = clash_env.run(p, settings={**settings, "snapshot_size": [0, 0]})
+    assert row.status == "succeeded", row.error_message
+    assert "snapshots_unavailable" in res["summary"]["warnings"]
+    noms = _members(clash_env.work_dir / "conflits.bcf").keys()
+    assert not [n for n in noms if n.endswith(".png")]
 
 
 @pytest.mark.parametrize("bad", [{}, {"bcf_executable": "C:/inexistant/deskgate-bcf.exe"}])

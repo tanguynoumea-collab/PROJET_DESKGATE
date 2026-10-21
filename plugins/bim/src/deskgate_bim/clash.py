@@ -18,6 +18,7 @@ import ifcopenshell.util.selector as sel
 from ifcclash import ifcclash
 from lark.exceptions import LarkError
 
+from . import render
 from .bcfdoc import build_doc
 from .bcfjob import write_bcf
 from .context import context_guids
@@ -229,6 +230,37 @@ def _write_bcf(
         threshold=p.threshold,
         titles=titles,
     )
+    if p.snapshots:
+        progress(93, "rendu des images", force=True)
+        try:
+            need = {
+                g
+                for t in doc["topics"]
+                for g in (*t["guids_a"], *t["guids_b"], *t["context_guids"])
+            }
+            meshes = render.harvest(list(clasher.opened.values()), need, clasher.num_threads)
+            size = tuple(ctx.settings.get("snapshot_size", (800, 450)))
+            paths, no_geom = render.render_topics(
+                doc,
+                meshes,
+                Path(ctx.work_dir) / "snapshots",
+                size=size,
+                progress=lambda i, n: progress(93 + 2.9 * i / max(n, 1), "rendu des images"),
+            )
+            for t in doc["topics"]:
+                if t["guid"] in paths:
+                    t["snapshots"] = paths[t["guid"]]
+            if no_geom:
+                warn(
+                    "snapshots_unavailable",
+                    f"{len(no_geom)} sujet(s) sans géométrie : pas d'image. "
+                    f"Premiers : {', '.join(no_geom[:20])}",
+                )
+            del meshes
+        except MemoryError:
+            raise
+        except Exception as exc:  # le rendu ne doit jamais arrêter le job
+            warn("snapshots_unavailable", f"Images des points de vue indisponibles : {exc}")
     progress(96, "écriture du BCF", force=True)
     dst = write_bcf(ctx.settings, doc, ctx.work_dir)
     ctx.artifact(dst, "bcf")

@@ -66,6 +66,7 @@ class ClashParams(BaseModel):
     include_openings: bool = False
     threads: int | None = Field(default=None, ge=1, le=64)
     bcf: bool = False
+    snapshots: bool = True
     bcf_author: str = Field(default="deskgate", min_length=1, max_length=256)
     bcf_project: str | None = Field(default=None, min_length=1, max_length=256)
     created_at: str | None = Field(default=None, pattern=ISO_8601)

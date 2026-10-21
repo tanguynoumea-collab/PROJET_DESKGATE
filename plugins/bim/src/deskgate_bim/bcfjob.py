@@ -15,7 +15,7 @@ NO_WINDOW = 0x08000000  # CREATE_NO_WINDOW ; jamais de breakaway : le processus 
 
 
 def write_bcf(
-    settings: dict[str, Any], doc: dict[str, Any], work_dir: str | Path, *, timeout: float = 600
+    settings: dict[str, Any], doc: dict[str, Any], work_dir: str | Path, *, timeout: float = 1800
 ) -> str:
     exe = settings.get("bcf_executable")
     if not isinstance(exe, str) or not os.path.isabs(exe) or not os.path.isfile(exe):
