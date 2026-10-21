@@ -28,7 +28,7 @@ def _docker() -> str:
 
 def _config(env_file: Path) -> subprocess.CompletedProcess[str]:
     env = {k: v for k, v in os.environ.items() if k not in SECRETS}
-    return subprocess.run(  # noqa: S603
+    return subprocess.run(
         [
             _docker(),
             "compose",
