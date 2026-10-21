@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
-status: verifying
+status: executing
 stopped_at: "Phase 5 : recherche faite, prochaine étape planification (05-VALIDATION.md puis gsd-planner)"
-last_updated: "2026-10-21T07:44:49.950Z"
-last_activity: 2026-10-20
+last_updated: "2026-10-21T08:17:00.036Z"
+last_activity: 2026-10-21 -- Phase 05 execution started
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 29
+  total_plans: 38
   completed_plans: 29
   percent: 0
 ---
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-20)
 
 **Core value:** n8n délègue une tâche longue au PC Windows et reprend fiablement quand elle se termine, quel que soit le résultat (succès, échec, délai dépassé, annulation, redémarrage du runner).
-**Current focus:** Phase 4 — Capacités v0.1
+**Current focus:** Phase 05 — installation-et-int-gration-n8n
 
 ## Current Position
 
-Phase: 5
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-10-21 - Completed quick task 261021-e6p: Épingler astral-sh/setup-uv@v10.3.0 dans la CI
+Phase: 05 (installation-et-int-gration-n8n) — EXECUTING
+Plan: 1 of 9
+Status: Executing Phase 05
+Last activity: 2026-10-21 -- Phase 05 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
