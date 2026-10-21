@@ -4,12 +4,12 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
 stopped_at: Phase 5.1 context gathered
-last_updated: "2026-10-21T14:16:46.646Z"
+last_updated: "2026-10-21T15:20:18.186Z"
 last_activity: 2026-10-21
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 38
+  total_plans: 46
   completed_plans: 38
   percent: 0
 ---
@@ -125,6 +125,7 @@ Recent decisions affecting current work:
 - [Phase 5]: ACC-01 : la durée n'est pas un objectif ; le critère retenu est un calcul de coordination réel et complet (maquettes réelles, aucun conflit tronqué, réservations exclues, mode hard 1 cm) lancé depuis n8n, runner démarré par la tâche, repris avec résumé et chemin du BCF — Décision utilisateur du 2026-10-21 : « peu importe le temps de calcul, la coordination la plus fiable »
 - [Phase 5]: Titre des sujets BCF : « <trigramme bâtiment>/<étage>/<techniques>/<sujet> », ex. « BaJ/P01/CVC-ARC/Gaine x Faux-plafond » ; trigramme et code étage tirés d'une charte passée en paramètre du job (bâtiment IFC → trigramme, ex. Jura → BaJ, Tour → BaT ; niveau → code court) ; sujet = types des deux objets principaux ; entrée absente de la charte → valeur IFC brute + avertissement dans le résumé — Décision utilisateur du 2026-10-21 (04-D1) : trier facilement les sujets
 - [Phase 5]: Phase insérée 5.1 : BCF exploitable dans BIMcollab Zoom (points de vue absents, 04-D1), nommage des sujets, findings clash-troncature et clash-reservations — 04-D1 en échec le 2026-10-21 ; findings d'audit corrigés par phase insérée, jamais en quick
+- [Phase 5.1]: Test BIMcollab Zoom V0..V5 : seules V4 (Header/File IFC) et V5 (viewpoint.bcfv/snapshot.png) affichent les deux points de vue ; V1 cadre bien en coordonnées monde. Retenu : coordonnées monde, snapshot.png par vue, Header/File, noms conventionnels, Comment et Index — Verdict utilisateur du 2026-10-21 sur C:\BIM\recherche-5.1\zoom-tests
 
 ### Roadmap Evolution
 
