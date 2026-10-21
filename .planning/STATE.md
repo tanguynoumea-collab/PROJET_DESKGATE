@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 Phase: 5
 Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-10-20
+Last activity: 2026-10-21 - Completed quick task 261021-e6p: Épingler astral-sh/setup-uv@v10.3.0 dans la CI
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -117,6 +117,12 @@ None yet.
 
 - Spikes de recherche : phase 1 (Job Object, host.docker.internal, bind exclusif), phase 3 (409 n8n, encodage signature), phase 4 (mcp dans Job Object, `bcf-client`, multiprocessing `ifcclash`), phase 5 (Planificateur sans élévation)
 - Relecture juridique de la frontière GPL avant distribution d'un binaire
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Status | Directory |
+|---|-------------|------|--------|--------|-----------|
+| 261021-e6p | Épingler astral-sh/setup-uv@v10.3.0 dans la CI | 2026-10-21 | cbe3e56 | Verified | [261021-e6p-pingler-astral-sh-setup-uv-v10-3-0-dans-](./quick/261021-e6p-pingler-astral-sh-setup-uv-v10-3-0-dans-/) |
 
 ## Session Continuity
 
