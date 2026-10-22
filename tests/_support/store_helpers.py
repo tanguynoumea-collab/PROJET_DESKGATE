@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import sqlite3
 from pathlib import Path
 
@@ -10,8 +11,21 @@ from deskgate import store
 CALLBACK_URL = "http://localhost:5678/webhook-waiting/1?signature=SECRETSIG"
 
 
+_OUVERTES: list[sqlite3.Connection] = []
+
+
 def make_db(tmp_path: Path) -> sqlite3.Connection:
-    return store.open_db(tmp_path / "d.db")
+    """Ouvre la base du test ; `fermer_bases()` (fixture autouse) la ferme en fin de test."""
+    conn = store.open_db(tmp_path / "d.db")
+    _OUVERTES.append(conn)
+    return conn
+
+
+def fermer_bases() -> None:
+    while _OUVERTES:
+        conn = _OUVERTES.pop()
+        with contextlib.suppress(sqlite3.Error):
+            conn.close()
 
 
 def submit(

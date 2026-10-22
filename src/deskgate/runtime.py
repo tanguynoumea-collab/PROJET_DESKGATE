@@ -115,6 +115,8 @@ def attach_startup_log(home: Path) -> Path | None:
         return None
     handler.setFormatter(RedactingFormatter(LOG_FORMAT))
     handler.addFilter(RedactingFilter())
+    for ancien in list(startup_logger.handlers):
+        ancien.close()
     startup_logger.handlers[:] = [handler]
     startup_logger.setLevel(logging.INFO)
     startup_logger.propagate = False

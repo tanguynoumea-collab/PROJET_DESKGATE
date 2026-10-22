@@ -56,6 +56,7 @@ def test_six_threads_un_seul_gagnant(tmp_path: Path) -> None:
         t.join()
     assert len([r for r in results if r is not None]) == 1
     assert count(conn, "jobs", "status='running'") == 1
+    conn.close()
 
 
 def test_idempotence(tmp_path: Path) -> None:

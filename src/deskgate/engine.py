@@ -693,6 +693,8 @@ class Engine:
             with contextlib.suppress(Exception):
                 cur.job.terminate(1)
             with contextlib.suppress(Exception):
+                cur.proc.wait(2.0)  # récolte le processus (pas de ResourceWarning)
+            with contextlib.suppress(Exception):
                 cur.job.close()
         if not already:
             logger.info("Engine arrêté.")

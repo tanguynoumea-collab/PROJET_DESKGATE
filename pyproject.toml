@@ -51,6 +51,7 @@ typeCheckingMode = "standard"
 testpaths = ["tests", "plugins"]
 addopts = ["--strict-markers", "--strict-config", "-ra", "--import-mode=importlib"]
 pythonpath = ["tests"]
+filterwarnings = ["error::ResourceWarning", "error::pytest.PytestUnraisableExceptionWarning"]
 markers = [
   "unit: noyau pur, sans disque, serveur ni sous-processus",
   "fs: vrai système de fichiers (jonctions, ADS, noms réservés)",

@@ -277,5 +277,7 @@ class Sender:
         thread = self._thread
         if thread is not None:
             thread.join(timeout)
+        if thread is None or not thread.is_alive():
+            self._drop_connection()
         if not already:
             logger.info("Sender arrêté.")

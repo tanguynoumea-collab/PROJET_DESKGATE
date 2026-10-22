@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import socket
 import subprocess
@@ -12,7 +13,10 @@ from pathlib import Path
 import pytest
 
 from _support.fake_n8n import FakeN8n
+from _support.store_helpers import fermer_bases
 from deskgate import scheduler
+from deskgate.engine import Engine
+from deskgate.sender import Sender
 
 
 @pytest.fixture
@@ -100,3 +104,39 @@ def _contexte_non_empaquete(
     if request.node.get_closest_marker("scheduler") is None:
         monkeypatch.setattr(scheduler, "packaged_context", lambda: None)
         monkeypatch.setattr(scheduler, "last_task_result", lambda name=scheduler.TASK_NAME, **kw: 0)
+
+
+@pytest.fixture(autouse=True)
+def _ferme_engines_senders(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
+    """Ferme les connexions SQLite des Engine et Sender créés par le test (D-06, TST-004).
+
+    Un `tick()` direct ouvre une connexion sans thread : sans `stop()`, elle fuit jusqu'au
+    ramasse-miettes et produit un ResourceWarning, désormais traité comme une erreur.
+    """
+    crees: list[Engine | Sender] = []
+
+    def suivre(classe: type[Engine] | type[Sender]) -> None:
+        original = classe.__init__
+
+        def init(self: Engine | Sender, *args: object, **kwargs: object) -> None:
+            original(self, *args, **kwargs)  # type: ignore[arg-type]
+            crees.append(self)
+
+        monkeypatch.setattr(classe, "__init__", init)
+
+    suivre(Engine)
+    suivre(Sender)
+    yield
+    for obj in crees:
+        obj.stop(timeout=2.0)
+    fermer_bases()
+
+
+@pytest.fixture(autouse=True)
+def _ferme_journal_demarrage() -> Iterator[None]:
+    """Ferme le journal de démarrage attaché par un `serve()` ou `attach_startup_log` du test."""
+    yield
+    startup = logging.getLogger("deskgate.startup")
+    for h in list(startup.handlers):
+        h.close()
+        startup.removeHandler(h)
