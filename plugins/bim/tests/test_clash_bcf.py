@@ -42,8 +42,9 @@ def read(plugin_envs: dict[str, Any], env: ClashEnv) -> dict[str, Any]:
 
 
 def views(topic: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
-    objets = [v for v in topic["viewpoints"] if not v["default_visibility"]]
-    contexte = [v for v in topic["viewpoints"] if v["default_visibility"]]
+    g2 = str(uuid.uuid5(uuid.UUID(topic["guid"]), "viewpoint-2-context"))
+    objets = [v for v in topic["viewpoints"] if v["guid"] != g2]
+    contexte = [v for v in topic["viewpoints"] if v["guid"] == g2]
     assert len(objets) == 1 and len(contexte) == 1
     return objets[0], contexte[0]
 
@@ -115,6 +116,11 @@ def test_contexte_gris_voisins_seulement(
     assert g["Dalle_proche"] in gris
     assert g["Poteau_loin"] not in gris and g["Mur1"] not in gris and g["Gaine1"] not in gris
     assert colored(contexte, "FFE53935") == [g["Mur1"]]
+    # D-18 : la vue 2 ne montre que conflit + contexte coloré (rien sans couleur)
+    assert contexte["default_visibility"] is False
+    visibles = set(colored(contexte, CONTEXT_COLOR)) | set(colored(contexte, "FFE53935"))
+    visibles |= set(colored(contexte, "FF1E88E5"))
+    assert set(contexte["exceptions"]) == visibles
     row, _ = clash_env.run({**p, "max_context": 0}, settings=settings)
     assert row.status == "succeeded", row.error_message
     (topic,) = read(plugin_envs, clash_env)["topics"]

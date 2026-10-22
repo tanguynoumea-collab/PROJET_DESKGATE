@@ -112,12 +112,13 @@ Un sujet par groupe de conflits (son GUID est celui du groupe), de type `Clash`,
 en perspective cadrée sur le centre du groupe. Chaque sujet a deux points de vue, sans sélection :
 
 1. les deux objets du conflit seuls visibles : A en rouge (`FFE53935`), B en bleu (`FF1E88E5`) ;
-2. la maquette visible, le contexte voisin en gris transparent (`40B0B0B0`), les objets du conflit
-   colorés comme dans la vue 1.
+2. seuls les objets du conflit et le contexte proche sont visibles (visibilité par défaut fausse,
+   le reste de la maquette est masqué) : contexte gris transparent `40B0B0B0`, objets du conflit
+   colorés comme dans la vue 1. Aucun élément visible n'est laissé sans couleur.
 
 Les couleurs sont au format ARGB. Le contexte est calculé par un arbre géométrique et `select_box`
 autour des éléments du conflit (`context_radius`) ; s'il échoue, l'avertissement `context_unavailable`
-est ajouté et la vue 2 ne colore que le conflit.
+est ajouté et la vue 2 ne montre que le conflit.
 
 Contrat d'écriture v2 : un PNG et un commentaire par point de vue ; le premier point de vue s'écrit
 `viewpoint.bcfv` / `snapshot.png` (noms conventionnels lus par BIMcollab Zoom), les suivants

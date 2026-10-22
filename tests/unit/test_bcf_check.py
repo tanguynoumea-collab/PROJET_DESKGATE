@@ -47,6 +47,19 @@ def _markup(title: str, header: bool, comments: int) -> str:
     )
 
 
+def _view2(vis: str, exc: tuple[str, ...], col: tuple[tuple[str, tuple[str, ...]], ...]) -> str:
+    e = "".join(f'<Component IfcGuid="{g}"/>' for g in exc)
+    c = "".join(
+        f'<Color Color="{k}">' + "".join(f'<Component IfcGuid="{g}"/>' for g in v) + "</Color>"
+        for k, v in col
+    )
+    return (
+        f'<VisualizationInfo><Components><Visibility DefaultVisibility="{vis}">'
+        f"<Exceptions>{e}</Exceptions></Visibility><Coloring>{c}</Coloring>"
+        "</Components></VisualizationInfo>"
+    )
+
+
 def _build(
     tmp: Path,
     *,
@@ -56,12 +69,19 @@ def _build(
     png2: bool = True,
     truncated: bool = False,
     cls: str = "IfcWall",
+    vis2: str = "false",
+    exc2: tuple[str, ...] = ("A", "B", "C"),
+    col2: tuple[tuple[str, tuple[str, ...]], ...] = (
+        ("40B0B0B0", ("C",)),
+        ("FFE53935", ("A",)),
+        ("FF1E88E5", ("B",)),
+    ),
 ) -> tuple[Path, Path]:
     bcf = tmp / "c.bcf"
     with zipfile.ZipFile(bcf, "w") as z:
         z.writestr(f"{TOPIC}/markup.bcf", _markup(title, header, comments))
         z.writestr(f"{TOPIC}/viewpoint.bcfv", "<v/>")
-        z.writestr(f"{TOPIC}/{G2}.bcfv", "<v/>")
+        z.writestr(f"{TOPIC}/{G2}.bcfv", _view2(vis2, exc2, col2))
         z.writestr(f"{TOPIC}/snapshot.png", PNG)
         if png2:
             z.writestr(f"{TOPIC}/{G2}.png", PNG)
@@ -141,3 +161,31 @@ def test_champ_repete_identique(tmp_path: Path) -> None:
     assert ok["verdict"] is True
     ko = _run(*_build(tmp_path, title="Gaine/Mur"), "{type_a}/{type_a}", {})
     assert ko["verdict"] is False
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "message"),
+    [
+        ({"vis2": "true"}, "visibilité par défaut vraie"),
+        ({"exc2": ("A", "B", "C", "D")}, "1 élément(s) visible(s) non coloré(s)"),
+        (
+            {"col2": (("FFB0B0B0", ("C",)), ("FFE53935", ("A",)), ("FF1E88E5", ("B",)))},
+            "contexte non transparent",
+        ),
+    ],
+)
+def test_vue2_defauts(tmp_path: Path, kwargs: dict[str, Any], message: str) -> None:
+    res = _run(*_build(tmp_path, **kwargs))
+    assert res["verdict"] is False
+    assert any(message in f for f in res["failures"])
+
+
+def test_vue2_sans_contexte(tmp_path: Path) -> None:
+    res = _run(
+        *_build(
+            tmp_path,
+            exc2=("A", "B"),
+            col2=(("FFE53935", ("A",)), ("FF1E88E5", ("B",))),
+        )
+    )
+    assert res["verdict"] is True

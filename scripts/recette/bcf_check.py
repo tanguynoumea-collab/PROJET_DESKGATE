@@ -20,6 +20,7 @@ from xml.etree import ElementTree as ET
 PNG = bytes.fromhex("89504e470d0a1a0a")
 FIELDS = ("building", "storey", "trade_a", "trade_b", "type_a", "type_b")
 DEFAULT_TEMPLATE = "{building}/{storey}/{trade_a}-{trade_b}/{type_a} x {type_b}"
+COLORS_CONFLICT = {"FFE53935", "FF1E88E5"}
 OPENINGS = {"IfcOpeningElement", "IfcOpeningStandardCase"}
 
 
@@ -52,6 +53,34 @@ def template_regex(template: str) -> re.Pattern[str]:
     return re.compile(f"^{out}$")
 
 
+def check_view2(z: zipfile.ZipFile, names: set[str], folder: str, view_guid: str) -> list[str]:
+    """Règle D-18 sur la vue 2 : tout élément visible est coloré, contexte transparent."""
+    member = f"{folder}/{view_guid}.bcfv"
+    if member not in names:
+        return []
+    root = ET.fromstring(z.read(member))  # noqa: S314
+    vis = next((e for e in root.iter() if _tag(e) == "Visibility"), None)
+    if vis is None or vis.get("DefaultVisibility", "true").lower() != "false":
+        return ["vue 2 : visibilité par défaut vraie, contrôle impossible"]
+    exceptions = {
+        c.get("IfcGuid", "")
+        for e in vis.iter()
+        if _tag(e) == "Exceptions"
+        for c in _kids(e, "Component")
+    }
+    colored: set[str] = set()
+    out: list[str] = []
+    for col in (e for e in root.iter() if _tag(e) == "Color"):
+        value = (col.get("Color") or "").upper()
+        colored |= {c.get("IfcGuid", "") for c in _kids(col, "Component")}
+        if len(value) == 8 and value.startswith("FF") and value not in COLORS_CONFLICT:
+            out.append("vue 2 : contexte non transparent")
+    missing = sorted(exceptions - colored)
+    if missing:
+        out.append(f"vue 2 : {len(missing)} élément(s) visible(s) non coloré(s) {missing[:5]}")
+    return out
+
+
 def _check_topic(z: zipfile.ZipFile, names: set[str], folder: str, fails: list[str]) -> str:
     markup = ET.fromstring(z.read(f"{folder}/markup.bcf"))  # noqa: S314
     topic = next(iter(_kids(markup, "Topic")), None)
@@ -70,10 +99,13 @@ def _check_topic(z: zipfile.ZipFile, names: set[str], folder: str, fails: list[s
     if len(views) != 2:
         fails.append(f"{tag} {len(views)} points de vue au lieu de 2")
     guids: set[str] = set()
+    view2 = ""
     indexes: list[str] = []
     for v in views:
         guids.add(v.get("Guid", ""))
         indexes.append(_text(next(iter(_kids(v, "Index")), None)))
+        if indexes[-1] == "1":
+            view2 = v.get("Guid", "")
         name = _text(next(iter(_kids(v, "Snapshot")), None))
         member = f"{folder}/{name}"
         if not name or member not in names:
@@ -82,6 +114,8 @@ def _check_topic(z: zipfile.ZipFile, names: set[str], folder: str, fails: list[s
             fails.append(f"{tag} {name} n'est pas un PNG")
     if views and sorted(indexes) != ["0", "1"]:
         fails.append(f"{tag} Index {indexes} au lieu de 0 et 1")
+    if view2:
+        fails.extend(f"{tag} {m}" for m in check_view2(z, names, folder, view2))
     comments = _kids(markup, "Comment")
     linked = [
         c for c in comments if any(_tag(x) == "Viewpoint" and x.get("Guid") in guids for x in c)
