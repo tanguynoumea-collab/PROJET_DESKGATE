@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 Phase: 05.1
 Plan: Not started
 Status: Executing — gap closure 05.1-12..13
-Last activity: 2026-10-22
+Last activity: 2026-10-22 - Completed quick task 261022-iea: Attendre tout l'arbre dans kill_tree des tests e2e
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -163,6 +163,7 @@ None yet.
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
 | 261021-e6p | Épingler astral-sh/setup-uv@v10.3.0 dans la CI | 2026-10-21 | cbe3e56 | Verified | [261021-e6p-pingler-astral-sh-setup-uv-v10-3-0-dans-](./quick/261021-e6p-pingler-astral-sh-setup-uv-v10-3-0-dans-/) |
+| 261022-iea | Attendre tout l'arbre dans kill_tree des tests e2e | 2026-10-22 | b233760 | Verified | [261022-iea-attendre-tout-l-arbre-dans-kill-tree-des](./quick/261022-iea-attendre-tout-l-arbre-dans-kill-tree-des/) |
 
 ## Session Continuity
 
