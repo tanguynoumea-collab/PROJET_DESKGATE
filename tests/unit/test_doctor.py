@@ -15,7 +15,7 @@ from pathlib import Path
 import pytest
 
 from deskgate import doctor, installer
-from deskgate.core.config import load_config
+from deskgate.core.config import RunnerConfig, load_config
 from deskgate.locations import config_path
 
 pytestmark = pytest.mark.unit
@@ -143,17 +143,37 @@ def test_plugins_interpreteur_absent(tmp_path: Path) -> None:
     assert any(c.level == "echec" and "ifc.test" in c.message for c in checks)
 
 
-def test_plugins_bcf_executable_absent(tmp_path: Path) -> None:
+def _cap_requise(tmp_path: Path, exe: str, declare: bool) -> RunnerConfig:
     python = Path(shutil.which("python") or __import__("sys").executable).as_posix()
-    absent = (tmp_path / "bcf.exe").as_posix()
+    req = 'required_files = ["bcf_executable"]\n' if declare else ""
     _, cfg_file = _with_capabilities(
         tmp_path,
-        f'[capabilities."bcf.write"]\nkind = "python"\npython = \'{python}\'\n'
-        f'entry = "mod:fn"\ntimeout_max = 60\n'
-        f"[capabilities.\"bcf.write\".settings]\nbcf_executable = '{absent}'\n",
+        f'[capabilities."ifc.clash"]\nkind = "python"\npython = \'{python}\'\n'
+        f'entry = "mod:fn"\ntimeout_max = 60\n{req}'
+        f"[capabilities.\"ifc.clash\".settings]\nbcf_executable = '{exe}'\n",
     )
-    checks = doctor.check_plugins(load_config(cfg_file))
-    assert any(c.level == "echec" and "bcf_executable" in c.message for c in checks)
+    return load_config(cfg_file)
+
+
+def test_plugins_fichier_requis_absent(tmp_path: Path) -> None:
+    absent = (tmp_path / "bcf.exe").as_posix()
+    checks = doctor.check_plugins(_cap_requise(tmp_path, absent, True))
+    assert any(
+        c.level == "echec" and "ifc.clash : bcf_executable absent" in c.message for c in checks
+    )
+
+
+def test_plugins_fichier_requis_present(tmp_path: Path) -> None:
+    present = tmp_path / "bcf.exe"
+    present.write_bytes(b"")
+    checks = doctor.check_plugins(_cap_requise(tmp_path, present.as_posix(), True))
+    assert not any(c.level == "echec" for c in checks)
+
+
+def test_plugins_settings_non_declare_ignore(tmp_path: Path) -> None:
+    absent = (tmp_path / "bcf.exe").as_posix()
+    checks = doctor.check_plugins(_cap_requise(tmp_path, absent, False))
+    assert not any(c.level == "echec" for c in checks)
 
 
 def test_plugins_serveur_mcp_absent(tmp_path: Path) -> None:

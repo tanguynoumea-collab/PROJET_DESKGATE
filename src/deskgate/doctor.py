@@ -109,9 +109,11 @@ def check_plugins(cfg: RunnerConfig) -> list[Check]:
             checks.append(
                 Check("Plugins", "echec", f"{ident} : interpréteur absent ({cap.python})")
             )
-        exe = cap.settings.get("bcf_executable")
-        if exe is not None and not Path(str(exe)).is_file():
-            checks.append(Check("Plugins", "echec", f"{ident} : bcf_executable absent ({exe})"))
+        if cap.kind == "python":
+            for key in cap.required_files:
+                value = str(cap.settings[key])
+                if not Path(value).is_file():
+                    checks.append(Check("Plugins", "echec", f"{ident} : {key} absent ({value})"))
     for ident, server in cfg.mcp_servers.items():
         if not Path(server.command).is_file():
             checks.append(

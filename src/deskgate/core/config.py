@@ -124,6 +124,7 @@ class Capability(Strict):
     resource: str = "default"
     settings: dict[Ident, SettingValue] = {}
     path_params: list[Ident] = []
+    required_files: list[Ident] = []
 
     @model_validator(mode="after")
     def _kind(self) -> Capability:
@@ -132,17 +133,33 @@ class Capability(Strict):
                 raise PydanticCustomError(
                     "python_fields_missing", 'kind = "python" exige python et entry'
                 )
+            for key in self.required_files:
+                if key not in self.settings:
+                    raise PydanticCustomError(
+                        "required_file_not_in_settings",
+                        "required_files : la clé {key} n'est pas déclarée dans settings",
+                        {"key": key},
+                    )
+                value = self.settings[key]
+                if not isinstance(value, str) or not value:
+                    raise PydanticCustomError(
+                        "required_file_not_a_string",
+                        "required_files : settings.{key} doit être un chemin de fichier "
+                        "(chaîne non vide)",
+                        {"key": key},
+                    )
         elif (
             self.python is not None
             or self.entry is not None
             or self.pythonpath
             or self.settings
             or self.path_params
+            or self.required_files
         ):
             raise PydanticCustomError(
                 "mcp_fields_forbidden",
                 'kind = "mcp" n\'accepte ni python, ni entry, ni pythonpath, '
-                "ni settings, ni path_params",
+                "ni settings, ni path_params, ni required_files",
             )
         return self
 

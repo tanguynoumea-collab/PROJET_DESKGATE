@@ -92,3 +92,35 @@ def test_mcp_env_secret_not_leaked() -> None:
     with pytest.raises(ConfigError) as e:
         _parse('[mcp_servers.demo]\ncommand = \'C:/p.exe\'\nenv = { "1BAD" = "VALEUR-SECRETE" }\n')
     assert "VALEUR-SECRETE" not in str(e.value)
+
+
+_PY = "[capabilities.x]\nkind='python'\npython='C:/p.exe'\nentry='m:f'\ntimeout_max=5\n"
+
+
+def test_required_files_valide() -> None:
+    cfg = _parse(_PY + 'required_files = ["outil"]\nsettings = { outil = \'C:/x.exe\' }\n')
+    assert cfg.capabilities["x"].required_files == ["outil"]
+
+
+def test_required_files_cle_absente() -> None:
+    with pytest.raises(ConfigError) as e:
+        _parse(_PY + 'required_files = ["outil"]\n')
+    assert "required_files" in str(e.value)
+
+
+@pytest.mark.parametrize("valeur", ["3", "''"])
+def test_required_files_valeur_non_chaine(valeur: str) -> None:
+    with pytest.raises(ConfigError) as e:
+        _parse(_PY + f'required_files = ["outil"]\nsettings = {{ outil = {valeur} }}\n')
+    assert "required_files" in str(e.value)
+
+
+def test_required_files_interdit_pour_mcp() -> None:
+    with pytest.raises(ConfigError) as e:
+        _parse("[capabilities.x]\nkind='mcp'\ntimeout_max=5\nrequired_files = ['x']\n")
+    assert "ni required_files" in str(e.value)
+
+
+def test_required_files_nom_invalide() -> None:
+    with pytest.raises(ConfigError):
+        _parse(_PY + 'required_files = ["a-b"]\n')
