@@ -51,3 +51,7 @@
 {"ts":"2026-10-22T21:05","type":"transition","ref":"IMPLEMENTATION -> GATE (phase 5.2)","commit":"7c050a8","note":"10/10 plans, verification human_needed (3 differes blocks none) ; ARC-001, SEC-001, 05-06-msix corriges non certifies"}
 {"ts":"2026-10-22T20:16","type":"gate","ref":".arthemis/reports/gate-1-05.2.log","commit":"23f0617","note":"vert : 936 passed + 33 e2e, pyright 0, build OK, CI verte"}
 {"ts":"2026-10-22T20:16","type":"transition","ref":"GATE -> AUDIT_COUNCIL (re-verification ciblee)","commit":"23f0617","note":"certification -role des dix findings de la phase 5.2"}
+{"ts":"2026-10-22T21:40","type":"fermeture","ref":"ARC-001","commit":"f853b33","note":"certifie par /saas-council-role, audits/saas-council-certification-2026-10-22.md"}
+{"ts":"2026-10-22T21:40","type":"fermeture","ref":"SEC-001","commit":"f853b33","note":"certifie par /saas-council-role, audits/saas-council-certification-2026-10-22.md"}
+{"ts":"2026-10-22T21:40","type":"fermeture","ref":"05-06-msix","commit":"f853b33","note":"certifie par /saas-council-role, audits/saas-council-certification-2026-10-22.md"}
+{"ts":"2026-10-22T21:40","type":"rapport","ref":"audits/saas-council-certification-2026-10-22.md","commit":"f853b33","note":"10/10 findings fermes ; 6 mineurs et 3 info nouveaux, triage a faire"}

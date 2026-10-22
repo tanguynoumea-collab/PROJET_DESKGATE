@@ -20,7 +20,7 @@
   },
   "route": "full",
   "phase": "AUDIT_COUNCIL",
-  "phase_status": "en_cours",
+  "phase_status": "attente_humaine",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -121,42 +121,6 @@
       "condition_levee": "reparation acceptee et faite, ou refus consigne"
     },
     {
-      "id": "05-06-msix",
-      "type": "finding",
-      "titre": "init lance depuis une app MSIX ecrit dans le stockage virtualise du paquet ; doctor ne le detecte pas",
-      "gravite": "majeur",
-      "statut": "corrige_non_certifie",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-21",
-      "source": "execution 05-06 tache 3 ; confirme par audits/saas-council-2026-10-22.md",
-      "ref": "LIV-001",
-      "condition_levee": "re-GATE vert puis certification /saas-council-role (05.2-D3)"
-    },
-    {
-      "id": "ARC-001",
-      "type": "finding",
-      "titre": "Mort d'un thread engine/sender : runner arrete avec code 0, non relance ; rappels bloques jusqu'a la session suivante",
-      "gravite": "majeur",
-      "statut": "corrige_non_certifie",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-22",
-      "source": "audits/saas-council-2026-10-22.md",
-      "ref": "ARC-001",
-      "condition_levee": "re-GATE vert puis certification /saas-council-role (05.2-D3)"
-    },
-    {
-      "id": "SEC-001",
-      "type": "finding",
-      "titre": "Executeur mcp : arguments transmis sans conversion ni validation allowed_roots (regle 4)",
-      "gravite": "majeur",
-      "statut": "corrige_non_certifie",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-22",
-      "source": "audits/saas-council-2026-10-22.md",
-      "ref": "SEC-001",
-      "condition_levee": "re-GATE vert puis certification /saas-council-role (05.2-D3)"
-    },
-    {
       "id": "acc01-duree",
       "type": "decision",
       "titre": "ACC-01 constate (critere revu) palier 4 complet ; certification a la DoD",
@@ -167,6 +131,18 @@
       "source": "05-08-SUMMARY.md",
       "ref": "ACC-01",
       "condition_levee": "certification a la DoD (critere revu, palier 4 et recettes 5.1)"
+    },
+    {
+      "id": "triage-council-1b",
+      "type": "decision",
+      "titre": "triage a faire : 6 mineurs introduits par la 5.2 (ARC-N2-001/002, MNT-N2-001, LIVR-N2-001/002, TST-N2-001)",
+      "gravite": "mineur",
+      "statut": "en_attente_decision",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-22",
+      "source": "audits/saas-council-certification-2026-10-22.md",
+      "ref": "checkpoints.triage",
+      "condition_levee": "phase inseree ou backlog, decision datee de l'utilisateur"
     }
   ],
   "livraisons": [],
@@ -224,6 +200,6 @@
   },
   "maj": {
     "le": "2026-10-22",
-    "commit": "7c050a8"
+    "commit": "f853b33"
   }
 }
