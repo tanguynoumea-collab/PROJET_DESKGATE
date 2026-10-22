@@ -5,6 +5,10 @@ Concurrence 1. L'état vit en base (table `callbacks`) : un redémarrage reprend
 `run()` n'est que la boucle de réveil autour de `tick()`. Ce module est le seul de `src/` qui
 importe `httpx2`. La `resumeUrl` est un secret : elle est passée telle quelle au client et
 n'apparaît jamais dans les journaux, les erreurs enregistrées ni l'audit.
+
+Politique d'erreur : toute exception d'un tour est journalisée, la connexion rouverte et le tour
+rejoué avec back-off ; l'état de chaque rappel vit en base, donc rien n'est perdu ; au-delà de
+`MAX_CONSECUTIVE_ERRORS` erreurs consécutives le thread meurt et le superviseur le recrée.
 """
 
 from __future__ import annotations

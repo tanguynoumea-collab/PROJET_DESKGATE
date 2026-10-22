@@ -3,6 +3,13 @@
 L'engine est le seul écrivain des transitions `running -> *` (la recovery au démarrage écrit
 `running -> interrupted`). `tick()` fait un tour complet et se teste sans thread, avec un
 launcher et des horloges injectés ; `run()` n'est que la boucle de réveil autour de `tick()`.
+
+Politique d'erreur : une erreur SQLite transitoire (`OperationalError` : verrou, occupation, E/S)
+est journalisée, la connexion rouverte et le tour rejoué avec back-off sans toucher au Job en
+cours, un verdict non écrit étant rejoué au tour suivant ; au-delà de `MAX_DB_ERRORS` erreurs
+consécutives, ou sur toute autre erreur interne, le thread meurt (`failed`, `on_fatal`) et le
+superviseur du runner conclut la tâche en `interrupted` puis recrée le thread. Limite connue : un
+thread bloqué (et non mort) n'est pas recréé ; /health le signale en `stale`.
 """
 
 from __future__ import annotations
