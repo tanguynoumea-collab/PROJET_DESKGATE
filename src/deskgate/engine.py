@@ -30,6 +30,12 @@ from typing import Protocol
 from deskgate import store
 from deskgate.core.config import RunnerConfig
 from deskgate.core.env import build_env, mcp_env_var
+from deskgate.core.health import (
+    ENGINE_STALE_FLOOR_S,
+    ThreadState,
+    stale_threshold,
+    thread_state,
+)
 from deskgate.core.outcome import (
     ENGINE_ERROR,
     MEMORY_LIMIT,
@@ -195,6 +201,7 @@ class Engine:
         self.on_fatal: Callable[[], None] | None = None
         self.failed = False
         self.last_tick_at: float | None = None
+        self._started_at: float | None = None
 
     @property
     def running_job_id(self) -> str | None:
@@ -652,7 +659,18 @@ class Engine:
         finally:
             self._drop_connection()
 
+    def status(self) -> ThreadState:
+        """ok, failed ou stale (dernier tour trop ancien) : lu par /health."""
+        ref = self.last_tick_at if self.last_tick_at is not None else self._started_at
+        age = None if ref is None else self._clock() - ref
+        return thread_state(
+            failed=self.failed,
+            age_s=age,
+            threshold_s=stale_threshold(self._poll, ENGINE_STALE_FLOOR_S),
+        )
+
     def start(self) -> None:
+        self._started_at = self._clock()
         thread = threading.Thread(target=self.run, name="deskgate-engine", daemon=True)
         self._thread = thread
         thread.start()

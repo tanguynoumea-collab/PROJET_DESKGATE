@@ -38,6 +38,12 @@ from deskgate.core.callback_policy import (
     next_delay,
 )
 from deskgate.core.config import RunnerConfig
+from deskgate.core.health import (
+    SENDER_STALE_FLOOR_S,
+    ThreadState,
+    stale_threshold,
+    thread_state,
+)
 from deskgate.core.payload import build_callback, encode, minimal
 
 logger = logging.getLogger("deskgate.sender")
@@ -99,6 +105,7 @@ class Sender:
         self.on_fatal: Callable[[], None] | None = None
         self.failed = False
         self.last_tick_at: datetime | None = None
+        self._started_at: datetime | None = None
 
     # ------------------------------------------------------------------ tour
 
@@ -246,7 +253,18 @@ class Sender:
             with contextlib.suppress(Exception):
                 self._client.close()
 
+    def status(self) -> ThreadState:
+        """ok, failed ou stale (dernier tour trop ancien) : lu par /health."""
+        ref = self.last_tick_at if self.last_tick_at is not None else self._started_at
+        age = None if ref is None else (self._wall() - ref).total_seconds()
+        return thread_state(
+            failed=self.failed,
+            age_s=age,
+            threshold_s=stale_threshold(self._poll, SENDER_STALE_FLOOR_S),
+        )
+
     def start(self) -> None:
+        self._started_at = self._wall()
         thread = threading.Thread(target=self.run, name="deskgate-sender", daemon=True)
         self._thread = thread
         thread.start()
