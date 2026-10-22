@@ -76,8 +76,8 @@
     "triage": {
       "valide": true,
       "le": "2026-10-22",
-      "commit": "4943155",
-      "preuve": ".arthemis/events.jsonl (checkpoint triage, citation utilisateur)",
+      "commit": "9c397bb",
+      "preuve": ".arthemis/events.jsonl (checkpoint triage N2, citation utilisateur)",
       "differe": false
     },
     "go_publication": {
@@ -131,18 +131,6 @@
       "source": "05-08-SUMMARY.md",
       "ref": "ACC-01",
       "condition_levee": "certification a la DoD (critere revu, palier 4 et recettes 5.1)"
-    },
-    {
-      "id": "triage-council-1b",
-      "type": "decision",
-      "titre": "triage a faire : 6 mineurs introduits par la 5.2 (ARC-N2-001/002, MNT-N2-001, LIVR-N2-001/002, TST-N2-001)",
-      "gravite": "mineur",
-      "statut": "en_attente_decision",
-      "proprietaire": "humain",
-      "ouvert_le": "2026-10-22",
-      "source": "audits/saas-council-certification-2026-10-22.md",
-      "ref": "checkpoints.triage",
-      "condition_levee": "phase inseree ou backlog, decision datee de l'utilisateur"
     }
   ],
   "livraisons": [],
