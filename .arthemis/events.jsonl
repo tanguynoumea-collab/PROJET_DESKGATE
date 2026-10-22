@@ -37,3 +37,4 @@
 {"ts":"2026-10-22T10:30","type":"rapport","ref":"phase 5.1 gaps","commit":"b5ec7ef","note":"plans 09 a 13, nommage generique et vue 2 ; checker sans bloquant, revision iteration 1 ; horizon 05.1-12 B1"}
 {"ts":"2026-10-22T12:00","type":"transition","ref":"05.1-12","commit":"2a6d42d","note":"horizon atteint : vagues 1 et 2 faites (09, 10, 11), B1 vue 2 en attente"}
 {"ts":"2026-10-22T13:00","type":"reprise","ref":"05.1-12","commit":"88c793d","note":"B1 leve (A), vue 2 isolee implementee, horizon leve"}
+{"ts":"2026-10-22T15:10","type":"fermeture","ref":"04-D1","commit":"5067d60","note":"BCF 835bfaaa2745 valide dans BIMcollab Zoom ; CAP-02 cochee ; phases 5 et 5.1 terminees dans GSD"}
