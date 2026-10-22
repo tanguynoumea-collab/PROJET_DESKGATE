@@ -151,14 +151,14 @@ Plans:
   3. Les arguments déclarés dans `path_arguments` d'un outil MCP sont convertis et validés à la soumission et au lancement (`..`, jonction, lien refusés) ; seul l'env du serveur visé atteint le worker (SEC-001, SEC-005)
   4. `deskgate init` refuse depuis une application MSIX sans rien écrire ; `doctor` signale le contexte et le dernier résultat `0x8007010B` de la tâche (LIV-001)
   5. `/health` expose l'état des threads, les échecs de démarrage sont dans `logs\startup.log`, `doctor` vérifie les `required_files` déclarés, la suite est sans `ResourceWarning` (FIA-005, FIA-003, PER-001, TST-004)
-**Plans:** 4/10 plans executed
+**Plans:** 5/10 plans executed
 
 Plans:
 - [x] 05.2-01-PLAN.md — Engine tolérant aux erreurs SQLite transitoires, verdict différé, stop() qui ferme sa connexion, docstrings de politique (vague 1)
 - [x] 05.2-02-PLAN.md — required_files déclaré par capacité, doctor générique sans bcf_executable (vague 1)
 - [x] 05.2-03-PLAN.md — Superviseur des threads : décision pure, budget 3/10 min, recréation réelle (vague 2)
 - [x] 05.2-04-PLAN.md — path_arguments par outil MCP, double validation, env du seul serveur visé (vague 2)
-- [ ] 05.2-05-PLAN.md — Détection MSIX par sonde d'écriture, refus d'init, contrôle doctor (vague 2)
+- [x] 05.2-05-PLAN.md — Détection MSIX par sonde d'écriture, refus d'init, contrôle doctor (vague 2)
 - [ ] 05.2-06-PLAN.md — serve() supervisé, code 6, startup.log, preuves e2e (vague 3)
 - [ ] 05.2-07-PLAN.md — Dernier résultat de la tâche planifiée (Get-ScheduledTaskInfo) lu par doctor (vague 3)
 - [ ] 05.2-08-PLAN.md — /health avec état des threads, doctor.check_port aligné (vague 4)

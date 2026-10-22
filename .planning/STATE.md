@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05.2-04-PLAN.md
-last_updated: "2026-10-22T14:20:21.601Z"
+stopped_at: Completed 05.2-05-PLAN.md
+last_updated: "2026-10-22T14:23:35.244Z"
 last_activity: 2026-10-22
 progress:
   total_phases: 13
   completed_phases: 6
   total_plans: 61
-  completed_plans: 55
+  completed_plans: 56
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 5.2 (corrections-audit-council-1-reprise-du-runner-chemins-mcp-installation-msix) — EXECUTING
-Plan: 5 of 10
+Plan: 6 of 10
 Status: Ready to execute
 Last activity: 2026-10-22
 
@@ -101,6 +101,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.2 P02 | 10min | 2 tasks | 8 files |
 | Phase 05.2 P03 | 15min | 2 tasks | 4 files |
 | Phase 05.2 P04 | 15min | 2 tasks | 8 files |
+| Phase 05.2 P05 | 15min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -154,6 +155,7 @@ Recent decisions affecting current work:
 - [Phase 05.2]: required_files (kind python) vérifié par doctor, interdit en mcp; existence non vérifiée au chargement
 - [Phase 05.2]: Superviseur : recréation dans le processus, abandon code 6 après 3 recréations en 10 min
 - [Phase 05.2]: path_arguments par outil, arguments non déclarés opaques, env MCP limité au serveur visé
+- [Phase 05.2]: Détection MSIX par sonde d'écriture (E3) + identité de paquet ; init refuse sans contournement
 
 ### Roadmap Evolution
 
@@ -178,6 +180,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-22T14:20:21.594Z
-Stopped at: Completed 05.2-04-PLAN.md
+Last session: 2026-10-22T14:23:35.238Z
+Stopped at: Completed 05.2-05-PLAN.md
 Resume file: None
