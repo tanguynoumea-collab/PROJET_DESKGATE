@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
-stopped_at: Completed 05.1-08-PLAN.md
-last_updated: "2026-10-22T07:36:23.446Z"
-last_activity: 2026-10-21
+stopped_at: Completed 05.1-09-PLAN.md
+last_updated: "2026-10-22T08:16:00.479Z"
+last_activity: 2026-10-22
 progress:
   total_phases: 6
-  completed_phases: 6
-  total_plans: 46
-  completed_plans: 46
+  completed_phases: 5
+  total_plans: 51
+  completed_plans: 47
   percent: 0
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 Phase: 05.1 (bcf-exploitable-dans-bimcollab-et-nommage-des-sujets) — EXECUTING
 Plan: 8 of 8
 Status: Phase complete — ready for verification
-Last activity: 2026-10-21
+Last activity: 2026-10-22
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -92,6 +92,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.1 P06 | 30min | 2 tasks | 7 files |
 | Phase 05.1 P07 | 30min | 3 tasks | 7 files |
 | Phase 05.1 P08 | 40min | 3 tasks | 5 files |
+| Phase 05.1 P09 | 40min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -159,6 +160,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-21T17:24:48.091Z
-Stopped at: Completed 05.1-08-PLAN.md
+Last session: 2026-10-22T08:16:00.474Z
+Stopped at: Completed 05.1-09-PLAN.md
 Resume file: None
