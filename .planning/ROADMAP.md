@@ -140,6 +140,16 @@ Plans:
 | 4. Capacités v0.1 | 0/0 | Complete    | 2026-10-20 |
 | 5. Installation et intégration n8n | 6/9 | Complete    | 2026-10-22 |
 
+### Phase 05.3: corrections audit council 1 passe 2 : superviseur, refus MSIX de task install, messages et test doctor (INSERTED)
+
+**Goal:** [Urgent work - to be planned]
+**Requirements**: TBD
+**Depends on:** Phase 5
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 05.3 to break down)
+
 ### Phase 05.2: corrections audit council 1 : reprise du runner, chemins MCP, installation MSIX (INSERTED)
 
 **Goal:** Le runner se reprend seul quand un de ses threads meurt (tâche courante conclue en `interrupted`, rappel envoyé, code 6 seulement après échec répété), les chemins des appels `mcp.call` respectent la règle 4, et une installation lancée depuis une application MSIX est refusée et diagnostiquée. Corrige les findings du council 1 retenus au triage, et eux seuls.

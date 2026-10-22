@@ -4,10 +4,10 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
 stopped_at: Completed 05.2-10-PLAN.md
-last_updated: "2026-10-22T15:42:54.032Z"
+last_updated: "2026-10-22T18:36:41.915Z"
 last_activity: 2026-10-22
 progress:
-  total_phases: 13
+  total_phases: 15
   completed_phases: 7
   total_plans: 61
   completed_plans: 61
@@ -166,11 +166,13 @@ Recent decisions affecting current work:
 - [Phase 05.2]: Seuil stale = max(10 x sondage, plancher fixe 30 s engine / 60 s sender) (D-07)
 - [Phase 05.2]: path_arguments du serveur mini limité aux outils de fichiers autorisés
 - [Phase 05.2]: Fermeture des Engine, Sender, bases et journal de démarrage par fixtures autouse ; ResourceWarning en erreur
+- [Phase 5.3]: Triage des findings N2 (certification du council 1) : phase 5.3 = ARC-N2-001 (budget du superviseur consommé par un recover qui échoue, sans back-off), ARC-N2-002 (stop pendant un recover lent laisse un engine vivant), MNT-N2-001 et LIVR-N2-002 (\r dans runtime.py et AGENTS.md), LIVR-N2-001 (task install sans refus MSIX), TST-N2-001 (chemin par défaut de last_task_result dans doctor non testé) ; Info LIVR-N2-003, FIAB-N2-001, PER-N2-001 en backlog 999.7 ; rapport audits/saas-council-certification-2026-10-22.md — Choix utilisateur du 2026-10-22 au checkpoint triage
 
 ### Roadmap Evolution
 
 - Phase 05.1 inserted after Phase 5: BCF exploitable dans BIMcollab et nommage des sujets (URGENT)
 - Phase 05.2 inserted after Phase 5: corrections audit council 1 : reprise du runner, chemins MCP, installation MSIX (URGENT)
+- Phase 05.3 inserted after Phase 5: corrections audit council 1 passe 2 : superviseur, refus MSIX de task install, messages et test doctor (URGENT)
 
 ### Pending Todos
 
