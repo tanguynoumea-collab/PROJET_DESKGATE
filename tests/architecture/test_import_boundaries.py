@@ -140,3 +140,9 @@ def test_frontiere_gpl_couvre_plugins() -> None:
         and BIM_SRC in py.parents
     ]
     assert vus
+
+
+def test_superviseur_sans_io() -> None:
+    assert not (
+        {"sqlite3", "ctypes", "subprocess", "httpx2"} & set(_imports(SRC / "supervisor.py"))
+    )
