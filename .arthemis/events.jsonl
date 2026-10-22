@@ -49,3 +49,5 @@
 {"ts":"2026-10-22T16:55","type":"transition","ref":"AUDIT_COUNCIL -> retour GSD phase 5.2","commit":"ac4f982","note":"audit_council 1/3 ; 3 majeurs + 7 mineurs retenus ; backlog 999.1-999.6"}
 {"ts":"2026-10-22T18:30","type":"transition","ref":"AUDIT_COUNCIL -> IMPLEMENTATION (phase 5.2)","commit":"c8740fc","note":"10 plans, 5 vagues, tous autonomes ; plan-checker vert ; horizon : phase entiere, aucun bloquant"}
 {"ts":"2026-10-22T21:05","type":"transition","ref":"IMPLEMENTATION -> GATE (phase 5.2)","commit":"7c050a8","note":"10/10 plans, verification human_needed (3 differes blocks none) ; ARC-001, SEC-001, 05-06-msix corriges non certifies"}
+{"ts":"2026-10-22T20:16","type":"gate","ref":".arthemis/reports/gate-1-05.2.log","commit":"23f0617","note":"vert : 936 passed + 33 e2e, pyright 0, build OK, CI verte"}
+{"ts":"2026-10-22T20:16","type":"transition","ref":"GATE -> AUDIT_COUNCIL (re-verification ciblee)","commit":"23f0617","note":"certification -role des dix findings de la phase 5.2"}
