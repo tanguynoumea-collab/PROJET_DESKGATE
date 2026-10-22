@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: executing
 stopped_at: Completed 05.1-13-PLAN.md
-last_updated: "2026-10-22T09:02:05.768Z"
+last_updated: "2026-10-22T10:14:43.271Z"
 last_activity: 2026-10-22
 progress:
   total_phases: 6
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 
 ## Current Position
 
-Phase: 05.1 (bcf-exploitable-dans-bimcollab-et-nommage-des-sujets) — EXECUTING
-Plan: 05.1-09, 10, 11 faits ; 12 et 13 restants (gap closure)
+Phase: 05.1
+Plan: Not started
 Status: Executing — gap closure 05.1-12..13
 Last activity: 2026-10-22
 
