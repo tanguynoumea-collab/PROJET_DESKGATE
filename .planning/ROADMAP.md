@@ -144,12 +144,12 @@ Plans:
 **Goal:** Le BCF d'`ifc.clash` s'ouvre dans BIMcollab Zoom avec ses deux points de vue par sujet, chaque sujet est titré selon la convention de tri du projet, et aucun conflit n'est perdu ni inventé par les réservations.
 **Requirements**: CAP-02, CAP-06, CAP-07
 **Success Criteria** (what must be TRUE):
-  1. Le BCF du calcul réel CVC × ARC, ouvert dans BIMcollab Zoom avec les deux maquettes, montre pour chaque sujet ses deux points de vue (objets seuls ; contexte gris transparent), cadrés sur le conflit (04-D1)
-  2. Les sujets sont titrés « <trigramme bâtiment>/<étage>/<techniques>/<sujet> » d'après la charte du job ; une entrée manquante donne la valeur IFC brute et un avertissement
+  1. Le BCF du calcul réel CVC × ARC, ouvert dans BIMcollab Zoom avec les deux maquettes, montre pour chaque sujet ses deux points de vue (objets seuls ; contexte gris transparent, aucun élément visible dans ses couleurs d'origine, D-18), cadrés sur le conflit (04-D1)
+  2. Les sujets sont titrés d'après un gabarit et des tables de correspondance fournis par le job (champs building, storey, trade_a, trade_b, type_a, type_b) ; aucune valeur métier dans le plugin ; une valeur absente d'une table reste brute avec un avertissement (révisé le 2026-10-22)
   3. Sur les maquettes réelles, `clashes.json` et le BCF contiennent tous les conflits par défaut, ou la troncature est explicite et signalée ; les réservations sont exclues par défaut
-  4. Le workflow d'exemple n8n passe la charte et les réglages de coordination fiable
+  4. Le workflow d'exemple n8n passe la charte du projet pilote (gabarit + tables) et les réglages de coordination fiable
 **Depends on:** Phase 5
-**Plans:** 8/8 plans complete
+**Plans:** 8/13 plans complete
 
 Plans:
 - [x] 05.1-01-PLAN.md — Pillow et uv.lock, contrat bcf-write-v2 (3 copies), scènes IFC synthétiques
@@ -160,3 +160,8 @@ Plans:
 - [x] 05.1-06-PLAN.md — Rendu 3D logiciel (Pillow) des deux points de vue, snapshots dans ifc.clash
 - [x] 05.1-07-PLAN.md — Header/File des maquettes, exemple n8n et documentation, script de mise à jour des plugins
 - [x] 05.1-08-PLAN.md — Recette réelle CVC x ARC depuis n8n, contrôle du BCF, ACCEPTANCE (Zoom différé)
+- [ ] 05.1-09-PLAN.md — (écart) Nommage générique dans le plugin : title_template + mappings, LABELS/TRADE_CODES/Charter retirés
+- [ ] 05.1-10-PLAN.md — (écart) Charte PIC dans l'exemple n8n (ifc-clash-params.json), README, AGENTS.md, bcf_check par gabarit
+- [ ] 05.1-11-PLAN.md — (écart) Trois BCF de test de la vue 2 (A isolé, B maquette grise, C voisinage large) pour Zoom
+- [ ] 05.1-12-PLAN.md — (écart, bloquant B1) Choix de l'approche de la vue 2 dans Zoom, généralisation, règle D-18 dans bcf_check
+- [ ] 05.1-13-PLAN.md — (écart) Recette 2 réelle depuis n8n, ACCEPTANCE, Zoom différé 05.1-D2 (solde 04-D1)
