@@ -212,8 +212,9 @@ def convert_mcp_arguments(
 ) -> dict[str, object]:
     """Convertit les arguments de chemin déclarés d'un appel mcp.call (premier niveau seulement).
 
-    Serveur, outil ou arguments inconnus ou mal typés : params renvoyés tels quels (le worker produit
-    déjà invalid_params, server_not_declared ou tool_not_allowed). Les arguments non déclarés restent opaques.
+    Serveur, outil ou arguments inconnus ou mal typés : params renvoyés tels quels (le worker
+    produit déjà invalid_params, server_not_declared ou tool_not_allowed). Les arguments non
+    déclarés restent opaques.
     """
     out: dict[str, object] = dict(params)
     server, tool, args = params.get("server"), params.get("tool"), params.get("arguments")

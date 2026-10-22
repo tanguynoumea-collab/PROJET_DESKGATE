@@ -98,7 +98,7 @@ _PY = "[capabilities.x]\nkind='python'\npython='C:/p.exe'\nentry='m:f'\ntimeout_
 
 
 def test_required_files_valide() -> None:
-    cfg = _parse(_PY + 'required_files = ["outil"]\nsettings = { outil = \'C:/x.exe\' }\n')
+    cfg = _parse(_PY + "required_files = [\"outil\"]\nsettings = { outil = 'C:/x.exe' }\n")
     assert cfg.capabilities["x"].required_files == ["outil"]
 
 
@@ -150,9 +150,7 @@ def test_path_arguments_liste_vide() -> None:
 
 def test_path_arguments_nom_argument_invalide() -> None:
     with pytest.raises(ConfigError):
-        _parse(
-            _SRV + 'allowed_tools = ["read_file"]\npath_arguments = { read_file = ["a-b"] }\n'
-        )
+        _parse(_SRV + 'allowed_tools = ["read_file"]\npath_arguments = { read_file = ["a-b"] }\n')
 
 
 def test_mcp_path_arguments() -> None:

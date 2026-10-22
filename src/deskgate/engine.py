@@ -43,6 +43,7 @@ from deskgate.core.outcome import (
 from deskgate.core.paths import (
     PathDenied,
     Resolver,
+    convert_mcp_arguments,
     convert_path_params,
     default_resolver,
     host_to_container,
@@ -292,13 +293,23 @@ class Engine:
             return
         try:
             # Revalidation au lancement : une jonction a pu changer depuis la soumission.
-            params = convert_path_params(
-                _params(row.params_json),
-                cap.path_params,
-                self._config.mappings(),
-                self._config.paths.allowed_roots,
-                self._resolver,
-            )
+            raw = _params(row.params_json)
+            if cap.kind == "mcp":
+                params = convert_mcp_arguments(
+                    raw,
+                    self._config.mcp_path_arguments(),
+                    self._config.mappings(),
+                    self._config.paths.allowed_roots,
+                    self._resolver,
+                )
+            else:
+                params = convert_path_params(
+                    raw,
+                    cap.path_params,
+                    self._config.mappings(),
+                    self._config.paths.allowed_roots,
+                    self._resolver,
+                )
         except PathDenied as exc:
             self._fail(conn, row.id, exc.code, exc.message)
             return
@@ -324,11 +335,14 @@ class Engine:
                 }
             }
             # Valeurs d'env : mémoire et environnement du worker seulement, jamais sur disque.
-            extra_env = {
-                mcp_env_var(name, key): value
-                for name, s in servers.items()
-                for key, value in s.env.items()
-            }
+            # D-13 : seules les variables du serveur visé par params.server.
+            target = params.get("server")
+            srv = servers.get(target) if isinstance(target, str) else None
+            extra_env = (
+                {mcp_env_var(target, key): value for key, value in srv.env.items()}
+                if srv is not None and isinstance(target, str)
+                else {}
+            )
         else:
             if cap.python is None or cap.entry is None:
                 raise ValueError("capacité python incomplète")

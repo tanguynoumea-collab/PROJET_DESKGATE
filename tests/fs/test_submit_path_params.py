@@ -81,3 +81,64 @@ def test_jonction_hors_racine(tmp_path: Path, junction: Callable[[Path, Path], P
     with pytest.raises(JobRequestError) as e:
         env.submit("/data/lien/a.ifc")
     assert (e.value.status, e.value.code) == (422, "path_outside_roots")
+
+
+class McpEnv(Env):
+    def __init__(self, tmp_path: Path) -> None:
+        self.root = tmp_path / "bim"
+        self.db = tmp_path / "d.db"
+        store.open_db(self.db).close()
+        server = {
+            "command": "C:/Python/python.exe",
+            "allowed_tools": ["read_file", "echo"],
+            "path_arguments": {"read_file": ["path"]},
+        }
+        cfg = make_config(tmp_path, {"mcp.call": {"kind": "mcp"}}, mcp_servers={"srv": server})
+        self.service = JobsService(db_path=self.db, config=cfg)
+
+    def submit_mcp(self, tool: str, arguments: dict[str, object]) -> str:
+        req = SubmitRequest.model_validate(
+            {
+                "capability": "mcp.call",
+                "params": {"server": "srv", "tool": tool, "arguments": arguments},
+                "callback": {"url": URL},
+            }
+        )
+        return self.service.submit(req)
+
+
+def test_mcp_dotdot_refuse(tmp_path: Path) -> None:
+    env = McpEnv(tmp_path)
+    with pytest.raises(JobRequestError) as e:
+        env.submit_mcp("read_file", {"path": "/data/../hors.txt"})
+    assert e.value.status == 422
+    assert e.value.code in {"path_outside_roots", "path_invalid"}
+    assert env.count("jobs") == 0
+    assert any(r.get("code") == e.value.code for r in env.refusals())
+
+
+def test_mcp_jonction_hors_racine(tmp_path: Path, junction: Callable[[Path, Path], Path]) -> None:
+    env = McpEnv(tmp_path)
+    outside = tmp_path / "dehors"
+    outside.mkdir()
+    junction(env.root / "lien", outside)
+    with pytest.raises(JobRequestError) as e:
+        env.submit_mcp("read_file", {"path": "/data/lien/secret.txt"})
+    assert (e.value.status, e.value.code) == (422, "path_outside_roots")
+    assert env.count("jobs") == 0
+
+
+def test_mcp_chemin_valide_accepte(tmp_path: Path) -> None:
+    env = McpEnv(tmp_path)
+    assert env.submit_mcp("read_file", {"path": "/data/depot/a.txt"})
+    conn = store.connect(env.db)
+    try:
+        raw = conn.execute("SELECT params_json FROM jobs").fetchone()[0]
+    finally:
+        conn.close()
+    assert json.loads(raw)["arguments"] == {"path": "/data/depot/a.txt"}
+
+
+def test_mcp_argument_non_declare_opaque(tmp_path: Path) -> None:
+    env = McpEnv(tmp_path)
+    assert env.submit_mcp("echo", {"text": "/data/../x"})
