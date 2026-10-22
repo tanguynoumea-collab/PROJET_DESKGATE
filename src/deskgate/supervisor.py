@@ -1,9 +1,19 @@
 """Superviseur des threads engine et sender (D-03 cas 2).
 
-Recrée un thread mort après avoir conclu la tâche courante en interrupted ; abandonne après
-MAX_RESTARTS recréations dans WINDOW_S secondes. RestartOnFailure du Planificateur ne relance pas
-une sortie non nulle (expérience E1, phase 5.2) : le code EXIT_THREAD_FAILED ne sert qu'à signaler
-l'abandon.
+Recrée un thread mort après avoir conclu la tâche courante en interrupted. Le budget (MAX_RESTARTS
+recréations dans WINDOW_S secondes) ne compte que les recréations effectives : recover réussi,
+thread neuf démarré et installé dans le Holder. Un recover qui échoue (base verrouillée) n'en
+consomme aucune ; il est retenté après min(RECOVER_BACKOFF_CAP_S, 2^n) secondes, n étant le nombre
+d'échecs consécutifs, et le superviseur abandonne après MAX_RECOVER_FAILURES échecs consécutifs.
+Abandon = code EXIT_THREAD_FAILED : RestartOnFailure du Planificateur ne relance pas une sortie
+non nulle (expérience E1, phase 5.2), le code ne sert qu'à signaler l'abandon.
+
+stop() ne prend pas le verrou (un recover peut durer plusieurs secondes) ; une recréation en cours
+revérifie _stop après le recover et après le démarrage du thread neuf, qui est alors arrêté.
+
+Limite assumée : un verdict différé (`Engine._unsettled`) encore en mémoire quand le thread meurt
+est perdu ; la tâche est conclue `interrupted` (`runner_restarted`) par la recovery, jamais avec le
+verdict calculé.
 """
 
 from __future__ import annotations
@@ -22,6 +32,8 @@ logger = logging.getLogger(__name__)
 EXIT_THREAD_FAILED = 6
 MAX_RESTARTS = 3
 WINDOW_S = 600.0
+MAX_RECOVER_FAILURES = 10
+RECOVER_BACKOFF_CAP_S = 30.0
 
 
 @dataclass(frozen=True)
@@ -36,15 +48,26 @@ def recent(times: Sequence[float], now: float, window: float = WINDOW_S) -> list
     return [t for t in times if now - t < window]
 
 
+def recover_delay(failures: int, cap: float = RECOVER_BACKOFF_CAP_S) -> float:
+    """Délai avant le prochain recover après `failures` échecs consécutifs (P-02)."""
+    if failures <= 0:
+        return 0.0
+    return min(cap, 2.0**failures)
+
+
 def decide(
     *,
     engine_failed: bool,
     sender_failed: bool,
     recent_restarts: int,
     max_restarts: int = MAX_RESTARTS,
+    recover_failures: int = 0,
+    max_recover_failures: int = MAX_RECOVER_FAILURES,
 ) -> Decision:
     if not (engine_failed or sender_failed):
         return Decision(False, False, False)
+    if engine_failed and recover_failures >= max_recover_failures:
+        return Decision(False, False, True)
     needed = int(engine_failed) + int(sender_failed)
     if recent_restarts + needed > max_restarts:
         return Decision(False, False, True)

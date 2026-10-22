@@ -7,7 +7,17 @@ import pathlib
 
 import pytest
 
-from deskgate.supervisor import EXIT_THREAD_FAILED, Decision, decide, exit_code, recent
+import deskgate.supervisor as supervisor_module
+from deskgate.supervisor import (
+    EXIT_THREAD_FAILED,
+    MAX_RECOVER_FAILURES,
+    RECOVER_BACKOFF_CAP_S,
+    Decision,
+    decide,
+    exit_code,
+    recent,
+    recover_delay,
+)
 
 pytestmark = pytest.mark.unit
 
@@ -50,3 +60,39 @@ def test_supervisor_sans_sqlite_ni_ctypes() -> None:
         a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names
     }
     assert not ({"sqlite3", "ctypes", "subprocess"} & names)
+
+
+@pytest.mark.parametrize(
+    ("n", "delay"),
+    [(0, 0.0), (1, 2.0), (2, 4.0), (3, 8.0), (4, 16.0), (5, 30.0), (10, 30.0)],
+)
+def test_recover_delay(n: int, delay: float) -> None:
+    assert recover_delay(n) == delay
+
+
+def test_recover_delay_plafond_personnalise() -> None:
+    assert recover_delay(3, cap=5.0) == 5.0
+
+
+@pytest.mark.parametrize(
+    ("eng", "snd", "failures", "expected"),
+    [
+        (True, False, 10, Decision(False, False, True)),
+        (True, False, 9, Decision(True, False, False)),
+        (False, True, 10, Decision(False, True, False)),
+    ],
+)
+def test_decide_echecs_de_recover(eng: bool, snd: bool, failures: int, expected: Decision) -> None:
+    d = decide(engine_failed=eng, sender_failed=snd, recent_restarts=0, recover_failures=failures)
+    assert d == expected
+
+
+def test_constantes_de_recover() -> None:
+    assert MAX_RECOVER_FAILURES == 10
+    assert RECOVER_BACKOFF_CAP_S == 30.0
+
+
+def test_docstring_verdict_differe() -> None:
+    doc = supervisor_module.__doc__ or ""
+    assert "verdict différé" in doc
+    assert "interrupted" in doc
