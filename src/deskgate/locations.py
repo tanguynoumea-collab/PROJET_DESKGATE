@@ -1,4 +1,7 @@
-"""Emplacements des données (D-01). Aucune création de dossier : rien n'est écrit avant le mutex.
+"""Emplacements des données (D-01). Aucune création de dossier ici.
+
+Seul le journal de démarrage (`logs/startup.log`) est écrit avant le mutex, par
+`runtime.attach_startup_log`.
 
 Priorité du fichier de configuration : `--config` > `DESKGATE_HOME` > dossier par défaut.
 La base suit toujours `resolve_home()`.
@@ -38,3 +41,7 @@ def logs_dir(home: Path) -> Path:
 
 def log_path(home: Path) -> Path:
     return logs_dir(home) / "runner.log"
+
+
+def startup_log_path(home: Path) -> Path:
+    return logs_dir(home) / "startup.log"

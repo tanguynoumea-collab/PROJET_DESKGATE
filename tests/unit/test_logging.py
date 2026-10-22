@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from deskgate.runtime import attach_file_log, configure_logging
+from deskgate.runtime import attach_file_log, attach_startup_log, configure_logging, startup_logger
 
 pytestmark = pytest.mark.unit
 
@@ -89,3 +89,37 @@ def test_journal_fichier_masque_et_additif(tmp_path: Path) -> None:
         for h in list(lg.handlers) + list(logging.getLogger().handlers):
             if isinstance(h, logging.FileHandler):
                 h.close()
+
+
+@pytest.fixture
+def startup_isole() -> Iterator[None]:
+    try:
+        yield
+    finally:
+        for h in list(startup_logger.handlers):
+            h.close()
+        startup_logger.handlers[:] = []
+        startup_logger.propagate = True
+
+
+@pytest.mark.fs
+@pytest.mark.usefixtures("startup_isole")
+def test_startup_log_plafonne(tmp_path: Path) -> None:
+    (tmp_path / "logs").mkdir()
+    (tmp_path / "logs" / "startup.log").write_bytes(b"x" * (300 * 1024))
+    path = attach_startup_log(tmp_path)
+    assert path is not None
+    assert path.stat().st_size < 256 * 1024
+    startup_logger.error("x signature=SECRET")
+    for h in startup_logger.handlers:
+        h.flush()
+    texte = path.read_text(encoding="utf-8")
+    assert "signature=***" in texte
+    assert "SECRET" not in texte
+
+
+@pytest.mark.fs
+@pytest.mark.usefixtures("startup_isole")
+def test_startup_log_dossier_impossible(tmp_path: Path) -> None:
+    (tmp_path / "logs").write_text("je suis un fichier", encoding="utf-8")
+    assert attach_startup_log(tmp_path) is None

@@ -40,3 +40,9 @@ def test_example_template_is_valid() -> None:
     assert cfg.callback.max_window_s == 86400
     assert cfg.callback_allowed_hosts == ["localhost", "127.0.0.1"]
     assert any(m.container == "/data" and m.host == "C:/BIM" for m in cfg.mappings())
+
+
+def test_startup_log_path(tmp_path: Path) -> None:
+    from deskgate.locations import startup_log_path
+
+    assert startup_log_path(tmp_path) == tmp_path / "logs" / "startup.log"

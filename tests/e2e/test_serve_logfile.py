@@ -20,7 +20,7 @@ from tests.e2e.conftest import (
     write_config,
 )
 
-from deskgate.locations import log_path
+from deskgate.locations import log_path, startup_log_path
 
 pytestmark = [
     pytest.mark.e2e,
@@ -78,6 +78,7 @@ def test_second_runner_n_ecrit_pas(data_home: Path, instance_name: str, free_por
         second = start_runner(env)
         assert second.wait(15) == 3
         assert _journal(data_home).count(MARQUEUR) == 1
+        assert "déjà en cours" in startup_log_path(data_home).read_text(encoding="utf-8")
     finally:
         if second is not None:
             _fermer(second)
@@ -102,3 +103,25 @@ def test_runner_sous_pythonw(data_home: Path, instance_name: str, free_port: int
         assert MARQUEUR in _journal(data_home)
     finally:
         _fermer(proc)
+
+
+@pytest.mark.timeout(60)
+def test_config_invalide_journalisee_sous_pythonw(data_home: Path, instance_name: str) -> None:
+    pyw = Path(sys.executable).with_name("pythonw.exe")
+    if not pyw.exists():
+        pytest.skip(f"pythonw.exe introuvable : {pyw}")
+    data_home.mkdir(parents=True, exist_ok=True)
+    (data_home / "runner.toml").write_text(
+        'bogus = 1\ntoken_sha256 = "SECRETVALUE"\n', encoding="utf-8"
+    )
+    res = subprocess.run(
+        [str(pyw), "-m", "deskgate", "serve"],
+        env=runner_env(data_home, instance_name),
+        timeout=60,
+        check=False,
+    )
+    assert res.returncode == 2
+    texte = startup_log_path(data_home).read_text(encoding="utf-8")
+    assert "Configuration invalide" in texte
+    assert "SECRETVALUE" not in texte
+    assert not (data_home / "deskgate.db").exists()

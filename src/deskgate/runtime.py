@@ -5,6 +5,7 @@ Configuration, puis mutex, puis socket exclusif, puis base, puis Uvicorn.
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import logging.handlers
 import os
@@ -26,9 +27,21 @@ from deskgate.instance import (
     instance_name_from_env,
 )
 from deskgate.jobs import JobsService
-from deskgate.locations import config_path, db_path, log_path, logs_dir, resolve_home
+from deskgate.locations import (
+    config_path,
+    db_path,
+    log_path,
+    logs_dir,
+    resolve_home,
+    startup_log_path,
+)
 from deskgate.sender import Sender
-from deskgate.store import SchemaTooNew, open_db, recover_interrupted
+from deskgate.store import (
+    DatabaseError,
+    SchemaTooNew,
+    open_db,
+    recover_interrupted,
+)
 
 EXIT_INVALID_CONFIG = 2
 EXIT_ALREADY_RUNNING = 3
@@ -39,7 +52,10 @@ LOG_MAX_BYTES = 2 * 1024 * 1024
 LOG_BACKUPS = 5
 LOG_FORMAT = "%(asctime)s %(levelname)s %(name)s : %(message)s"
 
+STARTUP_LOG_MAX_BYTES = 256 * 1024
+
 logger = logging.getLogger("deskgate")
+startup_logger = logging.getLogger("deskgate.startup")
 
 
 def configure_logging() -> None:
@@ -79,14 +95,50 @@ def attach_file_log(home: Path) -> Path:
     return path
 
 
+def attach_startup_log(home: Path) -> Path | None:
+    """Journal de démarrage plafonné, sans rotation, attaché avant le mutex (D-08, Pitfall 9).
+
+    Un second runner peut tenir le fichier ouvert : jamais de rotation ici, seulement une
+    troncature opportuniste au-delà du plafond. Renvoie None si le dossier est inutilisable.
+    """
+    try:
+        logs_dir(home).mkdir(parents=True, exist_ok=True)
+        path = startup_log_path(home)
+        with contextlib.suppress(OSError):
+            if path.exists() and path.stat().st_size > STARTUP_LOG_MAX_BYTES:
+                path.open("w").close()
+        handler = logging.FileHandler(path, mode="a", encoding="utf-8")
+    except OSError:
+        return None
+    handler.setFormatter(RedactingFormatter(LOG_FORMAT))
+    handler.addFilter(RedactingFilter())
+    startup_logger.handlers[:] = [handler]
+    startup_logger.setLevel(logging.INFO)
+    startup_logger.propagate = False
+    return path
+
+
 def _err(message: str) -> None:
     if sys.stderr is not None:
         print(message, file=sys.stderr)
+    startup_logger.error("%s", message)
 
 
 def serve(config_override: Path | None = None) -> int:
     """Lance le runner ; renvoie le code de sortie du processus."""
     home = resolve_home()
+    attach_startup_log(
+        home
+    )  # avant load_config : le dossier du runner est connu sans configuration
+    try:
+        return _serve(home, config_override)
+    except Exception:
+        logger.exception("Échec fatal du runner.")
+        startup_logger.exception("Échec fatal du runner.")
+        raise
+
+
+def _serve(home: Path, config_override: Path | None) -> int:
     try:
         cfg = load_config(config_path(home, config_override))
     except ConfigError as exc:
@@ -119,8 +171,16 @@ def serve(config_override: Path | None = None) -> int:
     except SchemaTooNew as exc:
         _err(str(exc))
         return EXIT_DB_ERROR
+    except DatabaseError as exc:
+        startup_logger.exception("Base inaccessible au démarrage.")
+        _err(f"Base de données inaccessible : {type(exc).__name__}.")
+        return EXIT_DB_ERROR
     try:
         ids = recover_interrupted(conn)  # running -> interrupted + rappels pending + audit
+    except DatabaseError as exc:
+        startup_logger.exception("Récupération des tâches impossible au démarrage.")
+        _err(f"Base de données inaccessible : {type(exc).__name__}.")
+        return EXIT_DB_ERROR
     finally:
         conn.close()
     if ids:
