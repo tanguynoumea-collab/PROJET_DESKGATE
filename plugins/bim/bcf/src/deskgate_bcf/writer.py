@@ -2,7 +2,8 @@
 """Écriture d'un BCF 2.1 à deux points de vue par sujet (seul module qui importe `bcf`).
 
 Vue 1 « only » : tout masqué, exceptions = objets du conflit, colorés A et B.
-Vue 2 « context » : tout visible, contexte coloré, objets du conflit colorés.
+Vue 2 « context » : tout masqué sauf objets du conflit et contexte, contexte coloré gris
+transparent, objets du conflit colorés.
 Aucune sélection n'est enregistrée (D-08). Les GUID sont déterministes.
 """
 
@@ -116,7 +117,12 @@ def _context(t: dict[str, Any], c: dict[str, str]) -> mdl.Components:
     col.append(mdl.ComponentColoringColor(color=c["a"], component=_comps(t["guids_a"])))
     col.append(mdl.ComponentColoringColor(color=c["b"], component=_comps(t["guids_b"])))
     return mdl.Components(
-        visibility=mdl.ComponentVisibility(default_visibility=True),
+        visibility=mdl.ComponentVisibility(
+            default_visibility=False,
+            exceptions=mdl.ComponentVisibilityExceptions(
+                component=_comps(t["guids_a"] + t["guids_b"] + ctx)
+            ),
+        ),
         coloring=mdl.ComponentColoring(color=col),
     )
 

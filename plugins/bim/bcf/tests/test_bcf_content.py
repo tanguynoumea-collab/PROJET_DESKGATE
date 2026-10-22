@@ -82,8 +82,11 @@ def test_deux_vues_et_couleurs(ecrire, doc_valide, tmp_path):
             if n.endswith((".bcfv", ".bcf")):
                 racine = ET.fromstring(z.read(n))  # noqa: S314
                 assert "Selection" not in {_tag(e) for e in racine.iter()}
-    only = next(r for r in vues.values() if _visibilite(r) == "false")
-    ctx = next(r for r in vues.values() if _visibilite(r) == "true")
+    g1 = str(uuid.uuid5(uuid.UUID(t["guid"]), "viewpoint-1-only"))
+    only = vues[f"{t['guid']}/{g1}.bcfv"]
+    ctx = vues[f"{t['guid']}/{_g2(t)}.bcfv"]
+    assert _visibilite(only) == "false"
+    assert _visibilite(ctx) == "false"
     assert _exceptions(only) == ab
     assert _couleurs(only) == {ROUGE: sorted(t["guids_a"]), BLEU: sorted(t["guids_b"])}
     restants = sorted(g for g in t["context_guids"] if g not in ab)
@@ -93,6 +96,19 @@ def test_deux_vues_et_couleurs(ecrire, doc_valide, tmp_path):
         ROUGE: sorted(t["guids_a"]),
         BLEU: sorted(t["guids_b"]),
     }
+    assert _exceptions(ctx) == sorted(set(ab) | set(restants))
+
+
+def test_vue2_sans_contexte(ecrire, doc_valide, tmp_path):
+    t = doc_valide["topics"][0]
+    t["context_guids"] = []
+    assert ecrire(doc_valide).returncode == 0
+    ab = sorted(t["guids_a"] + t["guids_b"])
+    with zipfile.ZipFile(tmp_path / "out.bcf") as z:
+        ctx = ET.fromstring(z.read(f"{t['guid']}/{_g2(t)}.bcfv"))  # noqa: S314
+    assert _visibilite(ctx) == "false"
+    assert _exceptions(ctx) == ab
+    assert CONTEXTE not in _couleurs(ctx)
 
 
 def test_determinisme_des_membres(ecrire, doc_valide, tmp_path):
