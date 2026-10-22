@@ -151,10 +151,10 @@ Plans:
   3. Les arguments déclarés dans `path_arguments` d'un outil MCP sont convertis et validés à la soumission et au lancement (`..`, jonction, lien refusés) ; seul l'env du serveur visé atteint le worker (SEC-001, SEC-005)
   4. `deskgate init` refuse depuis une application MSIX sans rien écrire ; `doctor` signale le contexte et le dernier résultat `0x8007010B` de la tâche (LIV-001)
   5. `/health` expose l'état des threads, les échecs de démarrage sont dans `logs\startup.log`, `doctor` vérifie les `required_files` déclarés, la suite est sans `ResourceWarning` (FIA-005, FIA-003, PER-001, TST-004)
-**Plans:** 10 plans
+**Plans:** 1/10 plans executed
 
 Plans:
-- [ ] 05.2-01-PLAN.md — Engine tolérant aux erreurs SQLite transitoires, verdict différé, stop() qui ferme sa connexion, docstrings de politique (vague 1)
+- [x] 05.2-01-PLAN.md — Engine tolérant aux erreurs SQLite transitoires, verdict différé, stop() qui ferme sa connexion, docstrings de politique (vague 1)
 - [ ] 05.2-02-PLAN.md — required_files déclaré par capacité, doctor générique sans bcf_executable (vague 1)
 - [ ] 05.2-03-PLAN.md — Superviseur des threads : décision pure, budget 3/10 min, recréation réelle (vague 2)
 - [ ] 05.2-04-PLAN.md — path_arguments par outil MCP, double validation, env du seul serveur visé (vague 2)
