@@ -12,6 +12,7 @@ import pytest
 pytestmark = pytest.mark.unit
 
 FICHIER = Path(__file__).resolve().parents[2] / "n8n" / "examples" / "ifc-clash.json"
+PARAMS = FICHIER.with_name("ifc-clash-params.json")
 
 
 @pytest.fixture(scope="module")
@@ -80,22 +81,21 @@ def test_condition_sur_body(wf: dict[str, Any], texte: str) -> None:
 
 def test_parametres_par_defaut(wf: dict[str, Any]) -> None:
     sortie = _noeud(wf, "Parametres")["parameters"]["jsonOutput"]
-    for attendu in (
-        "/data/depot/PIC-EXE-AW-CVC-MNQ-BaJ-SUP-30701-IFC4.ifc",
-        "/data/depot/PIC_REV_HRS_ARC_MNQ_BaJ_SUP_30400.ifc",
-        "mode: 'hard'",
-        "bcf: true",
-        "tolerance: 0.01",
-        "charter: {",
-        "Jura: 'BaJ'",
-        "Tour: 'BaT'",
-        "J_11_P01: 'P01'",
-        "J_18_P08: 'P08'",
-        "trades: { a: 'CVC', b: 'ARC' }",
-        "! IfcFurnishingElement",
-    ):
-        assert attendu in sortie
+    marque = "$json.body?.params ?? "
+    debut = sortie.index(marque) + len(marque)
+    fin = sortie.rindex(", timeout:")
+    objet = json.loads(sortie[debut:fin])
+    canonique = json.loads(PARAMS.read_text(encoding="utf-8"))
+    assert objet == canonique
+    assert (
+        canonique["title_template"] == "{building}/{storey}/{trade_a}-{trade_b}/{type_a} x {type_b}"
+    )
+    assert len(canonique["mappings"]["type"]) == 38
+    assert len(canonique["mappings"]["storey"]) == 9
+    assert canonique["mappings"]["type"]["IfcCovering/CEILING"] == "Faux-plafond"
+    assert "charter" not in sortie
     assert "max_clashes" not in sortie
+    assert sortie.count("}}") == 1
 
 
 def test_aucun_jeton(texte: str) -> None:

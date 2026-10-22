@@ -1,0 +1,28 @@
+{
+  "ifc_a": "/data/depot/PIC-EXE-AW-CVC-MNQ-BaJ-SUP-30701-IFC4.ifc",
+  "selector_a": "IfcElement, ! IfcOpeningElement, ! IfcVirtualElement, ! IfcElementAssembly",
+  "ifc_b": "/data/depot/PIC_REV_HRS_ARC_MNQ_BaJ_SUP_30400.ifc",
+  "selector_b": "IfcElement, ! IfcOpeningElement, ! IfcVirtualElement, ! IfcElementAssembly, ! IfcCurtainWall, ! IfcStair, ! IfcFurnishingElement",
+  "mode": "hard",
+  "tolerance": 0.01,
+  "bcf": true,
+  "title_template": "{building}/{storey}/{trade_a}-{trade_b}/{type_a} x {type_b}",
+  "mappings": {
+    "building": {"Jura": "BaJ", "Tour": "BaT"},
+    "storey": {"J_10_P00": "P00", "J_11_P01": "P01", "J_12_P02": "P02", "J_13_P03": "P03", "J_14_P04": "P04", "J_15_P05": "P05", "J_16_P06": "P06", "J_17_P07": "P07", "J_18_P08": "P08"},
+    "trade": {"PIC-EXE-AW-CVC-MNQ-BaJ-SUP-30701-IFC4": "CVC", "PIC_REV_HRS_ARC_MNQ_BaJ_SUP_30400": "ARC"},
+    "type": {
+      "IfcDuctSegment": "Gaine", "IfcDuctSegment/FLEXIBLESEGMENT": "Gaine flexible", "IfcPipeSegment": "Canalisation",
+      "IfcDuctFitting": "Raccord de gaine", "IfcDuctFitting/BEND": "Coude de gaine", "IfcPipeFitting": "Raccord de tuyauterie",
+      "IfcAirTerminal": "Bouche d'air", "IfcValve": "Vanne", "IfcDamper": "Clapet", "IfcDamper/FIREDAMPER": "Clapet coupe-feu",
+      "IfcLightFixture": "Luminaire", "IfcCableCarrierSegment": "Chemin de câbles", "IfcCovering/INSULATION": "Isolant",
+      "IfcCovering/CEILING": "Faux-plafond", "IfcCovering/FLOORING": "Revêtement de sol", "IfcCovering": "Revêtement",
+      "IfcWall": "Mur", "IfcSlab": "Dalle", "IfcBeam": "Poutre", "IfcColumn": "Poteau", "IfcMember": "Ossature",
+      "IfcPlate": "Panneau", "IfcPlate/CURTAIN_PANEL": "Panneau de façade", "IfcDoor": "Porte", "IfcWindow": "Fenêtre",
+      "IfcStair": "Escalier", "IfcRailing": "Garde-corps", "IfcRoof": "Toiture", "IfcBuildingElementProxy": "Objet générique",
+      "IfcFlowSegment": "Conduit", "IfcFlowFitting": "Raccord", "IfcFlowTerminal": "Terminal", "IfcFlowController": "Régulation",
+      "IfcFlowTreatmentDevice": "Traitement", "IfcEnergyConversionDevice": "Équipement de production",
+      "IfcFlowMovingDevice": "Ventilateur ou pompe", "IfcDistributionElement": "Équipement", "IfcOpeningElement": "Réservation"
+    }
+  }
+}
