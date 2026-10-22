@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: executing
 stopped_at: Completed 05.1-10-PLAN.md
-last_updated: "2026-10-22T08:30:10.655Z"
+last_updated: "2026-10-22T08:37:50.411Z"
 last_activity: 2026-10-22
 progress:
   total_phases: 6
@@ -140,6 +140,7 @@ Recent decisions affecting current work:
 - [Phase 05.1]: 07 : maj-5.1.ps1 réinstalle les paquets des plugins (--reinstall-package), non éditables ; Header/File par maquette, caméras monde
 - [Phase 5.1]: Nommage générique : Deskgate reçoit du job un gabarit de titre (champs bâtiment, étage, techniques, types) et des tables de correspondance ; aucun libellé ni code métier en dur dans le plugin (table française et liste de techniques retirées). La charte PIC, les libellés et les codes vivent dans le pipeline n8n (exemple) — Décision utilisateur du 2026-10-22 : Deskgate est une passerelle, pas un pipeline
 - [Phase 5.1]: Vue 2 du BCF : le contexte gris transparent doit couvrir tout ce qui est visible ; les éléments hors contexte ne doivent pas rester dans leurs couleurs d'origine — 04-D1 rejoué le 2026-10-22 : certains éléments non grisés
+- [Phase 5.1]: Vue 2 : approche A retenue (DefaultVisibility false, exceptions = conflit + contexte à 5 m, contexte gris transparent, reste masqué) — Choix utilisateur du 2026-10-22 dans BIMcollab Zoom (zoom-tests-v2), B1 de 05.1-12 levé
 
 ### Roadmap Evolution
 
