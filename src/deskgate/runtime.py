@@ -39,14 +39,17 @@ from deskgate.sender import Sender
 from deskgate.store import (
     DatabaseError,
     SchemaTooNew,
+    connect,
     open_db,
     recover_interrupted,
 )
+from deskgate.supervisor import EXIT_THREAD_FAILED, Holder, Supervisor, exit_code
 
 EXIT_INVALID_CONFIG = 2
 EXIT_ALREADY_RUNNING = 3
 EXIT_BIND_FAILED = 4
 EXIT_DB_ERROR = 5
+EXIT_THREAD_FAILED = EXIT_THREAD_FAILED  # 6 : réexport du superviseur
 
 LOG_MAX_BYTES = 2 * 1024 * 1024
 LOG_BACKUPS = 5
@@ -187,17 +190,41 @@ def _serve(home: Path, config_override: Path | None) -> int:
         logger.warning("%d tâche(s) interrompue(s) par l'arrêt précédent du runner.", len(ids))
 
     warnings = cfg.listen_warnings()
-    engine = Engine(
-        db_path=db_path(home),
-        config=cfg,
-        worker_script=Path(deskgate_sdk.run.__file__).resolve(),
+    worker = Path(deskgate_sdk.run.__file__).resolve()
+
+    def make_engine() -> Engine:
+        return Engine(db_path=db_path(home), config=cfg, worker_script=worker)
+
+    def make_sender() -> Sender:
+        return Sender(db_path=db_path(home), config=cfg)
+
+    def recover() -> list[str]:
+        rconn = connect(db_path(home))
+        try:
+            return recover_interrupted(rconn)
+        finally:
+            rconn.close()
+
+    holder = Holder(engine=make_engine(), sender=make_sender())
+    jobs = JobsService(db_path=db_path(home), config=cfg, wake=lambda: holder.engine.wake())
+    stop_requested: list[uvicorn.Server] = []
+
+    def _give_up() -> None:
+        for server in stop_requested:
+            server.should_exit = True
+
+    supervisor = Supervisor(
+        holder=holder,
+        make_engine=make_engine,
+        make_sender=make_sender,
+        recover=recover,
+        on_give_up=_give_up,
     )
-    jobs = JobsService(db_path=db_path(home), config=cfg, wake=engine.wake)
-    sender = Sender(db_path=db_path(home), config=cfg)
 
     def _shutdown() -> None:
-        engine.stop()
-        sender.stop()
+        supervisor.stop()
+        holder.engine.stop()
+        holder.sender.stop()
 
     app = create_app(
         token_sha256=cfg.token_sha256,
@@ -215,14 +242,23 @@ def _serve(home: Path, config_override: Path | None) -> int:
         )
     logger.info("Écoute sur http://%s:%s", cfg.host, sock.getsockname()[1])
     server = uvicorn.Server(uvicorn.Config(app, log_config=None, lifespan="on"))
-    # Le Planificateur relancera le runner ; la recovery rend l'arrêt sûr.
-    engine.on_fatal = lambda: setattr(server, "should_exit", True)
-    sender.on_fatal = lambda: setattr(server, "should_exit", True)
-    engine.start()
-    sender.start()
+    stop_requested.append(server)
+    # Un thread mort est recréé par le superviseur ; RestartOnFailure ne relance ni un
+    # processus tué ni une sortie non nulle (phase 5.2, E1).
+    supervisor.attach()
+    holder.engine.start()
+    holder.sender.start()
+    supervisor.start()
     try:
         server.run(sockets=[sock])
     finally:
-        engine.stop()
-        sender.stop()  # KeyboardInterrupt ; la voie CTRL_BREAK passe par le lifespan
-    return 0
+        supervisor.stop()
+        holder.engine.stop()
+        holder.sender.stop()  # KeyboardInterrupt ; la voie CTRL_BREAK passe par le lifespan
+    code = exit_code(gave_up=supervisor.gave_up)
+    if code != 0:
+        _err(
+            f"Runner arrêté : thread {supervisor.last_cause} en échec répété (code {code}). "
+            "Voir logs\runner.log."
+        )
+    return code

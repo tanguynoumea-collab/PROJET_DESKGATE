@@ -61,9 +61,13 @@ d'étapes. Une tâche = un appel d'un plugin. L'enchaînement est le rôle de n8
   élévation : ouverture de session, `InteractiveToken`, `LeastPrivilege`, `ExecutionTimeLimit=PT0S`,
   batterie autorisée, `IgnoreNew`. L'action est `pythonw.exe -m deskgate serve` du venv de l'outil (pas de
   console, pas de `gui-scripts`) ; le journal `logs\runner.log` est ouvert après le mutex.
-  `RestartOnFailure` ne couvre que les échecs de démarrage : un runner tué reste arrêté jusqu'à
-  `deskgate task run` ou la prochaine ouverture de session. La recovery `interrupted` rend cette relance
-  sûre (constaté : runner tué, relancé, rappel `interrupted` reçu par n8n). Pas de service Windows : un
+  `RestartOnFailure` ne couvre que les échecs de démarrage : il ne relance ni un runner tué, ni un runner
+  sorti avec un code non nul (constaté en phase 5.2). Dans le processus, un superviseur recrée un thread
+  engine ou sender mort après avoir conclu la tâche courante en `interrupted` ; au-delà de 3 recréations
+  en 10 min, le runner sort avec le code 6. Les échecs de démarrage sont écrits dans `logs\startup.log`
+  (même sous `pythonw`). Un runner tué reste arrêté jusqu'à `deskgate task run` ou la prochaine ouverture
+  de session ; la recovery `interrupted` rend cette relance sûre (constaté : runner tué, relancé, rappel
+  `interrupted` reçu par n8n). Pas de service Windows : un
   service ne voit pas le bureau et ne peut pas piloter de logiciel graphique.
 - **Configuration** : `runner.toml` (port, racines autorisées, correspondance des chemins,
   concurrence par ressource, dossier des plugins, jetons en v0.1).
