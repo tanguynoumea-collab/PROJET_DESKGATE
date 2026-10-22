@@ -141,6 +141,8 @@ et numpy) ; leur taille se règle par `settings.snapshot_size` de la capacité (
 | `bcf_write_failed` | Échec ou délai dépassé de l'écriture du BCF |
 | `memory_limit` | Attribué par le runner quand le plafond `memory_mb` du Job Object est atteint |
 
+Déclarer aussi `required_files = ["bcf_executable"]` dans la capacité : `deskgate doctor` signale alors un exécutable absent avant le premier calcul.
+
 ## Licence
 
 MIT pour `src/deskgate_bim/`. `bcf/` est GPL-3 et n'est appelé que par chemin d'exécutable, en

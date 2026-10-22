@@ -62,6 +62,8 @@ max_backoff_s = 300
 # resource = "cpu-heavy"
 # # path_params : paramètres convertis (chemin n8n vers chemin hôte) et validés par le runner.
 # path_params = ["ifc_a", "ifc_b"]
+# # required_files : clés de settings qui désignent un fichier ; deskgate doctor vérifie qu'il existe.
+# required_files = ["bcf_executable"]
 #
 # # settings : table libre, lue par le plugin (jamais par le runner).
 # [capabilities."ifc.clash".settings]

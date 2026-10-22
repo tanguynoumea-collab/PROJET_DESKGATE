@@ -114,6 +114,8 @@ Puis, dans `runner.toml`, copier le bloc d'exemples de `src/deskgate/runner.exam
 `# >>> exemples phase 4` et `# <<< exemples phase 4`), retirer les `# ` et remplacer les chemins par
 ceux des environnements créés ci-dessus (`...\bim\Scripts\python.exe` et
 `...\bcf\Scripts\deskgate-bcf.exe`). Les exemples couvrent `ifc.clash`, `mcp.call` et `mcp_servers`.
+La clé `required_files = ["bcf_executable"]` du bloc `ifc.clash` demande à `deskgate doctor` de vérifier que
+`deskgate-bcf.exe` existe ; une capacité d'un autre plugin peut déclarer ses propres fichiers requis de la même façon.
 Adapter `memory_mb` de `[capabilities."ifc.clash"]` à la machine (24576 sur le PC de recette). Vérifier
 les chemins par `deskgate doctor`, puis `deskgate task end` et `deskgate task run`.
 

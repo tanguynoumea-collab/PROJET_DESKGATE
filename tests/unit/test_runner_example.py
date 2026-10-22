@@ -40,6 +40,7 @@ def test_exemples_phase_4_valides() -> None:
     clash = cfg.capabilities["ifc.clash"]
     assert clash.kind == "python"
     assert clash.path_params == ["ifc_a", "ifc_b"]
+    assert clash.required_files == ["bcf_executable"]
     assert str(clash.settings["bcf_executable"]).endswith("deskgate-bcf.exe")
     assert cfg.capabilities["mcp.call"].kind == "mcp"
     assert "demo" in cfg.mcp_servers
