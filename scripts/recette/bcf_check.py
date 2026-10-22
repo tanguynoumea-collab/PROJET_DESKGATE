@@ -1,6 +1,7 @@
 """Contrôle automatique d'un BCF réel et de son clashes.json (stdlib seule).
 
-Usage : bcf_check.py --bcf X.bcf --clashes clashes.json --trigrams BaJ,BaT --out preuve.json
+Usage : bcf_check.py --bcf X.bcf --clashes clashes.json --template GABARIT
+        --allowed building=BaJ,BaT --out preuve.json
 Code de sortie 0 si le verdict est vrai, 1 sinon.
 """
 
@@ -17,7 +18,8 @@ from typing import Any
 from xml.etree import ElementTree as ET
 
 PNG = bytes.fromhex("89504e470d0a1a0a")
-TITLE = re.compile(r"^[^/]+/[^/]+/[^/]+-[^/]+/.+ x .+$")
+FIELDS = ("building", "storey", "trade_a", "trade_b", "type_a", "type_b")
+DEFAULT_TEMPLATE = "{building}/{storey}/{trade_a}-{trade_b}/{type_a} x {type_b}"
 OPENINGS = {"IfcOpeningElement", "IfcOpeningStandardCase"}
 
 
@@ -33,13 +35,30 @@ def _text(el: ET.Element | None) -> str:
     return (el.text or "").strip() if el is not None else ""
 
 
+def template_regex(template: str) -> re.Pattern[str]:
+    """Regex du gabarit : un groupe nommé par champ, la reprise d'un champ doit être identique."""
+    seen: set[str] = set()
+    out = ""
+    pos = 0
+    for m in re.finditer(r"\{([^{}]*)\}", template):
+        name = m.group(1)
+        if name not in FIELDS:
+            raise SystemExit(f"champ inconnu dans le gabarit : {name!r}")
+        out += re.escape(template[pos : m.start()])
+        out += f"(?P={name})" if name in seen else f"(?P<{name}>[^/]+?)"
+        seen.add(name)
+        pos = m.end()
+    out += re.escape(template[pos:])
+    return re.compile(f"^{out}$")
+
+
 def _check_topic(z: zipfile.ZipFile, names: set[str], folder: str, fails: list[str]) -> str:
     markup = ET.fromstring(z.read(f"{folder}/markup.bcf"))  # noqa: S314
     topic = next(iter(_kids(markup, "Topic")), None)
     title = _text(next(iter(_kids(topic, "Title")), None)) if topic is not None else ""
     tag = f"[{folder[:8]}]"
-    if not TITLE.match(title) or "(+" in title:
-        fails.append(f"{tag} titre non conforme : {title!r}")
+    if "(+" in title:
+        fails.append(f"{tag} titre non conforme (suffixe) : {title!r}")
     for member in ("viewpoint.bcfv", "snapshot.png"):
         if f"{folder}/{member}" not in names:
             fails.append(f"{tag} membre absent : {member}")
@@ -72,7 +91,12 @@ def _check_topic(z: zipfile.ZipFile, names: set[str], folder: str, fails: list[s
     return title
 
 
-def check(bcf: Path, clashes: Path, trigrams: set[str]) -> dict[str, Any]:
+def check(
+    bcf: Path,
+    clashes: Path,
+    template: str = DEFAULT_TEMPLATE,
+    allowed: dict[str, set[str]] | None = None,
+) -> dict[str, Any]:
     fails: list[str] = []
     data = json.loads(clashes.read_text(encoding="utf-8"))
     counts = data.get("counts", {})
@@ -101,20 +125,45 @@ def check(bcf: Path, clashes: Path, trigrams: set[str]) -> dict[str, Any]:
         warnings = [str(w) for w in summary.get("warnings", [])]
         if "snapshots_unavailable" in warnings:
             fails.append("avertissement snapshots_unavailable dans le résumé")
-    with_tri = sum(1 for t in titles if t.split("/")[0] in trigrams)
-    if with_tri != len(titles):
-        fails.append(f"titres avec trigramme {with_tri} sur {len(titles)}")
-    storeys = Counter(t.split("/")[1] for t in titles if t.count("/") >= 1)
+    allowed = allowed or {}
+    regex = template_regex(template)
+    for name in allowed:
+        if name not in FIELDS:
+            raise SystemExit(f"champ inconnu dans --allowed : {name!r}")
+    matches = [regex.match(title) for title in titles]
+    outside = [title for title, m in zip(titles, matches, strict=True) if m is None]
+    if outside:
+        fails.append(f"titre hors gabarit : {outside[:10]}")
+    ok_allowed = 0
+    bad: Counter[tuple[str, str]] = Counter()
+    values: dict[str, Counter[str]] = {"building": Counter(), "storey": Counter()}
+    for m in matches:
+        if m is None:
+            continue
+        groups = m.groupdict()
+        good = True
+        for name, vals in allowed.items():
+            if name in groups and groups[name] not in vals:
+                bad[(name, groups[name])] += 1
+                good = False
+        ok_allowed += good
+        for name, counter in values.items():
+            if name in groups:
+                counter[groups[name]] += 1
+    for (name, value), n in sorted(bad.items()):
+        fails.append(f"champ {name} hors valeurs admises : {value!r} ({n})")
     return {
         "verdict": not fails,
         "failures": fails[:50],
         "topics": len(folders),
         "groups": counts.get("groups"),
         "clashes": counts.get("clashes"),
-        "titles_with_trigram": with_tri,
+        "template": template,
+        "titles_matching": len(titles) - len(outside),
+        "titles_allowed": ok_allowed,
         "warnings": warnings,
         "sample_titles": sorted(titles)[:10],
-        "storeys": dict(sorted(storeys.items())),
+        "values_by_field": {k: dict(sorted(v.items())) for k, v in values.items() if v},
     }
 
 
@@ -122,10 +171,15 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--bcf", required=True)
     ap.add_argument("--clashes", required=True)
-    ap.add_argument("--trigrams", required=True)
+    ap.add_argument("--template", default=DEFAULT_TEMPLATE)
+    ap.add_argument("--allowed", action="append", default=[], metavar="CHAMP=V1,V2")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
-    res = check(Path(a.bcf), Path(a.clashes), {t for t in a.trigrams.split(",") if t})
+    allowed: dict[str, set[str]] = {}
+    for item in a.allowed:
+        name, _, vals = item.partition("=")
+        allowed.setdefault(name, set()).update(v for v in vals.split(",") if v)
+    res = check(Path(a.bcf), Path(a.clashes), a.template, allowed)
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     Path(a.out).write_text(json.dumps(res, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({k: res[k] for k in ("verdict", "failures", "topics", "groups")}))

@@ -80,15 +80,24 @@ def _build(
     return bcf, clashes
 
 
-def _run(bcf: Path, clashes: Path) -> dict[str, Any]:
-    return _module().check(bcf, clashes, {"BaJ", "BaT"})
+PIC = "{building}/{storey}/{trade_a}-{trade_b}/{type_a} x {type_b}"
+ALLOWED = {"building": {"BaJ", "BaT"}, "trade_a": {"CVC"}, "trade_b": {"ARC"}}
+
+
+def _run(
+    bcf: Path,
+    clashes: Path,
+    template: str = PIC,
+    allowed: dict[str, set[str]] | None = None,
+) -> dict[str, Any]:
+    return _module().check(bcf, clashes, template, ALLOWED if allowed is None else allowed)
 
 
 def test_conforme(tmp_path: Path) -> None:
     res = _run(*_build(tmp_path))
     assert res["verdict"] is True and res["failures"] == []
-    assert res["titles_with_trigram"] == res["topics"] == 1
-    assert res["storeys"] == {"P01": 1}
+    assert res["titles_matching"] == res["titles_allowed"] == res["topics"] == 1
+    assert res["values_by_field"]["storey"] == {"P01": 1}
 
 
 @pytest.mark.parametrize(
@@ -97,7 +106,8 @@ def test_conforme(tmp_path: Path) -> None:
         ({"png2": False}, "PNG manquant"),
         ({"header": False}, "Header/File"),
         ({"comments": 1}, "commentaires"),
-        ({"title": "Gaine x Mur (+2)"}, "titre non conforme"),
+        ({"title": "BaJ/P01/CVC-ARC/Gaine x Mur (+2)"}, "titre non conforme"),
+        ({"title": "Gaine x Mur"}, "hors gabarit"),
         ({"truncated": True}, "tronqué"),
         ({"cls": "IfcOpeningElement"}, "IfcOpeningElement"),
     ],
@@ -106,3 +116,28 @@ def test_defauts(tmp_path: Path, kwargs: dict[str, Any], message: str) -> None:
     res = _run(*_build(tmp_path, **kwargs))
     assert res["verdict"] is False
     assert any(message in f for f in res["failures"])
+
+
+def test_valeur_non_admise(tmp_path: Path) -> None:
+    res = _run(*_build(tmp_path, title="Jura/J_11_P01/CVC-ARC/Gaine x Mur"))
+    assert res["verdict"] is False
+    assert res["titles_matching"] == 1 and res["titles_allowed"] == 0
+    assert any("building" in f for f in res["failures"])
+
+
+def test_gabarit_simple_sans_tables(tmp_path: Path) -> None:
+    res = _run(*_build(tmp_path, title="Gaine x Mur"), "{type_a} x {type_b}", {})
+    assert res["verdict"] is True
+    assert res["titles_matching"] == 1
+
+
+def test_gabarit_champ_inconnu(tmp_path: Path) -> None:
+    with pytest.raises(SystemExit):
+        _run(*_build(tmp_path), "{inconnu}/{type_a}", {})
+
+
+def test_champ_repete_identique(tmp_path: Path) -> None:
+    ok = _run(*_build(tmp_path, title="Gaine/Gaine"), "{type_a}/{type_a}", {})
+    assert ok["verdict"] is True
+    ko = _run(*_build(tmp_path, title="Gaine/Mur"), "{type_a}/{type_a}", {})
+    assert ko["verdict"] is False

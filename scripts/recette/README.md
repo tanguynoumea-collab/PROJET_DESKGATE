@@ -18,8 +18,8 @@ uv run python scripts/recette/recette.py acc02 --params-file <params.json> --kil
   (arrêt brutal du runner pendant un calcul). Preuve JSON dans `%LOCALAPPDATA%\Deskgate\recette\`.
 
 - `acc01 --min-duration-s N` : seuil de durée du verdict (défaut 600 ; 0 pour ne pas juger la durée).
-- `bcf_check.py --bcf X.bcf --clashes clashes.json --trigrams BaJ,BaT --out preuve.json` : contrôle d'un BCF réel
-  (2 points de vue avec PNG, Header/File, 2 commentaires, titres à charte, absence de `snapshots_unavailable`) et de
+- `bcf_check.py --bcf X.bcf --clashes clashes.json --template "{building}/{storey}/{trade_a}-{trade_b}/{type_a} x {type_b}" --allowed building=BaJ,BaT --allowed trade_a=CVC --allowed trade_b=ARC --out preuve.json` : contrôle d'un BCF réel
+  (2 points de vue avec PNG, Header/File, 2 commentaires, titres conformes au gabarit, absence de `snapshots_unavailable`) et de
   `clashes.json` (complet, sans paire de réservation). Code de sortie 1 si le verdict est faux.
 
 ## Règles de secret
