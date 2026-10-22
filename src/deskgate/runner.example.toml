@@ -77,6 +77,10 @@ max_backoff_s = 300
 # args = ['C:/BIM/serveurs/demo_server.py']
 # env = { LANG = "fr" }
 # allowed_tools = ["echo"]
+# # path_arguments : par outil, arguments de premier niveau convertis (/data/... vers C:/...) et validés
+# # contre allowed_roots, à la soumission et au lancement. Seuls ces arguments sont convertis et validés :
+# # n'autorisez pas d'outil de fichiers sans les déclarer. Exemple pour un outil read_file autorisé :
+# # path_arguments = { read_file = ["path"] }
 #
 # [capabilities."mcp.call"]
 # kind = "mcp"

@@ -44,3 +44,8 @@ def test_exemples_phase_4_valides() -> None:
     assert str(clash.settings["bcf_executable"]).endswith("deskgate-bcf.exe")
     assert cfg.capabilities["mcp.call"].kind == "mcp"
     assert "demo" in cfg.mcp_servers
+
+
+def test_regle_path_arguments_documentee() -> None:
+    text = (resources.files("deskgate") / "runner.example.toml").read_text(encoding="utf-8")
+    assert "n'autorisez pas d'outil de fichiers sans les déclarer" in text

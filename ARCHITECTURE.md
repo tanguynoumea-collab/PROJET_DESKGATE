@@ -109,7 +109,8 @@ reste le plan B.
 ### Contexte passé au plugin (`ctx`)
 
 `job_id`, `work_dir`, `log(msg)`, `progress(pct, msg)`, `artifact(path, kind)`, `cancelled()`.
-Les chemins reçus sont déjà convertis au format Windows et validés contre les racines autorisées.
+Les chemins déclarés (`path_params` d'une capacité python, `path_arguments` d'un outil MCP) sont
+déjà convertis au format Windows et validés contre les racines autorisées.
 
 ### Sortie d'un plugin
 
@@ -205,6 +206,13 @@ host = "C:/BIM"
 Conversion `/data/...` ↔ `C:/BIM/...` dans les deux sens (entrées et artefacts). Tout chemin hors
 des racines est refusé, y compris via `..`, liens symboliques ou jonctions. On transmet des chemins,
 jamais les fichiers.
+
+Exécuteur `mcp` : seuls les arguments de premier niveau déclarés dans
+`[mcp_servers.<nom>].path_arguments` (par outil) sont convertis et validés, à la soumission (422) et
+au lancement ; les autres arguments sont transmis tels quels, sans heuristique. N'autorisez pas un
+outil de fichiers sans déclarer ses arguments de chemin. Une fois le chemin validé, le serveur MCP
+reçoit un chemin hôte absolu ; un lien créé ensuite sous la racine reste hors de portée du runner
+(même limite que pour les plugins).
 
 ## 8. Sécurité (un runner par PC)
 
