@@ -28,20 +28,105 @@ def _load() -> ModuleType:
 n = _load()
 
 
-def test_build_title_nominal():
-    assert (
-        n.build_title("BaJ", "P01", "CVC", "ARC", "Gaine", "Faux-plafond")
-        == "BaJ/P01/CVC-ARC/Gaine x Faux-plafond"
+PIC = "{building}/{storey}/{trade_a}-{trade_b}/{type_a} x {type_b}"
+CHAMPS = "building, storey, trade_a, trade_b, type_a, type_b"
+
+
+def test_template_fields_ordre():
+    assert n.template_fields(PIC) == [
+        "building",
+        "storey",
+        "trade_a",
+        "trade_b",
+        "type_a",
+        "type_b",
+    ]
+
+
+def test_template_fields_sans_doublon():
+    assert n.template_fields("{type_a}/{type_a}") == ["type_a"]
+
+
+def test_template_fields_inconnu():
+    with pytest.raises(ValueError) as exc:
+        n.template_fields("{floor}/{type_a}")
+    assert "floor" in str(exc.value) and CHAMPS in str(exc.value)
+    assert "champ inconnu" in str(exc.value)
+
+
+@pytest.mark.parametrize("bad", ["{type_a} x {type_b", "type}", "{{type_a}"])
+def test_template_fields_accolade(bad):
+    with pytest.raises(ValueError, match="accolade non appariée"):
+        n.template_fields(bad)
+
+
+def test_template_fields_aucun_champ():
+    with pytest.raises(ValueError, match="aucun champ"):
+        n.template_fields("Conflit")
+
+
+def test_render_title_nominal():
+    values = {
+        "building": "BaJ",
+        "storey": "P01",
+        "trade_a": "CVC",
+        "trade_b": "ARC",
+        "type_a": "Gaine",
+        "type_b": "Faux-plafond",
+    }
+    assert n.render_title(PIC, values) == "BaJ/P01/CVC-ARC/Gaine x Faux-plafond"
+
+
+def test_render_title_assainit_et_tronque():
+    assert n.render_title("{building}/{storey}", {"building": "Ba/J", "storey": "P
+01"}) == (
+        "Ba-J/P 01"
     )
+    assert len(n.render_title("{type_a}", {"type_a": "x" * 600})) == 512
 
 
-def test_build_title_assainit_et_tronque():
-    assert n.build_title("Ba/J", "P\n01", "", "ARC", "a", "b") == "Ba-J/P 01/?-ARC/a x b"
-    assert len(n.build_title("B", "E", "T", "U", "x" * 600, "y")) == 512
+def test_render_title_repete_et_vide():
+    assert n.render_title("{type_a}+{type_a}", {"type_a": "G"}) == "G+G"
+    assert n.render_title("{type_a}", {}) == "?"
 
 
-def test_build_title_sans_suffixe():
-    assert "(+" not in n.build_title("B", "E", "T", "U", "a", "b")
+def test_resolve():
+    assert n.resolve(None, ["Jura"], "Jura") == ("Jura", False)
+    assert n.resolve({"Jura": "BaJ"}, ["Jura"], "Jura") == ("BaJ", False)
+    assert n.resolve({"jura": "BaJ"}, ["Jura"], "Jura") == ("BaJ", False)
+    assert n.resolve({"Tour": "BaT"}, ["Jura"], "Jura") == ("Jura", True)
+
+
+def test_type_candidates():
+    info = {
+        "ifc_class": "IfcFlowSegment",
+        "predefined": "RIGIDSEGMENT",
+        "type_class": "IfcDuctSegment",
+        "type_name": "T",
+        "type_ifc_class": "IfcDuctSegmentType",
+        "supertypes": ["IfcDistributionFlowElement"],
+    }
+    assert n.type_candidates(info)[:6] == [
+        "IfcDuctSegmentType:T",
+        "T",
+        "IfcDuctSegment/RIGIDSEGMENT",
+        "IfcDuctSegment",
+        "IfcFlowSegment/RIGIDSEGMENT",
+        "IfcFlowSegment",
+    ]
+
+
+def test_type_raw():
+    assert n.type_raw({"type_name": "T", "ifc_class": "IfcX"}) == "T"
+    assert n.type_raw({"type_name": None, "ifc_class": "IfcX"}) == "IfcX"
+
+
+def test_pas_de_valeur_metier_dans_la_source():
+    text = SRC.read_text(encoding="utf-8")
+    for banned in ("LABELS", "TRADE_CODES", "Charter", '"Gaine"', '"CVC"', '"BaJ"'):
+        assert banned not in text
+    assert not hasattr(n, "LABELS") and not hasattr(n, "TRADE_CODES")
+    assert n.DEFAULT_TEMPLATE == "{type_a} x {type_b}"
 
 
 @pytest.mark.parametrize(
@@ -58,52 +143,6 @@ def test_lookup_exact_puis_casse():
     assert n.lookup(m, "tour") == "BaT"
     assert n.lookup(m, None) is None
     assert n.lookup(m, "autre") is None
-
-
-def _info(cls, predefined=None, type_class=None, supertypes=()):
-    return {
-        "ifc_class": cls,
-        "predefined": predefined,
-        "type_class": type_class,
-        "supertypes": list(supertypes),
-    }
-
-
-def test_element_label_ifc2x3_par_type():
-    info = _info(
-        "IfcFlowSegment",
-        None,
-        "IfcDuctSegment",
-        ["IfcDistributionFlowElement", "IfcDistributionElement", "IfcElement"],
-    )
-    assert n.element_label(info, {}) == ("Gaine", False)
-
-
-def test_element_label_plafond():
-    info = _info("IfcCovering", "CEILING", "IfcCovering", ["IfcBuildingElement", "IfcElement"])
-    assert n.element_label(info, {}) == ("Faux-plafond", False)
-
-
-def test_element_label_ifc4_flexible():
-    assert n.element_label(_info("IfcDuctSegment", "FLEXIBLESEGMENT"), {}) == (
-        "Gaine flexible",
-        False,
-    )
-
-
-def test_element_label_charte_prioritaire():
-    info = _info("IfcCovering", "CEILING", "IfcCovering", ["IfcBuildingElement", "IfcElement"])
-    assert n.element_label(info, {"ifccovering/ceiling": "Plafond"}) == ("Plafond", False)
-    assert n.element_label(info, {"IfcCovering": "Habillage"}) == ("Habillage", False)
-
-
-def test_element_label_super_type():
-    info = _info("IfcWallStandardCase", None, None, ["IfcWall", "IfcBuildingElement"])
-    assert n.element_label(info, {}) == ("Mur", False)
-
-
-def test_element_label_inconnu():
-    assert n.element_label(_info("IfcFooBar"), {}) == ("IfcFooBar", True)
 
 
 LEVELS = [(382.9, "J_11_P01"), (378.0, "J_10_P00"), (386.4, "J_12_P02")]
@@ -141,33 +180,18 @@ def test_pick_principal_repli_classe():
     assert n.pick_principal([_pair("a1", "b1", "IfcX", "IfcY")], {}) == ("IfcX", "IfcY", "a1")
 
 
-def test_trade_code_charte():
-    assert n.trade_code("CVC", "x") == ("CVC", None)
-
-
-def test_trade_code_nom_de_fichier():
-    code, note = n.trade_code(None, "PIC-EXE-AW-CVC-MNQ-BaJ-SUP-30701-IFC4")
-    assert code == "CVC" and note is not None and "repéré" in note
-    assert n.trade_code(None, "PIC_REV_HRS_ARC_MNQ_BaJ_SUP_30400")[0] == "ARC"
-    assert n.trade_code("", "PIC-ARC")[0] == "ARC"
-
-
-def test_trade_code_tronque():
-    code, note = n.trade_code(None, "maquette_essai_longue")
-    assert code == "maquette_ess" and note is not None and "tronqué" in note
-
-
 def test_missing_message():
-    assert n.missing_message(["niveau : J_11_P01", "bâtiment : Jura", "niveau : J_11_P01"]) == (
-        "Valeurs absentes de la charte (valeur brute dans le titre) : "
-        "bâtiment : Jura ; niveau : J_11_P01."
+    assert n.missing_message(["storey : J_11_P01", "type : IfcFoo", "storey : J_11_P01"]) == (
+        "Valeurs absentes des tables de correspondance (valeur brute dans le titre) : "
+        "storey : J_11_P01 ; type : IfcFoo."
     )
     assert len(n.missing_message([f"v{i}" * 50 for i in range(500)])) <= 2000
 
 
-def test_fallback_message():
-    assert n.fallback_message(["IfcB", "IfcA", "IfcB"]) == (
-        "Libellé inconnu, classe IFC brute dans le titre : IfcA, IfcB."
+def test_incomplete_message():
+    assert n.incomplete_message(["storey", "building", "storey"]) == (
+        "Champs du titre introuvables dans les maquettes (« ? » dans le titre) : "
+        "building, storey."
     )
 
 
