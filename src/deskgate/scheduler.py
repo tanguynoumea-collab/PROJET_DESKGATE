@@ -8,6 +8,7 @@ et le XML relu comptent.
 
 from __future__ import annotations
 
+import contextlib
 import ctypes
 import getpass
 import os
@@ -16,7 +17,7 @@ import subprocess
 import sys
 import uuid
 import xml.etree.ElementTree as ET
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -24,6 +25,84 @@ TASK_NAME = "Deskgate"
 TASK_NS = "http://schemas.microsoft.com/windows/2004/02/mit/task"
 SERVE_ARGUMENTS = "-m deskgate serve"
 DESCRIPTION = "Runner Deskgate (passerelle n8n)"
+
+# --- Contexte empaqueté (MSIX) -------------------------------------------------------------
+APPMODEL_ERROR_NO_PACKAGE = 15700
+ERROR_INSUFFICIENT_BUFFER = 122
+
+
+def package_full_name() -> str | None:
+    """Nom complet du paquet du processus courant, ou ``None`` (pas d'identité, ou inconnu)."""
+    try:
+        from ctypes import wintypes
+
+        func = ctypes.WinDLL("kernel32", use_last_error=True).GetCurrentPackageFullName  # type: ignore[attr-defined]
+        func.argtypes = [ctypes.POINTER(wintypes.UINT), wintypes.LPWSTR]
+        func.restype = wintypes.LONG
+        length = wintypes.UINT(0)
+        rc = func(ctypes.byref(length), None)
+        if rc == APPMODEL_ERROR_NO_PACKAGE or rc != ERROR_INSUFFICIENT_BUFFER:
+            return None
+        buf = ctypes.create_unicode_buffer(length.value)
+        if func(ctypes.byref(length), buf) != 0:
+            return None
+        return buf.value or None
+    except (OSError, AttributeError):
+        return None
+
+
+def _write_bytes(path: Path, data: bytes) -> None:
+    path.write_bytes(data)
+
+
+def probe_virtualized(
+    local_appdata: Path, *, write: Callable[[Path, bytes], None] | None = None
+) -> Path | None:
+    """Sonde d'écriture : renvoie la copie redirigée sous Packages/*/LocalCache/Local, ou ``None``.
+
+    Le marqueur et son éventuelle copie physique sont toujours supprimés.
+    """
+    name = f"deskgate-probe-{uuid.uuid4().hex}.tmp"
+    marker = local_appdata / name
+    found: list[Path] = []
+    try:
+        (write or _write_bytes)(marker, b"deskgate")
+        found = list((local_appdata / "Packages").glob(f"*/LocalCache/Local/{name}"))
+        return found[0] if found else None
+    except OSError:
+        return None
+    finally:
+        with contextlib.suppress(OSError):
+            marker.unlink(missing_ok=True)
+        for copy in found:
+            with contextlib.suppress(OSError):
+                copy.unlink(missing_ok=True)
+
+
+def detect_packaged_context(
+    environ: Mapping[str, str],
+    *,
+    identity: Callable[[], str | None] = package_full_name,
+    probe: Callable[[Path], Path | None] = probe_virtualized,
+) -> str | None:
+    """Raison (français) de l'exécution dans un contexte empaqueté, ou ``None`` (D-14)."""
+    name = identity()
+    if name:
+        return f"processus empaqueté (paquet {name})"
+    local = environ.get("LOCALAPPDATA")
+    if local:
+        copy = probe(Path(local))
+        if copy is not None:
+            return f"écritures sous %LOCALAPPDATA% redirigées vers le paquet {copy.parents[2].name}"
+    home = environ.get("DESKGATE_HOME", "").lower().replace("/", "\\")
+    if "\\packages\\" in home and "\\localcache\\" in home:
+        return "DESKGATE_HOME pointe dans le stockage d'une application empaquetée"
+    return None
+
+
+def packaged_context() -> str | None:
+    """Détection sur le poste réel (``os.environ``)."""
+    return detect_packaged_context(os.environ)
 
 
 class SchedulerError(Exception):

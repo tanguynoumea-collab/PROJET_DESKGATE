@@ -12,6 +12,7 @@ from pathlib import Path
 import pytest
 
 from _support.fake_n8n import FakeN8n
+from deskgate import scheduler
 
 
 @pytest.fixture
@@ -85,3 +86,15 @@ def fake_n8n() -> Iterator[FakeN8n]:
         yield serveur
     finally:
         serveur.stop()
+
+
+@pytest.fixture(autouse=True)
+def _contexte_non_empaquete(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """La suite tourne aussi depuis une application MSIX (session Claude).
+
+    Le détecteur réel est neutralisé, sauf pour les tests `scheduler` qui interrogent le vrai poste.
+    """
+    if request.node.get_closest_marker("scheduler") is None:
+        monkeypatch.setattr(scheduler, "packaged_context", lambda: None)
