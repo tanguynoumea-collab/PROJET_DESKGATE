@@ -142,13 +142,20 @@ Plans:
 
 ### Phase 05.3: corrections audit council 1 passe 2 : superviseur, refus MSIX de task install, messages et test doctor (INSERTED)
 
-**Goal:** [Urgent work - to be planned]
-**Requirements**: TBD
+**Goal:** Un verrou passager de la base ne fait plus sortir le runner en code 6 et un arrêt pendant une recréation ne laisse aucun thread orphelin ; le message d'abandon et AGENTS.md sont sans retour chariot parasite ; `deskgate task install` refuse en contexte MSIX comme `init` ; le câblage par défaut de `doctor` vers le dernier résultat de la tâche est testé. Corrige les six Mineurs de la certification du council 1 (`audits/saas-council-certification-2026-10-22.md` §2), et eux seuls.
+**Requirements**: aucun (findings ARC-N2-001, ARC-N2-002, MNT-N2-001, LIVR-N2-002, LIVR-N2-001, TST-N2-001)
 **Depends on:** Phase 5
-**Plans:** 0 plans
+**Success Criteria** (what must be TRUE):
+  1. Un `recover()` en échec ne consomme aucune place du budget, est retenté après min(30 s, 2^n) ; l'abandon (code 6) n'arrive qu'après 3 recréations effectives en 10 min ou 10 échecs consécutifs de recover (ARC-N2-001)
+  2. Un `stop()` pendant un recover lent ou l'arrêt lent d'un thread mort ne laisse aucun engine ni sender neuf vivant (ARC-N2-002)
+  3. Le message d'abandon cite le chemin réel de `logs\runner.log` sans retour chariot ; AGENTS.md n'a plus d'octet CR ; un test refuse tout `\r` isolé dans les documents et les chaînes des sources (MNT-N2-001, LIVR-N2-002)
+  4. `deskgate task install` sort en code 2 en contexte empaqueté, sans question ni tâche créée (LIVR-N2-001)
+  5. `doctor.run_all(with_task=True)` signale 0x8007010B lu par `scheduler.last_task_result` par défaut (TST-N2-001) ; gate complet vert
+**Plans:** 2 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 05.3 to break down)
+- [ ] 05.3-01-PLAN.md — Superviseur : budget sur recréation effective, back-off des recover, double vérification de stop (vague 1)
+- [ ] 05.3-02-PLAN.md — Retours chariot (runtime, AGENTS.md, test d'octets), refus MSIX de task install, test doctor run_all, gate complet (vague 2)
 
 ### Phase 05.2: corrections audit council 1 : reprise du runner, chemins MCP, installation MSIX (INSERTED)
 
