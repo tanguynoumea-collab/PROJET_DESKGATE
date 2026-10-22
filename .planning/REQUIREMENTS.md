@@ -50,7 +50,7 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 - [x] **CAP-03**: `ifc.clash` traite une sélection vide comme un succès à 0 conflit avec avertissement
 - [x] **CAP-04**: La capacité `mcp.call` appelle un outil d'un serveur MCP stdio déclaré dans la configuration, sans LLM, dans le Job Object de la tâche, et renvoie son résultat
 - [x] **CAP-05**: Le paquet `deskgate-bcf` (GPL-3) écrit un BCF 2.1 à partir d'un fichier JSON versionné, appelé en sous-processus ; aucun autre paquet n'importe `bcf-client` ni `deskgate-bcf` (vérifié par un test)
-- [ ] **CAP-06**: Chaque sujet BCF d'`ifc.clash` est titré d'après un gabarit et des tables de correspondance fournis par le job (champs génériques : bâtiment, étage du point de conflit, maquettes, types d'objets) ; aucune valeur métier n'est codée dans le plugin ; une valeur absente d'une table reste brute et produit un avertissement (révisé le 2026-10-22)
+- [x] **CAP-06**: Chaque sujet BCF d'`ifc.clash` est titré d'après un gabarit et des tables de correspondance fournis par le job (champs génériques : bâtiment, étage du point de conflit, maquettes, types d'objets) ; aucune valeur métier n'est codée dans le plugin ; une valeur absente d'une table reste brute et produit un avertissement (révisé le 2026-10-22)
 - [x] **CAP-07**: `ifc.clash` ne perd aucun conflit en silence (troncature explicite et signalée, défaut sans perte sur des maquettes réelles) et exclut par défaut les réservations (`IfcOpeningElement`) des sélections
 
 ### Installation et intégration
@@ -154,7 +154,7 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | CAP-03 | Phase 4 | Complete |
 | CAP-04 | Phase 4 | Complete |
 | CAP-05 | Phase 4 | Complete |
-| CAP-06 | Phase 5.1 | Pending |
+| CAP-06 | Phase 5.1 | Complete |
 | CAP-07 | Phase 5.1 | Complete |
 | INS-01 | Phase 5 | Complete |
 | INS-02 | Phase 5 | Complete |

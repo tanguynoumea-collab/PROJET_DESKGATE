@@ -149,7 +149,7 @@ Plans:
   3. Sur les maquettes réelles, `clashes.json` et le BCF contiennent tous les conflits par défaut, ou la troncature est explicite et signalée ; les réservations sont exclues par défaut
   4. Le workflow d'exemple n8n passe la charte du projet pilote (gabarit + tables) et les réglages de coordination fiable
 **Depends on:** Phase 5
-**Plans:** 12/13 plans executed
+**Plans:** 13/13 plans complete
 
 Plans:
 - [x] 05.1-01-PLAN.md — Pillow et uv.lock, contrat bcf-write-v2 (3 copies), scènes IFC synthétiques
@@ -164,4 +164,4 @@ Plans:
 - [x] 05.1-10-PLAN.md — (écart) Charte PIC dans l'exemple n8n (ifc-clash-params.json), README, AGENTS.md, bcf_check par gabarit
 - [x] 05.1-11-PLAN.md — (écart) Trois BCF de test de la vue 2 (A isolé, B maquette grise, C voisinage large) pour Zoom
 - [x] 05.1-12-PLAN.md — (écart, bloquant B1) Choix de l'approche de la vue 2 dans Zoom, généralisation, règle D-18 dans bcf_check
-- [ ] 05.1-13-PLAN.md — (écart) Recette 2 réelle depuis n8n, ACCEPTANCE, Zoom différé 05.1-D2 (solde 04-D1)
+- [x] 05.1-13-PLAN.md — (écart) Recette 2 réelle depuis n8n, ACCEPTANCE, Zoom différé 05.1-D2 (solde 04-D1)
