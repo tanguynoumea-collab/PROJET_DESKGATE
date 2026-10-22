@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05.2-01-PLAN.md
-last_updated: "2026-10-22T14:11:52.708Z"
+stopped_at: Completed 05.2-02-PLAN.md
+last_updated: "2026-10-22T14:14:29.334Z"
 last_activity: 2026-10-22
 progress:
   total_phases: 13
   completed_phases: 6
   total_plans: 61
-  completed_plans: 52
+  completed_plans: 53
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 5.2 (corrections-audit-council-1-reprise-du-runner-chemins-mcp-installation-msix) — EXECUTING
-Plan: 2 of 10
+Plan: 3 of 10
 Status: Ready to execute
 Last activity: 2026-10-22
 
@@ -98,6 +98,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.1 P12 | 25min | 3 tasks | 6 files |
 | Phase 05.1 P13 | 40min | 2 tasks | 1 files |
 | Phase 05.2 P01 | 20min | 2 tasks | 5 files |
+| Phase 05.2 P02 | 10min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -148,6 +149,7 @@ Recent decisions affecting current work:
 - [Phase 5.1]: AUDIT_COUNCIL cycle 1 : /saas-council complet ; outillage en exécution éphémère (uvx pip-audit 2.10.1, semgrep 1.182.1, radon 6.0.1, uv run --with pytest-cov, npx jscpd), gitleaks NON VÉRIFIÉ (recherche de secrets par rg, déclarée) ; roster Tier 1 + Tier 2 (tenancy, sécurité, fiabilité, données) + Tier 3 pertinence et livraison ; perfcout sauté (runner local, aucun coût d'exécution) ; billing, conformité, IA, SEO non activés (aucune dépendance de paiement, aucune donnée personnelle, aucun SDK de modèle, aucune page publique) — Choix utilisateur du 2026-10-22 au pré-vol du council ; audit pas encore lancé
 - [Phase 5.2]: Triage du council 1 : phase 5.2 = ARC-001 (code de sortie et relance du runner), SEC-001 (path_params par outil MCP, règle 4), LIV-001 (détection MSIX) + Mineurs FIA-001, MNT-007, FIA-005, TST-004, SEC-005, PER-001, FIA-003 ; autres Mineurs en backlog 999.1-999.6 ; rapport audits/saas-council-2026-10-22.md — Choix utilisateur du 2026-10-22 au checkpoint triage
 - [Phase 05.2]: Engine: verdict non écrit mémorisé (_unsettled) et rejoué ; Job jamais tué sur OperationalError ; fatal à 5 erreurs
+- [Phase 05.2]: required_files (kind python) vérifié par doctor, interdit en mcp; existence non vérifiée au chargement
 
 ### Roadmap Evolution
 
@@ -172,6 +174,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-22T14:11:52.702Z
-Stopped at: Completed 05.2-01-PLAN.md
+Last session: 2026-10-22T14:14:29.328Z
+Stopped at: Completed 05.2-02-PLAN.md
 Resume file: None
