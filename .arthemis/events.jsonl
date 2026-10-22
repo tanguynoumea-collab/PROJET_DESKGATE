@@ -34,3 +34,4 @@
 {"ts":"2026-10-21T12:50","type":"reprise","ref":"05-06","commit":"100f163","note":"installation faite depuis le terminal non virtualise, runner lance par le Planificateur, bloquant leve"}
 {"ts":"2026-10-21T13:10","type":"transition","ref":"phase 5.1","commit":"3df7334","note":"04-D1 en echec ; phase 5.1 inseree (CAP-02, CAP-06 nommage, CAP-07)"}
 {"ts":"2026-10-21T15:00","type":"rapport","ref":"phase 5.1","commit":"eb48908","note":"8 plans en 6 vagues, plan-checker passe (iteration 2), aucun bloquant, horizon null"}
+{"ts":"2026-10-22T10:30","type":"rapport","ref":"phase 5.1 gaps","commit":"b5ec7ef","note":"plans 09 a 13, nommage generique et vue 2 ; checker sans bloquant, revision iteration 1 ; horizon 05.1-12 B1"}

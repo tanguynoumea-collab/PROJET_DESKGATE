@@ -121,7 +121,7 @@
     {
       "id": "04-D1",
       "type": "uat",
-      "titre": "04-D1 en echec le 2026-10-21 : points de vue absents dans BIMcollab Zoom ; repris en phase 5.1 (CAP-02)",
+      "titre": "04-D1 rejoue le 2026-10-22 : vue 2 incomplete (contexte non grise) ; corrige par 05.1-11 a 05.1-13",
       "gravite": "majeur",
       "statut": "ouvert",
       "proprietaire": "ia",
@@ -231,7 +231,13 @@
       "cycle": 1
     }
   ],
-  "horizon": null,
+  "horizon": {
+    "phase": "5.1",
+    "wave_bloquante": 3,
+    "plan": "05.1-12",
+    "kind": "decision",
+    "raison": "B1 : choix de l'approche de la vue 2 (A, B ou C) dans BIMcollab Zoom, consomme par 05.1-12 T2/T3 et 05.1-13"
+  },
   "pending_bloquant": null,
   "extension": {
     "web_saas": {
@@ -270,6 +276,6 @@
   },
   "maj": {
     "le": "2026-10-21",
-    "commit": "3df7334"
+    "commit": "b5ec7ef"
   }
 }
