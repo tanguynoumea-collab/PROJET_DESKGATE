@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05.2-02-PLAN.md
-last_updated: "2026-10-22T14:14:29.334Z"
+stopped_at: Completed 05.2-03-PLAN.md
+last_updated: "2026-10-22T14:17:04.012Z"
 last_activity: 2026-10-22
 progress:
   total_phases: 13
   completed_phases: 6
   total_plans: 61
-  completed_plans: 53
+  completed_plans: 54
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 5.2 (corrections-audit-council-1-reprise-du-runner-chemins-mcp-installation-msix) — EXECUTING
-Plan: 3 of 10
+Plan: 4 of 10
 Status: Ready to execute
 Last activity: 2026-10-22
 
@@ -99,6 +99,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.1 P13 | 40min | 2 tasks | 1 files |
 | Phase 05.2 P01 | 20min | 2 tasks | 5 files |
 | Phase 05.2 P02 | 10min | 2 tasks | 8 files |
+| Phase 05.2 P03 | 15min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -150,6 +151,7 @@ Recent decisions affecting current work:
 - [Phase 5.2]: Triage du council 1 : phase 5.2 = ARC-001 (code de sortie et relance du runner), SEC-001 (path_params par outil MCP, règle 4), LIV-001 (détection MSIX) + Mineurs FIA-001, MNT-007, FIA-005, TST-004, SEC-005, PER-001, FIA-003 ; autres Mineurs en backlog 999.1-999.6 ; rapport audits/saas-council-2026-10-22.md — Choix utilisateur du 2026-10-22 au checkpoint triage
 - [Phase 05.2]: Engine: verdict non écrit mémorisé (_unsettled) et rejoué ; Job jamais tué sur OperationalError ; fatal à 5 erreurs
 - [Phase 05.2]: required_files (kind python) vérifié par doctor, interdit en mcp; existence non vérifiée au chargement
+- [Phase 05.2]: Superviseur : recréation dans le processus, abandon code 6 après 3 recréations en 10 min
 
 ### Roadmap Evolution
 
@@ -174,6 +176,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-22T14:14:29.328Z
-Stopped at: Completed 05.2-02-PLAN.md
+Last session: 2026-10-22T14:17:04.007Z
+Stopped at: Completed 05.2-03-PLAN.md
 Resume file: None
