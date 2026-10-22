@@ -78,8 +78,7 @@ def test_render_title_nominal():
 
 
 def test_render_title_assainit_et_tronque():
-    assert n.render_title("{building}/{storey}", {"building": "Ba/J", "storey": "P
-01"}) == (
+    assert n.render_title("{building}/{storey}", {"building": "Ba/J", "storey": "P\n01"}) == (
         "Ba-J/P 01"
     )
     assert len(n.render_title("{type_a}", {"type_a": "x" * 600})) == 512
