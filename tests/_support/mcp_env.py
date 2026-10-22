@@ -14,7 +14,7 @@ from deskgate.engine import Engine
 
 MINI = Path(__file__).resolve().parents[1] / "mcp_fake" / "mini_server.py"
 SECRET = "valeur-secrete-mcp-42"  # noqa: S105  valeur de test
-ALL_TOOLS = ("echo", "add", "sleep", "erreur", "spawn_orphan", "env")
+ALL_TOOLS = ("echo", "add", "sleep", "erreur", "spawn_orphan", "env", "read_file", "write_file")
 
 
 def mcp_config(
@@ -23,14 +23,16 @@ def mcp_config(
     servers: Mapping[str, Mapping[str, object]] | None = None,
     allowed: tuple[str, ...] = ALL_TOOLS,
 ) -> RunnerConfig:
-    default: dict[str, Mapping[str, object]] = {
-        "mini": {
-            "command": sys.executable.replace("\\", "/"),
-            "args": [str(MINI).replace("\\", "/")],
-            "env": {"MINI_SECRET": SECRET},
-            "allowed_tools": list(allowed),
-        }
+    mini: dict[str, object] = {
+        "command": sys.executable.replace("\\", "/"),
+        "args": [str(MINI).replace("\\", "/")],
+        "env": {"MINI_SECRET": SECRET},
+        "allowed_tools": list(allowed),
     }
+    path_arguments = {t: ["path"] for t in ("read_file", "write_file") if t in allowed}
+    if path_arguments:
+        mini["path_arguments"] = path_arguments
+    default: dict[str, Mapping[str, object]] = {"mini": mini}
     return make_config(
         tmp_path,
         caps={"mcp.call": {"kind": "mcp", "timeout_max": 600}},

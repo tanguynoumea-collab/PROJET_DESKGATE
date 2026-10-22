@@ -1,4 +1,4 @@
-"""Serveur MCP de test (D-12) : echo, add, sleep, erreur, spawn_orphan, env."""
+"""Serveur MCP de test (D-12) : echo, add, sleep, erreur, spawn_orphan, env, fichiers."""
 
 from __future__ import annotations
 
@@ -50,6 +50,19 @@ def env(names: list[str]) -> dict[str, Any]:
         "values": {n: os.environ.get(n) for n in names},
         "deskgate": sorted(k for k in os.environ if k.upper().startswith("DESKGATE")),
     }
+
+
+@mcp.tool()
+def read_file(path: str) -> str:
+    with open(path, encoding="utf-8") as f:
+        return f.read()
+
+
+@mcp.tool()
+def write_file(path: str, text: str = "ecrit") -> str:
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text)
+    return path
 
 
 if __name__ == "__main__":
