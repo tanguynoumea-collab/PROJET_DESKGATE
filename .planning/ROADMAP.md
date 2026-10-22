@@ -18,7 +18,8 @@ Milestone v0.1 : un runner minimal, prouvé de bout en bout sur une détection d
  (completed 2026-10-20)
 - [x] **Phase 4: Capacités v0.1** - `ifc.clash`, `deskgate-bcf` (BCF 2.1) et `mcp.call`
  (completed 2026-10-20)
-- [x] **Phase 5: Installation et intégration n8n** - `deskgate init`, tâche planifiée, docker-compose n8n, workflow d'exemple, acceptation (completed 2026-10-22)
+- [x] **Phase 5: Installation et intégration n8n** - `deskgate init`, tâche planifiée, docker-compose n8n, workflow d'exemple, acceptation
+ (completed 2026-10-22)
 
 ## Phase Details
 
@@ -141,13 +142,28 @@ Plans:
 
 ### Phase 05.2: corrections audit council 1 : reprise du runner, chemins MCP, installation MSIX (INSERTED)
 
-**Goal:** [Urgent work - to be planned]
-**Requirements**: TBD
+**Goal:** Le runner se reprend seul quand un de ses threads meurt (tâche courante conclue en `interrupted`, rappel envoyé, code 6 seulement après échec répété), les chemins des appels `mcp.call` respectent la règle 4, et une installation lancée depuis une application MSIX est refusée et diagnostiquée. Corrige les findings du council 1 retenus au triage, et eux seuls.
+**Requirements**: aucun (findings ARC-001, SEC-001, LIV-001, FIA-001, MNT-007, FIA-005, TST-004, SEC-005, PER-001, FIA-003)
 **Depends on:** Phase 5
-**Plans:** 0 plans
+**Success Criteria** (what must be TRUE):
+  1. Un thread engine ou sender mort est recréé dans le processus ; la tâche en cours est conclue `interrupted` avec rappel ; au-delà de 3 recréations en 10 min le runner sort en code 6 (ARC-001, prouvé en e2e)
+  2. Une erreur SQLite transitoire ne tue ni le Job ni le verdict ; 5 erreurs consécutives seulement sont fatales (FIA-001, MNT-007)
+  3. Les arguments déclarés dans `path_arguments` d'un outil MCP sont convertis et validés à la soumission et au lancement (`..`, jonction, lien refusés) ; seul l'env du serveur visé atteint le worker (SEC-001, SEC-005)
+  4. `deskgate init` refuse depuis une application MSIX sans rien écrire ; `doctor` signale le contexte et le dernier résultat `0x8007010B` de la tâche (LIV-001)
+  5. `/health` expose l'état des threads, les échecs de démarrage sont dans `logs\startup.log`, `doctor` vérifie les `required_files` déclarés, la suite est sans `ResourceWarning` (FIA-005, FIA-003, PER-001, TST-004)
+**Plans:** 10 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 05.2 to break down)
+- [ ] 05.2-01-PLAN.md — Engine tolérant aux erreurs SQLite transitoires, verdict différé, stop() qui ferme sa connexion, docstrings de politique (vague 1)
+- [ ] 05.2-02-PLAN.md — required_files déclaré par capacité, doctor générique sans bcf_executable (vague 1)
+- [ ] 05.2-03-PLAN.md — Superviseur des threads : décision pure, budget 3/10 min, recréation réelle (vague 2)
+- [ ] 05.2-04-PLAN.md — path_arguments par outil MCP, double validation, env du seul serveur visé (vague 2)
+- [ ] 05.2-05-PLAN.md — Détection MSIX par sonde d'écriture, refus d'init, contrôle doctor (vague 2)
+- [ ] 05.2-06-PLAN.md — serve() supervisé, code 6, startup.log, preuves e2e (vague 3)
+- [ ] 05.2-07-PLAN.md — Dernier résultat de la tâche planifiée (Get-ScheduledTaskInfo) lu par doctor (vague 3)
+- [ ] 05.2-08-PLAN.md — /health avec état des threads, doctor.check_port aligné (vague 4)
+- [ ] 05.2-09-PLAN.md — Tests MCP réels de refus de chemin, règle d'opacité documentée (vague 4)
+- [ ] 05.2-10-PLAN.md — Zéro ResourceWarning en erreur, gate complet, actions humaines différables (vague 5)
 
 ### Phase 05.1: BCF exploitable dans BIMcollab et nommage des sujets (INSERTED)
 
