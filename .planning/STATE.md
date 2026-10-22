@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05.2-07-PLAN.md
-last_updated: "2026-10-22T14:33:26.593Z"
+stopped_at: Completed 05.2-08-PLAN.md
+last_updated: "2026-10-22T14:41:12.505Z"
 last_activity: 2026-10-22
 progress:
   total_phases: 13
   completed_phases: 6
   total_plans: 61
-  completed_plans: 58
+  completed_plans: 59
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 5.2 (corrections-audit-council-1-reprise-du-runner-chemins-mcp-installation-msix) — EXECUTING
-Plan: 8 of 10
+Plan: 9 of 10
 Status: Ready to execute
 Last activity: 2026-10-22
 
@@ -104,6 +104,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.2 P05 | 15min | 2 tasks | 8 files |
 | Phase 05.2 P06 | 25min | 2 tasks | 9 files |
 | Phase 05.2 P07 | 12min | 2 tasks | 7 files |
+| Phase 05.2 P08 | 30min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -160,6 +161,7 @@ Recent decisions affecting current work:
 - [Phase 05.2]: Détection MSIX par sonde d'écriture (E3) + identité de paquet ; init refuse sans contournement
 - [Phase 05.2]: serve() supervisé : on_give_up par assignation directe server.should_exit (B010), startup.log sans rotation avant le mutex
 - [Phase 05.2]: Dernier résultat de la tâche lu par Get-ScheduledTaskInfo (argv fixe, nom par environnement); 0x8007010B en échec
+- [Phase 05.2]: Seuil stale = max(10 x sondage, plancher fixe 30 s engine / 60 s sender) (D-07)
 
 ### Roadmap Evolution
 
@@ -184,6 +186,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-22T14:33:26.587Z
-Stopped at: Completed 05.2-07-PLAN.md
+Last session: 2026-10-22T14:41:12.499Z
+Stopped at: Completed 05.2-08-PLAN.md
 Resume file: None
