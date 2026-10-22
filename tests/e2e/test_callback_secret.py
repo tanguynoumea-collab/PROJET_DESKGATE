@@ -49,7 +49,8 @@ def _raw(
         with urllib.request.urlopen(req, timeout=10) as r:  # noqa: S310 (http local)
             return r.status, r.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as exc:
-        return exc.code, exc.read().decode("utf-8", "replace")
+        with exc:
+            return exc.code, exc.read().decode("utf-8", "replace")
 
 
 @contextmanager

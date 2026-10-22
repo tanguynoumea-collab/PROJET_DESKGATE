@@ -38,7 +38,8 @@ def _get(port: int, path: str, token: str | None = None) -> tuple[int, dict[str,
         with urllib.request.urlopen(req, timeout=5) as r:  # noqa: S310 (http local)
             return r.status, json.loads(r.read())
     except urllib.error.HTTPError as exc:
-        return exc.code, json.loads(exc.read())
+        with exc:
+            return exc.code, json.loads(exc.read())
 
 
 def _serve(env: dict[str, str], timeout: float = 60) -> subprocess.CompletedProcess[bytes]:

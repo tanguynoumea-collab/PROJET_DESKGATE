@@ -189,7 +189,8 @@ def api(
         with urllib.request.urlopen(req, timeout=10) as r:  # noqa: S310 (http local)
             return r.status, json.loads(r.read())
     except urllib.error.HTTPError as exc:
-        return exc.code, json.loads(exc.read())
+        with exc:
+            return exc.code, json.loads(exc.read())
 
 
 def wait_status(
