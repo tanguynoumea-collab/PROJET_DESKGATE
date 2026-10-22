@@ -19,7 +19,7 @@
     "roadmap_projet": "docs/passation/04-FEUILLE-DE-ROUTE.md"
   },
   "route": "full",
-  "phase": "IMPLEMENTATION",
+  "phase": "GATE",
   "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
@@ -189,6 +189,6 @@
   },
   "maj": {
     "le": "2026-10-22",
-    "commit": "427449a"
+    "commit": "d1fd3db"
   }
 }
