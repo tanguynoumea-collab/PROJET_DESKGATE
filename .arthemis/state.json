@@ -19,7 +19,7 @@
     "roadmap_projet": "docs/passation/04-FEUILLE-DE-ROUTE.md"
   },
   "route": "full",
-  "phase": "IMPLEMENTATION",
+  "phase": "GATE",
   "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
@@ -125,36 +125,36 @@
       "type": "finding",
       "titre": "init lance depuis une app MSIX ecrit dans le stockage virtualise du paquet ; doctor ne le detecte pas",
       "gravite": "majeur",
-      "statut": "ouvert",
+      "statut": "corrige_non_certifie",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-21",
       "source": "execution 05-06 tache 3 ; confirme par audits/saas-council-2026-10-22.md",
       "ref": "LIV-001",
-      "condition_levee": "doctor detecte ou init refuse un home virtualise ; teste"
+      "condition_levee": "re-GATE vert puis certification /saas-council-role (05.2-D3)"
     },
     {
       "id": "ARC-001",
       "type": "finding",
       "titre": "Mort d'un thread engine/sender : runner arrete avec code 0, non relance ; rappels bloques jusqu'a la session suivante",
       "gravite": "majeur",
-      "statut": "ouvert",
+      "statut": "corrige_non_certifie",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-22",
       "source": "audits/saas-council-2026-10-22.md",
       "ref": "ARC-001",
-      "condition_levee": "code de sortie non nul + relance prouvee + test e2e ; certifie par -role fiabilite"
+      "condition_levee": "re-GATE vert puis certification /saas-council-role (05.2-D3)"
     },
     {
       "id": "SEC-001",
       "type": "finding",
       "titre": "Executeur mcp : arguments transmis sans conversion ni validation allowed_roots (regle 4)",
       "gravite": "majeur",
-      "statut": "ouvert",
+      "statut": "corrige_non_certifie",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-22",
       "source": "audits/saas-council-2026-10-22.md",
       "ref": "SEC-001",
-      "condition_levee": "path_params par outil mcp convertis et valides + tests obligatoires ; certifie par -role securite"
+      "condition_levee": "re-GATE vert puis certification /saas-council-role (05.2-D3)"
     },
     {
       "id": "acc01-duree",
@@ -224,6 +224,6 @@
   },
   "maj": {
     "le": "2026-10-22",
-    "commit": "c8740fc"
+    "commit": "7c050a8"
   }
 }
