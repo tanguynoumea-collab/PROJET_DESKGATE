@@ -20,7 +20,7 @@
   },
   "route": "full",
   "phase": "AUDIT_COUNCIL",
-  "phase_status": "attente_humaine",
+  "phase_status": "retour_gsd",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -38,7 +38,8 @@
       "3",
       "4",
       "5",
-      "5.1"
+      "5.1",
+      "5.2"
     ],
     "quick_ids": [
       "261021-e6p",
@@ -223,6 +224,6 @@
   },
   "maj": {
     "le": "2026-10-22",
-    "commit": "b3902a8"
+    "commit": "55c12e5"
   }
 }

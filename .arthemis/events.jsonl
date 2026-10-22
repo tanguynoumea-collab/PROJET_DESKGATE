@@ -46,3 +46,4 @@
 {"ts":"2026-10-22T16:30","type":"fermeture","ref":"clash-troncature","commit":"b3902a8","note":"certifie par saas-tests : test_clash_limits.py:84-95"}
 {"ts":"2026-10-22T16:30","type":"fermeture","ref":"clash-reservations","commit":"b3902a8","note":"certifie avec reserve par saas-tests : test_clash_openings.py:27-53 ; cas IfcElement = TST-002 (mineur)"}
 {"ts":"2026-10-22T16:45","type":"checkpoint","ref":"triage","commit":"4943155","note":"Tanguy : « je retiens les 3 Majeurs (ARC-001, SEC-001, LIV-001) avec les Mineurs de leurs modules (FIA-001, MNT-007, FIA-005, TST-004, SEC-005, PER-001, FIA-003). Le reste part en backlog. »"}
+{"ts":"2026-10-22T16:55","type":"transition","ref":"AUDIT_COUNCIL -> retour GSD phase 5.2","commit":"ac4f982","note":"audit_council 1/3 ; 3 majeurs + 7 mineurs retenus ; backlog 999.1-999.6"}
