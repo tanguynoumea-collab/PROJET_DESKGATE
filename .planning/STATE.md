@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: "AUDIT_COUNCIL : pré-vol fait (outillage éphémère vérifié), dispatch des auditeurs à lancer"
-last_updated: "2026-10-22T12:55:39.855Z"
+stopped_at: Phase 5.2 context gathered
+last_updated: "2026-10-22T13:02:56.879Z"
 last_activity: "2026-10-22 - Completed quick task 261022-iea: Attendre tout l'arbre dans kill_tree des tests e2e"
 progress:
   total_phases: 13
@@ -170,6 +170,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-22T11:58:38.874Z
-Stopped at: AUDIT_COUNCIL : pré-vol fait (outillage éphémère vérifié), dispatch des auditeurs à lancer
-Resume file: .arthemis/PASSATION.md
+Last session: 2026-10-22T13:02:56.873Z
+Stopped at: Phase 5.2 context gathered
+Resume file: .planning/phases/05.2-corrections-audit-council-1-reprise-du-runner-chemins-mcp-installation-msix/05.2-CONTEXT.md
