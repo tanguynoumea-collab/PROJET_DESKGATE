@@ -37,7 +37,7 @@ ZERO_HASH = "0" * 64
 
 
 PACKAGED_MESSAGE = (
-    "Contexte empaqueté détecté ({reason}) : deskgate init écrirait dans un stockage virtualisé "
+    "Contexte empaqueté détecté ({reason}) : {command} écrirait dans un stockage virtualisé "
     "que la tâche planifiée ne voit pas. Relancez-le depuis un terminal normal (PowerShell ou "
     "Terminal Windows ouvert hors de toute application MSIX) : voir "
     "« Terminal normal obligatoire » dans AGENTS.md. Rien n'a été écrit."
@@ -56,11 +56,16 @@ def load_template() -> str:
     return (resources.files("deskgate") / "runner.example.toml").read_text(encoding="utf-8")
 
 
-def refuse_if_packaged(detect: Callable[[], str | None] | None = None) -> None:
-    """D-15 : refus avant toute écriture ; aucun contournement (--force ne change rien)."""
+def refuse_if_packaged(
+    detect: Callable[[], str | None] | None = None, *, command: str = "deskgate init"
+) -> None:
+    """D-15 : refus avant toute écriture ; aucun contournement (--force ne change rien).
+
+    Utilisé par init et task install.
+    """
     reason = (detect or scheduler.packaged_context)()
     if reason:
-        raise InitError(PACKAGED_MESSAGE.format(reason=reason))
+        raise InitError(PACKAGED_MESSAGE.format(reason=reason, command=command))
 
 
 def normalize_root(raw: str) -> str:

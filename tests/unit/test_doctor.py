@@ -18,6 +18,8 @@ from deskgate import doctor, installer, scheduler
 from deskgate.core.config import RunnerConfig, load_config
 from deskgate.locations import config_path
 
+from .test_doctor_task import _xml as task_xml
+
 pytestmark = pytest.mark.unit
 
 
@@ -251,4 +253,27 @@ def test_run_all_contexte_en_tete(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
     checks = doctor.run_all(home, with_task=False)
     assert checks[0].name == "Contexte d'exécution"
     assert checks[0].level == "echec"
+    assert doctor.exit_code(checks) == 1
+
+
+def test_run_all_lit_le_dernier_resultat_par_defaut(
+    tmp_path: Path, free_port: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    home, _ = _setup(tmp_path, free_port)
+    xml = task_xml(tmp_path)
+    appels: list[str] = []
+
+    def dernier(name: str = scheduler.TASK_NAME, **kw: object) -> int | None:
+        appels.append(name)
+        return 0x8007010B
+
+    monkeypatch.setattr(scheduler, "query_task_xml", lambda name: xml)
+    monkeypatch.setattr(scheduler, "last_task_result", dernier)
+    checks = doctor.run_all(home, with_task=True)
+    tache = [c for c in checks if c.name == "Tâche"]
+    assert len(tache) == 1
+    assert tache[0].level == "echec"
+    assert "0x8007010B" in tache[0].message
+    assert "MSIX" in tache[0].message
+    assert appels == ["Deskgate"]
     assert doctor.exit_code(checks) == 1

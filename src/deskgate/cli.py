@@ -147,6 +147,7 @@ def init(
         _err("Tâche du Planificateur ignorée (--no-task).")
         return
     try:
+        installer.refuse_if_packaged(command="deskgate task install")
         if not _confirm_task(yes):
             _err("Tâche non installée (deskgate task install pour l'ajouter plus tard).")
             return
@@ -176,6 +177,7 @@ def task_install(
 ) -> None:
     """Installe (ou vérifie) la tâche du Planificateur."""
     try:
+        installer.refuse_if_packaged(command="deskgate task install")
         if not _confirm_task(yes):
             _err("Tâche non installée.")
             return

@@ -163,3 +163,42 @@ def test_init_refuse_meme_avec_force(
     assert list(data_home.iterdir()) == []
     assert not (tmp_path / "bim").exists()
     assert created_tasks == []
+
+
+def _prepare_task_install_msix(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> list[str]:
+    lues: list[str] = []
+    monkeypatch.delenv("DESKGATE_HOME", raising=False)
+    monkeypatch.setattr("deskgate.locations.default_home", lambda: tmp_path / "home2")
+    monkeypatch.setattr(scheduler, "packaged_context", lambda: _RAISON)
+    monkeypatch.setattr(installer, "query_task_xml", lambda name: lues.append(name))
+    return lues
+
+
+def test_task_install_refuse_en_contexte_empaquete(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    pythonw: Path,
+    created_tasks: list[tuple[str, bytes]],
+) -> None:
+    lues = _prepare_task_install_msix(tmp_path, monkeypatch)
+    res = runner.invoke(app, ["task", "install", "--yes"])
+    assert res.exit_code == 2
+    assert "Terminal normal obligatoire" in res.stderr
+    assert "deskgate task install" in res.stderr
+    assert created_tasks == []
+    assert lues == []
+    assert not (tmp_path / "home2").exists()
+
+
+def test_task_install_refuse_sans_poser_la_question(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    pythonw: Path,
+    created_tasks: list[tuple[str, bytes]],
+) -> None:
+    lues = _prepare_task_install_msix(tmp_path, monkeypatch)
+    res = runner.invoke(app, ["task", "install"], input="o\n")
+    assert res.exit_code == 2
+    assert "Installer la tâche" not in res.stderr
+    assert created_tasks == []
+    assert lues == []
