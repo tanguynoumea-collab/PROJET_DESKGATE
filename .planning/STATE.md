@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
 stopped_at: Completed 05.2-10-PLAN.md
-last_updated: "2026-10-22T15:37:49.081Z"
+last_updated: "2026-10-22T15:42:54.032Z"
 last_activity: 2026-10-22
 progress:
   total_phases: 13
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 
 ## Current Position
 
-Phase: 5.2 (corrections-audit-council-1-reprise-du-runner-chemins-mcp-installation-msix) — EXECUTING
-Plan: 10 of 10
+Phase: 999.1
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-10-22
 
