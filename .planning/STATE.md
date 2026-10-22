@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
 stopped_at: Completed 05.1-08-PLAN.md
-last_updated: "2026-10-21T17:24:48.096Z"
+last_updated: "2026-10-22T07:36:23.446Z"
 last_activity: 2026-10-21
 progress:
   total_phases: 6
@@ -135,6 +135,8 @@ Recent decisions affecting current work:
 - [Phase 5]: Phase insérée 5.1 : BCF exploitable dans BIMcollab Zoom (points de vue absents, 04-D1), nommage des sujets, findings clash-troncature et clash-reservations — 04-D1 en échec le 2026-10-21 ; findings d'audit corrigés par phase insérée, jamais en quick
 - [Phase 5.1]: Test BIMcollab Zoom V0..V5 : seules V4 (Header/File IFC) et V5 (viewpoint.bcfv/snapshot.png) affichent les deux points de vue ; V1 cadre bien en coordonnées monde. Retenu : coordonnées monde, snapshot.png par vue, Header/File, noms conventionnels, Comment et Index — Verdict utilisateur du 2026-10-21 sur C:\BIM\recherche-5.1\zoom-tests
 - [Phase 05.1]: 07 : maj-5.1.ps1 réinstalle les paquets des plugins (--reinstall-package), non éditables ; Header/File par maquette, caméras monde
+- [Phase 5.1]: Nommage générique : Deskgate reçoit du job un gabarit de titre (champs bâtiment, étage, techniques, types) et des tables de correspondance ; aucun libellé ni code métier en dur dans le plugin (table française et liste de techniques retirées). La charte PIC, les libellés et les codes vivent dans le pipeline n8n (exemple) — Décision utilisateur du 2026-10-22 : Deskgate est une passerelle, pas un pipeline
+- [Phase 5.1]: Vue 2 du BCF : le contexte gris transparent doit couvrir tout ce qui est visible ; les éléments hors contexte ne doivent pas rester dans leurs couleurs d'origine — 04-D1 rejoué le 2026-10-22 : certains éléments non grisés
 
 ### Roadmap Evolution
 
