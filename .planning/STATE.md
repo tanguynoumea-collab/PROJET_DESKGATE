@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
-status: verifying
-stopped_at: Completed 05.2-10-PLAN.md
-last_updated: "2026-10-22T18:36:41.915Z"
+status: executing
+stopped_at: Completed 05.3-01-PLAN.md
+last_updated: "2026-10-22T18:57:04.729Z"
 last_activity: 2026-10-22
 progress:
   total_phases: 15
   completed_phases: 7
-  total_plans: 61
-  completed_plans: 61
+  total_plans: 63
+  completed_plans: 62
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-20)
 
 **Core value:** n8n délègue une tâche longue au PC Windows et reprend fiablement quand elle se termine, quel que soit le résultat (succès, échec, délai dépassé, annulation, redémarrage du runner).
-**Current focus:** Phase 5.2 — corrections-audit-council-1-reprise-du-runner-chemins-mcp-installation-msix
+**Current focus:** Phase 5.3 — corrections-audit-council-1-passe-2-superviseur-refus-msix-de-task-install-messages-et-test-doctor
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 5.3 (corrections-audit-council-1-passe-2-superviseur-refus-msix-de-task-install-messages-et-test-doctor) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
 Last activity: 2026-10-22
 
 Progress: [░░░░░░░░░░] 0%
@@ -107,6 +107,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.2 P08 | 30min | 2 tasks | 13 files |
 | Phase 05.2 P09 | 20min | 2 tasks | 6 files |
 | Phase 05.2 P10 | 75min | 2 tasks | 10 files |
+| Phase 05.3 P01 | 20min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -167,6 +168,7 @@ Recent decisions affecting current work:
 - [Phase 05.2]: path_arguments du serveur mini limité aux outils de fichiers autorisés
 - [Phase 05.2]: Fermeture des Engine, Sender, bases et journal de démarrage par fixtures autouse ; ResourceWarning en erreur
 - [Phase 5.3]: Triage des findings N2 (certification du council 1) : phase 5.3 = ARC-N2-001 (budget du superviseur consommé par un recover qui échoue, sans back-off), ARC-N2-002 (stop pendant un recover lent laisse un engine vivant), MNT-N2-001 et LIVR-N2-002 (\r dans runtime.py et AGENTS.md), LIVR-N2-001 (task install sans refus MSIX), TST-N2-001 (chemin par défaut de last_task_result dans doctor non testé) ; Info LIVR-N2-003, FIAB-N2-001, PER-N2-001 en backlog 999.7 ; rapport audits/saas-council-certification-2026-10-22.md — Choix utilisateur du 2026-10-22 au checkpoint triage
+- [Phase 05.3]: Budget du superviseur compté sur recréations effectives; back-off recover min(30s,2^n), abandon après 10 échecs
 
 ### Roadmap Evolution
 
@@ -192,6 +194,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-22T15:37:49.076Z
-Stopped at: Completed 05.2-10-PLAN.md
+Last session: 2026-10-22T18:57:04.722Z
+Stopped at: Completed 05.3-01-PLAN.md
 Resume file: None

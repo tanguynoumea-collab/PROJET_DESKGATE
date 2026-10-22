@@ -151,10 +151,10 @@ Plans:
   3. Le message d'abandon cite le chemin réel de `logs\runner.log` sans retour chariot ; AGENTS.md n'a plus d'octet CR ; un test refuse tout `\r` isolé dans les documents et les chaînes des sources (MNT-N2-001, LIVR-N2-002)
   4. `deskgate task install` sort en code 2 en contexte empaqueté, sans question ni tâche créée (LIVR-N2-001)
   5. `doctor.run_all(with_task=True)` signale 0x8007010B lu par `scheduler.last_task_result` par défaut (TST-N2-001) ; gate complet vert
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 05.3-01-PLAN.md — Superviseur : budget sur recréation effective, back-off des recover, double vérification de stop (vague 1)
+- [x] 05.3-01-PLAN.md — Superviseur : budget sur recréation effective, back-off des recover, double vérification de stop (vague 1)
 - [ ] 05.3-02-PLAN.md — Retours chariot (runtime, AGENTS.md, test d'octets), refus MSIX de task install, test doctor run_all, gate complet (vague 2)
 
 ### Phase 05.2: corrections audit council 1 : reprise du runner, chemins MCP, installation MSIX (INSERTED)
