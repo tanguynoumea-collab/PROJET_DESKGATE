@@ -21,6 +21,9 @@ from deskgate.core.redact import redact_params, redact_signature
 SCHEMA_VERSION = 2
 
 Connection = sqlite3.Connection  # alias : les autres modules n'importent pas sqlite3
+# alias : erreurs SQLite visibles hors de store.py sans importer sqlite3
+OperationalError = sqlite3.OperationalError
+DatabaseError = sqlite3.DatabaseError
 
 CALLBACK_DELAY_S = 2
 AUDIT_PARAMS_MAX = 4096

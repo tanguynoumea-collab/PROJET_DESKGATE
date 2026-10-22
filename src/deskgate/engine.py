@@ -66,6 +66,11 @@ logger = logging.getLogger("deskgate.engine")
 
 EVENTS_READ_MAX = 1_048_576
 WAIT_AFTER_KILL_S = 5.0
+MAX_DB_ERRORS = 5
+
+
+def _default_backoff(errors: int) -> float:
+    return float(min(30, 2**errors))
 
 
 @dataclass(frozen=True)
@@ -126,6 +131,15 @@ class _Running:
     memory_mb: int | None = None
 
 
+@dataclass(frozen=True)
+class _Unsettled:
+    """Verdict calculé mais non écrit (base occupée) : rejoué au tour suivant."""
+
+    job_id: str
+    outcome: Verdict
+    result_json: str | None
+
+
 MCP_ENTRY = "deskgate.workers.mcp_call:run"
 
 
@@ -145,7 +159,14 @@ class Engine:
         resolver: Resolver = default_resolver,
         callback_max_bytes: int = CALLBACK_MAX_BYTES,
         runner_python: str | None = None,
+        connect: Callable[[Path], store.Connection] = store.connect,
+        backoff: Callable[[int], float] = _default_backoff,
+        max_db_errors: int = MAX_DB_ERRORS,
     ) -> None:
+        self._connect = connect
+        self._backoff = backoff
+        self._max_db_errors = max_db_errors
+        self._unsettled: _Unsettled | None = None
         self._db_path = db_path
         self._config = config
         self._worker_script = worker_script
@@ -176,13 +197,22 @@ class Engine:
 
     def _connection(self) -> store.Connection:
         if self._conn is None:
-            self._conn = store.connect(self._db_path)
+            self._conn = self._connect(self._db_path)
         return self._conn
+
+    def _drop_connection(self) -> None:
+        if self._conn is not None:
+            with contextlib.suppress(Exception):
+                self._conn.close()
+            self._conn = None
 
     def tick(self) -> None:
         """Un tour : réclamer si rien ne tourne, puis observer la tâche en cours."""
         self.last_tick_at = self._clock()
         conn = self._connection()
+        if self._unsettled is not None:
+            self._settle(conn)
+            return
         if self._cur is None:
             row = store.claim_next(conn, self._wall())
             if row is not None:
@@ -192,24 +222,57 @@ class Engine:
 
     # -------------------------------------------------------------- lancement
 
-    def _fail(self, conn: store.Connection, job_id: str, code: str, message: str) -> None:
+    def _store_verdict(
+        self, conn: store.Connection, job_id: str, outcome: Verdict, result_json: str | None
+    ) -> None:
         try:
             store.finish(
                 conn,
                 job_id,
                 from_status=RUNNING,
-                to_status=FAILED,
-                result_json=None,
-                error_code=code,
-                error_message=message,
+                to_status=outcome.status,
+                result_json=result_json,
+                error_code=outcome.error_code,
+                error_message=outcome.error_message,
                 now=self._wall(),
             )
         except store.StaleTransition:
-            logger.warning("Transition obsolète pour la tâche %s (échec %s).", job_id, code)
+            logger.warning("Transition obsolète pour la tâche %s.", job_id)
+        except store.OperationalError:
+            self._unsettled = _Unsettled(job_id, outcome, result_json)
+            logger.warning(
+                "Verdict de la tâche %s non écrit (base occupée) : nouvel essai au prochain tour.",
+                job_id,
+            )
+            raise
+
+    def _settle(self, conn: store.Connection) -> None:
+        pending = self._unsettled
+        if pending is None:
+            return
+        try:
+            store.finish(
+                conn,
+                pending.job_id,
+                from_status=RUNNING,
+                to_status=pending.outcome.status,
+                result_json=pending.result_json,
+                error_code=pending.outcome.error_code,
+                error_message=pending.outcome.error_message,
+                now=self._wall(),
+            )
+        except store.StaleTransition:
+            logger.warning("Transition obsolète pour la tâche %s.", pending.job_id)
+        self._unsettled = None
+
+    def _fail(self, conn: store.Connection, job_id: str, code: str, message: str) -> None:
+        self._store_verdict(conn, job_id, Verdict(FAILED, code, message), None)
 
     def _launch(self, conn: store.Connection, row: store.JobRow) -> None:
         try:
             self._launch_inner(conn, row)
+        except store.OperationalError:
+            raise
         except Exception:
             logger.exception("Erreur interne au lancement de la tâche %s.", row.id)
             self._cur = None
@@ -327,6 +390,8 @@ class Engine:
             return
         try:
             self._observe_inner(conn, cur)
+        except store.OperationalError:
+            raise
         except Exception:
             if self._cur is None:  # la conclusion elle-même a échoué : erreur d'infrastructure
                 raise
@@ -515,18 +580,7 @@ class Engine:
         result_json: str | None,
     ) -> None:
         try:
-            store.finish(
-                conn,
-                cur.job_id,
-                from_status=RUNNING,
-                to_status=outcome.status,
-                result_json=result_json,
-                error_code=outcome.error_code,
-                error_message=outcome.error_message,
-                now=self._wall(),
-            )
-        except store.StaleTransition:
-            logger.warning("Transition obsolète pour la tâche %s.", cur.job_id)
+            self._store_verdict(conn, cur.job_id, outcome, result_json)
         finally:
             self._release(cur)
 
@@ -536,23 +590,46 @@ class Engine:
         self._wake.set()
 
     def run(self) -> None:
+        errors = 0
         try:
             while not self._stop.is_set():
                 self._wake.wait(self._poll)
                 self._wake.clear()  # avant la lecture de la base : aucun réveil perdu
                 if self._stop.is_set():
                     break
-                self.tick()
+                try:
+                    self.tick()
+                    errors = 0
+                except store.OperationalError:
+                    errors += 1
+                    self._drop_connection()
+                    if errors >= self._max_db_errors:
+                        logger.exception(
+                            "Base indisponible : %d erreurs consécutives, thread engine arrêté.",
+                            errors,
+                        )
+                        raise
+                    if errors == 1:
+                        logger.warning(
+                            "Base occupée ou indisponible : nouvel essai (%d/%d).",
+                            errors,
+                            self._max_db_errors,
+                            exc_info=True,
+                        )
+                    else:
+                        logger.warning(
+                            "Base occupée ou indisponible : nouvel essai (%d/%d).",
+                            errors,
+                            self._max_db_errors,
+                        )
+                    self._stop.wait(self._backoff(errors))
         except BaseException:
             logger.exception("Thread engine arrêté sur erreur.")
             self.failed = True
             if self.on_fatal is not None:
                 self.on_fatal()
         finally:
-            if self._conn is not None:
-                with contextlib.suppress(Exception):
-                    self._conn.close()
-                self._conn = None
+            self._drop_connection()
 
     def start(self) -> None:
         thread = threading.Thread(target=self.run, name="deskgate-engine", daemon=True)
@@ -570,6 +647,8 @@ class Engine:
         thread = self._thread
         if thread is not None:
             thread.join(timeout)
+        if thread is None or not thread.is_alive():
+            self._drop_connection()
         cur = self._cur
         if cur is not None:
             with contextlib.suppress(Exception):
