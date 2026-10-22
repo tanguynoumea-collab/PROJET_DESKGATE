@@ -1,0 +1,90 @@
+# ARTHEMIS GATE
+cycle: 1
+phase: 05.1
+profil: web_saas
+commit: d689cbe
+date: 2026-10-22T13:27:49+0200
+verdict: vert
+
+## Porte 1 : installation figÃ©e
+commande: uv sync --locked
+resolution: profil.gate
+code_sortie: 0
+duree: 0s
+extrait:
+  Resolved 69 packages in 1ms
+  Checked 49 packages in 5ms
+
+## Porte 2 : lint
+commande: uv run ruff check
+resolution: profil.gate
+code_sortie: 0
+duree: 1s
+extrait:
+  All checks passed!
+
+## Porte 3 : lint (format)
+commande: uv run ruff format --check
+resolution: profil.gate
+code_sortie: 0
+duree: 0s
+extrait:
+  178 files already formatted
+
+## Porte 4 : types
+commande: uv run pyright
+resolution: profil.gate
+code_sortie: 0
+duree: 4s
+extrait:
+  0 errors, 0 warnings, 0 informations
+
+## Porte 5 : tests unitaires et d'intÃ©gration
+commande: uv run pytest -m "not e2e"
+resolution: profil.gate
+code_sortie: 0
+duree: 226s
+extrait:
+  SKIPPED [1] tests\fs\test_paths_real.py:116: Privilège de lien symbolique absent (mode développeur désactivé)
+  ========== 803 passed, 1 skipped, 30 deselected in 224.00s (0:03:43) ==========
+
+## Porte 6 : build de production
+commande: uv build --all-packages
+resolution: profil.gate
+code_sortie: 0
+duree: 2s
+extrait:
+  Successfully built dist\deskgate_bim-0.1.0.dev0.tar.gz
+  Successfully built dist\deskgate_bim-0.1.0.dev0-py3-none-any.whl
+
+## Porte 7 : tests E2E
+commande: uv run pytest -m e2e
+resolution: profil.gate
+code_sortie: 0
+duree: 114s
+extrait:
+  
+  =============== 30 passed, 804 deselected in 112.50s (0:01:52) ================
+
+## Porte migrations
+commande: uv run pytest -m "not e2e" (tests/fs/test_store_schema.py, inclus porte 5)
+resolution: tests du projet
+statut: couverte (migrations 1 et 2 additives, PRAGMA user_version, base neuve, aucune base existante Ã  migrer)
+
+## Porte budgets (informative)
+commande: ls dist/
+extrait:
+  dist/deskgate-0.1.0.dev0-py3-none-any.whl 68171 octets
+  dist/deskgate-0.1.0.dev0.tar.gz 289369 octets
+  dist/deskgate_bcf-0.1.0.dev0-py3-none-any.whl 21109 octets
+  dist/deskgate_bcf-0.1.0.dev0.tar.gz 23116 octets
+  dist/deskgate_bim-0.1.0.dev0-py3-none-any.whl 25075 octets
+  dist/deskgate_bim-0.1.0.dev0.tar.gz 39529 octets
+
+## CI
+run: 39769903459 (windows-latest, Python 3.11 et 3.13) : vert sur d689cbe
+
+## Bilan
+vertes: installation, types, lint, tests, build, E2E, migrations
+rouges: aucune
+non_couvertes: aucune

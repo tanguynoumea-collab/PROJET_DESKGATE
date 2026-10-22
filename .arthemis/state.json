@@ -19,8 +19,8 @@
     "roadmap_projet": "docs/passation/04-FEUILLE-DE-ROUTE.md"
   },
   "route": "full",
-  "phase": "IMPLEMENTATION",
-  "phase_status": "terminee",
+  "phase": "AUDIT_COUNCIL",
+  "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -41,7 +41,8 @@
       "5.1"
     ],
     "quick_ids": [
-      "261021-e6p"
+      "261021-e6p",
+      "261022-iea"
     ],
     "config_attendue": {
       "commit_docs": true,
@@ -107,18 +108,6 @@
       "condition_levee": "cycle ulterieur"
     },
     {
-      "id": "gate-portes-na",
-      "type": "porte_non_couverte",
-      "titre": "Portes migrations (base neuve, migration 1) et budgets (sans objet pour un runner local) a declarer au GATE",
-      "gravite": "mineur",
-      "statut": "ouvert",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-20",
-      "source": ".arthemis/dod/cycle-1.md",
-      "ref": null,
-      "condition_levee": "motif ecrit dans le journal de gate"
-    },
-    {
       "id": "uv-pythons",
       "type": "decision",
       "titre": "Pythons geres par uv casses (Roaming\\uv\\python 3.13/3.14) ; reparation proposee, contournement UV_PYTHON",
@@ -129,30 +118,6 @@
       "source": "passation 2026-10-21T09:41",
       "ref": ".planning/STATE.md",
       "condition_levee": "reparation acceptee et faite, ou refus consigne"
-    },
-    {
-      "id": "remote-ci",
-      "type": "decision",
-      "titre": "CI run 39568004313 : 3.11 vert ; 3.13 rouge sur test_audit_parcours (disk I/O SQLite)",
-      "gravite": "majeur",
-      "statut": "ouvert",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-21",
-      "source": "passation 2026-10-21T09:41",
-      "ref": "github.com/tanguynoumea-collab/PROJET_DESKGATE",
-      "condition_levee": "premier run ci.yml vert sur main (3.11 et 3.13)"
-    },
-    {
-      "id": "ci-e2e-kill-tree",
-      "type": "finding",
-      "titre": "kill_tree attend le lanceur du venv, pas le runner enfant : base WAL relue trop tot (test_audit_parcours, 3.13)",
-      "gravite": "majeur",
-      "statut": "ouvert",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-21",
-      "source": "CI run 39568004313",
-      "ref": "tests/e2e/conftest.py:109",
-      "condition_levee": "correctif en quick --full et CI 3.13 verte"
     },
     {
       "id": "05-06-msix",
@@ -258,6 +223,6 @@
   },
   "maj": {
     "le": "2026-10-21",
-    "commit": "5067d60"
+    "commit": "d689cbe"
   }
 }

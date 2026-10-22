@@ -38,3 +38,6 @@
 {"ts":"2026-10-22T12:00","type":"transition","ref":"05.1-12","commit":"2a6d42d","note":"horizon atteint : vagues 1 et 2 faites (09, 10, 11), B1 vue 2 en attente"}
 {"ts":"2026-10-22T13:00","type":"reprise","ref":"05.1-12","commit":"88c793d","note":"B1 leve (A), vue 2 isolee implementee, horizon leve"}
 {"ts":"2026-10-22T15:10","type":"fermeture","ref":"04-D1","commit":"5067d60","note":"BCF 835bfaaa2745 valide dans BIMcollab Zoom ; CAP-02 cochee ; phases 5 et 5.1 terminees dans GSD"}
+{"ts":"2026-10-22T13:30","type":"gate","ref":".arthemis/reports/gate-1-05.1.log","commit":"d689cbe","note":"gate vert, 7 commandes code 0, migrations couvertes, CI 39769903459 verte"}
+{"ts":"2026-10-22T13:30","type":"fermeture","ref":"remote-ci, ci-e2e-kill-tree, gate-portes-na","commit":"d689cbe","note":"CI verte 3.11/3.13 ; kill_tree corrige (quick 261022-iea) ; portes declarees au gate"}
+{"ts":"2026-10-22T13:30","type":"transition","ref":"GATE -> AUDIT_COUNCIL","commit":"d689cbe","note":"cycle sans impact UI : DESIGN_REVIEW sautee"}
