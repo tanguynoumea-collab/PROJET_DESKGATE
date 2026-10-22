@@ -23,7 +23,7 @@ from .bcfdoc import build_doc
 from .bcfjob import write_bcf
 from .context import context_guids
 from .grouping import build_groups, prepare
-from .naming import fallback_message, missing_message
+from .naming import DEFAULT_TEMPLATE, incomplete_message, missing_message
 from .params import ClashError, ClashParams, parse_params
 from .spatial import project_refs, topic_titles
 
@@ -207,13 +207,18 @@ def _write_bcf(
     )
     titles: dict[str, str] = {}
     try:
-        titles, missing, fallbacks = topic_titles(
-            clasher.opened, p.ifc_a, p.ifc_b, groups, p.charter.model_dump()
+        titles, missing, incomplete = topic_titles(
+            clasher.opened,
+            p.ifc_a,
+            p.ifc_b,
+            groups,
+            p.title_template or DEFAULT_TEMPLATE,
+            p.mappings.model_dump(),
         )
         if missing:
-            warn("charter_missing", missing_message(missing))
-        if fallbacks:
-            warn("label_fallback", fallback_message(fallbacks))
+            warn("mapping_missing", missing_message(missing))
+        if incomplete:
+            warn("naming_incomplete", incomplete_message(incomplete))
     except MemoryError:
         raise
     except Exception as exc:  # le nommage ne doit jamais arrêter le calcul (D-06)

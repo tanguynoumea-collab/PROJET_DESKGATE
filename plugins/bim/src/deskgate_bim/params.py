@@ -11,8 +11,11 @@ from pydantic import (
     Field,
     StringConstraints,
     ValidationError,
+    field_validator,
     model_validator,
 )
+
+from .naming import template_fields
 
 ISO_8601 = (
     r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
@@ -27,28 +30,20 @@ class ClashError(Exception):
         self.error_code = error_code
 
 
-Key = Annotated[str, StringConstraints(min_length=1, max_length=128)]
-Code = Annotated[str, StringConstraints(min_length=1, max_length=32)]
-Label = Annotated[str, StringConstraints(min_length=1, max_length=64)]
+Raw = Annotated[str, StringConstraints(min_length=1, max_length=256)]
+Shown = Annotated[str, StringConstraints(min_length=1, max_length=128)]
+Table = dict[Raw, Shown]
 
 
-class Trades(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    a: Code | None = None
-    b: Code | None = None
-
-
-class Charter(BaseModel):
-    """Charte de nommage des sujets (D-05) : valeurs IFC -> codes courts."""
+class Mappings(BaseModel):
+    """Tables de correspondance du titre (D-05) : valeur IFC brute -> valeur affichée."""
 
     model_config = ConfigDict(extra="forbid")
 
-    version: Literal[1] = 1
-    buildings: dict[Key, Code] = Field(default_factory=dict, max_length=500)
-    levels: dict[Key, Code] = Field(default_factory=dict, max_length=500)
-    trades: Trades = Field(default_factory=Trades)
-    labels: dict[Key, Label] = Field(default_factory=dict, max_length=500)
+    building: Table | None = Field(default=None, max_length=2000)
+    storey: Table | None = Field(default=None, max_length=2000)
+    trade: Table | None = Field(default=None, max_length=2000)
+    type: Table | None = Field(default=None, max_length=2000)
 
 
 class ClashParams(BaseModel):
@@ -72,7 +67,15 @@ class ClashParams(BaseModel):
     created_at: str | None = Field(default=None, pattern=ISO_8601)
     context_radius: float = Field(default=5.0, ge=0, le=1000)
     max_context: int = Field(default=500, ge=0, le=5000)
-    charter: Charter = Field(default_factory=Charter)
+    title_template: str | None = Field(default=None, min_length=1, max_length=256)
+    mappings: Mappings = Field(default_factory=Mappings)
+
+    @field_validator("title_template")
+    @classmethod
+    def _template(cls, value: str | None) -> str | None:
+        if value is not None:
+            template_fields(value)
+        return value
 
     @model_validator(mode="after")
     def _threshold(self) -> ClashParams:

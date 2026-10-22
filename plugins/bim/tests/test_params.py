@@ -17,12 +17,17 @@ BASE = {"ifc_a": "x.ifc", "selector_a": "IfcWall", "mode": "hard", "tolerance": 
 
 
 def _load() -> ModuleType:
-    spec = importlib.util.spec_from_file_location("dg_params", SRC)
-    assert spec is not None and spec.loader is not None
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules["dg_params"] = mod
-    spec.loader.exec_module(mod)
-    return mod
+    """Charge params.py et naming.py sous un paquet factice (import relatif), sans ifcopenshell."""
+    pkg = ModuleType("dg_pkg")
+    pkg.__path__ = [str(SRC.parent)]
+    sys.modules["dg_pkg"] = pkg
+    for name in ("naming", "params"):
+        spec = importlib.util.spec_from_file_location(f"dg_pkg.{name}", SRC.parent / f"{name}.py")
+        assert spec is not None and spec.loader is not None
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[f"dg_pkg.{name}"] = mod
+        spec.loader.exec_module(mod)
+    return sys.modules["dg_pkg.params"]
 
 
 m = _load()
@@ -50,35 +55,48 @@ def test_parametre_inconnu() -> None:
         m.parse_params({**BASE, "bidule": 1})
 
 
-def test_charte_complete_acceptee() -> None:
-    charte = {
-        "buildings": {"Jura": "BaJ", "Tour": "BaT"},
-        "levels": {"J_11_P01": "P01"},
-        "trades": {"a": "CVC", "b": "ARC"},
-        "labels": {"IfcCovering/CEILING": "Faux-plafond"},
-    }
-    p = m.parse_params({**BASE, "charter": charte})
-    assert p.charter.buildings["Jura"] == "BaJ" and p.charter.trades.b == "ARC"
+def test_titre_par_defaut() -> None:
+    p = m.parse_params(BASE)
+    assert p.title_template is None
+    assert p.mappings.building is None and p.mappings.storey is None
+    assert p.mappings.trade is None and p.mappings.type is None
 
 
-def test_charte_par_defaut_vide() -> None:
-    c = m.parse_params(BASE).charter
-    assert c.buildings == {} and c.levels == {} and c.labels == {} and c.trades.a is None
+def test_gabarit_et_tables_acceptes() -> None:
+    p = m.parse_params(
+        {
+            **BASE,
+            "title_template": "{building}/{type_a} x {type_b}",
+            "mappings": {"building": {"Jura": "BaJ"}},
+        }
+    )
+    assert p.mappings.building == {"Jura": "BaJ"}
 
 
-def test_charte_cle_inconnue() -> None:
-    with pytest.raises(m.ClashError, match=r"paramètre inconnu : charter\.foo"):
-        m.parse_params({**BASE, "charter": {"foo": {}}})
-
-
-def test_charte_code_trop_long() -> None:
+def test_gabarit_champ_inconnu() -> None:
     with pytest.raises(m.ClashError) as exc:
-        m.parse_params({**BASE, "charter": {"buildings": {"x": "A" * 33}}})
+        m.parse_params({**BASE, "title_template": "{floor}"})
+    assert exc.value.error_code == "invalid_params"
+    assert "champ inconnu « floor »" in str(exc.value)
+
+
+def test_charte_refusee() -> None:
+    with pytest.raises(m.ClashError, match="paramètre inconnu : charter"):
+        m.parse_params({**BASE, "charter": {}})
+
+
+def test_table_inconnue() -> None:
+    with pytest.raises(m.ClashError, match=r"paramètre inconnu : mappings\.level"):
+        m.parse_params({**BASE, "mappings": {"level": {}}})
+
+
+def test_table_valeur_trop_longue() -> None:
+    with pytest.raises(m.ClashError) as exc:
+        m.parse_params({**BASE, "mappings": {"type": {"x": "A" * 129}}})
     assert exc.value.error_code == "invalid_params"
 
 
-def test_charte_trop_d_entrees() -> None:
-    levels = {f"n{i}": "P" for i in range(501)}
+def test_table_cle_vide() -> None:
     with pytest.raises(m.ClashError) as exc:
-        m.parse_params({**BASE, "charter": {"levels": levels}})
+        m.parse_params({**BASE, "mappings": {"type": {"": "A"}}})
     assert exc.value.error_code == "invalid_params"

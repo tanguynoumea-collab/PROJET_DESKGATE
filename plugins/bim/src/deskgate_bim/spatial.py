@@ -13,12 +13,14 @@ import ifcopenshell.util.placement
 import ifcopenshell.util.unit
 
 from .naming import (
+    TABLE_OF,
     bracket_storey,
-    build_title,
-    element_label,
-    lookup,
     pick_principal,
-    trade_code,
+    render_title,
+    resolve,
+    template_fields,
+    type_candidates,
+    type_raw,
 )
 
 _UNDEFINED = {None, "NOTDEFINED", "USERDEFINED"}
@@ -87,6 +89,8 @@ def element_info(element: Any) -> dict[str, Any]:
         "ifc_class": ifc_class,
         "predefined": predefined,
         "type_class": type_class,
+        "type_name": str(typ.Name) if typ is not None and getattr(typ, "Name", None) else None,
+        "type_ifc_class": typ.is_a() if typ is not None else None,
         "supertypes": supers,
     }
 
@@ -96,16 +100,23 @@ def topic_titles(
     ifc_a: str,
     ifc_b: str | None,
     groups: list[dict[str, Any]],
-    charter: Mapping[str, Any],
+    template: str,
+    mappings: Mapping[str, Mapping[str, str] | None],
 ) -> tuple[dict[str, str], list[str], list[str]]:
-    """(titre par id de groupe, entrées absentes de la charte, classes en repli)."""
+    """(titre par id de groupe, entrées absentes des tables, champs introuvables)."""
     fa = files[ifc_a]
     fb = files[ifc_b or ifc_a]
     levels = storey_levels(fa) or storey_levels(fb)
-    overrides = charter.get("labels") or {}
+    used = set(template_fields(template))
+    tables = {TABLE_OF[f] for f in used}
     missing: list[str] = []
-    fallbacks: list[str] = []
+    incomplete: list[str] = []
     cache: dict[tuple[str, str], tuple[str, Any]] = {}
+    type_table = mappings.get("type")
+
+    def note(table: str, raw: str, absent: bool) -> None:
+        if absent and table in tables:
+            missing.append(f"{table} : {raw}")
 
     def label(side: str, f: Any, guid: str, ifc_class: str) -> str:
         key = (side, guid)
@@ -116,21 +127,23 @@ def topic_titles(
                 el = None
             if el is None:
                 cache[key] = (ifc_class, None)
-                fallbacks.append(ifc_class)
+                note("type", ifc_class, type_table is not None)
             else:
-                text, fell_back = element_label(element_info(el), overrides)
-                if fell_back:
-                    fallbacks.append(text)
-                cache[key] = (text, el)
+                info = element_info(el)
+                raw = type_raw(info)
+                shown, absent = resolve(type_table, type_candidates(info), raw)
+                note("type", raw, absent)
+                cache[key] = (shown, el)
         return cache[key][0]
 
-    trades = charter.get("trades") or {}
-    trade_a, note_a = trade_code(trades.get("a"), Path(ifc_a).stem)
-    trade_b, note_b = trade_code(trades.get("b"), Path(ifc_b or ifc_a).stem)
-    if note_a:
-        missing.append(f"technique A : {note_a}")
-    if note_b:
-        missing.append(f"technique B : {note_b}")
+    def trade(path: str) -> str:
+        stem = Path(path).stem
+        shown, absent = resolve(mappings.get("trade"), [stem, Path(path).name], stem)
+        note("trade", stem, absent)
+        return shown
+
+    trade_a = trade(ifc_a)
+    trade_b = trade(ifc_b or ifc_a)
 
     titles: dict[str, str] = {}
     for g in groups:
@@ -142,25 +155,33 @@ def topic_titles(
         lib_a, lib_b, a_guid = pick_principal(pairs, labels)
         storey = bracket_storey(levels, g["centre"][2])
         if storey is None:
-            storey_code = "?"
-            missing.append("niveau : aucun étage dans les maquettes")
+            storey_shown = "?"
+            if "storey" in used:
+                incomplete.append("storey")
         else:
-            found = lookup(charter.get("levels") or {}, storey)
-            storey_code = found or storey
-            if not found:
-                missing.append(f"niveau : {storey}")
+            storey_shown, absent = resolve(mappings.get("storey"), [storey], storey)
+            note("storey", storey, absent)
         element = cache.get(("a", a_guid), (None, None))[1]
         name = building_name(element) if element is not None else None
         if name is None:
-            building_code = "?"
-            missing.append("bâtiment : introuvable")
+            building_shown = "?"
+            if "building" in used:
+                incomplete.append("building")
         else:
-            found = lookup(charter.get("buildings") or {}, name)
-            building_code = found or name
-            if not found:
-                missing.append(f"bâtiment : {name}")
-        titles[g["id"]] = build_title(building_code, storey_code, trade_a, trade_b, lib_a, lib_b)
-    return titles, missing, fallbacks
+            building_shown, absent = resolve(mappings.get("building"), [name], name)
+            note("building", name, absent)
+        titles[g["id"]] = render_title(
+            template,
+            {
+                "building": building_shown,
+                "storey": storey_shown,
+                "trade_a": trade_a,
+                "trade_b": trade_b,
+                "type_a": lib_a,
+                "type_b": lib_b,
+            },
+        )
+    return titles, missing, incomplete
 
 
 def project_refs(files: Mapping[str, Any], paths: Sequence[str]) -> list[dict[str, str]]:
