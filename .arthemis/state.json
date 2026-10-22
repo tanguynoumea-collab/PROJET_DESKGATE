@@ -20,7 +20,7 @@
   },
   "route": "full",
   "phase": "IMPLEMENTATION",
-  "phase_status": "attente_humaine",
+  "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -231,23 +231,8 @@
       "cycle": 1
     }
   ],
-  "horizon": {
-    "phase": "5.1",
-    "wave_bloquante": 3,
-    "plan": "05.1-12",
-    "kind": "decision",
-    "raison": "B1 : choix de l'approche de la vue 2 (A, B ou C) dans BIMcollab Zoom, consomme par 05.1-12 T2/T3 et 05.1-13"
-  },
-  "pending_bloquant": {
-    "plan": "05.1-12",
-    "task": 1,
-    "kind": "decision",
-    "resume_signal": "A, B ou C (approche de la vue 2 retenue dans BIMcollab Zoom), ou aucune avec ce que Zoom affiche",
-    "completed_tasks": [],
-    "current_task": "T1 : choix de l'approche de la vue 2 sur C:\\BIM\recherche-5.1\\zoom-tests-v2",
-    "checkpoint_details": "A isole 5 m, B maquette grise (42767 composants), C voisinage 15 m (5000)",
-    "reponse": "A (isole) le 2026-10-22"
-  },
+  "horizon": null,
+  "pending_bloquant": null,
   "extension": {
     "web_saas": {
       "contexte_saas": {
@@ -285,6 +270,6 @@
   },
   "maj": {
     "le": "2026-10-21",
-    "commit": "2a6d42d"
+    "commit": "88c793d"
   }
 }
