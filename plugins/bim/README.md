@@ -26,7 +26,8 @@ refusé (`invalid_params`).
 | `max_clashes` | entier | aucun (illimité) | Plafond optionnel de paires conservées ; s'il est atteint, `truncated` vaut vrai |
 | `include_openings` | booléen | `false` | `false` : les réservations `IfcOpeningElement` sont exclues des deux sélections |
 | `snapshots` | booléen | `true` | Génère une image PNG par point de vue du BCF |
-| `charter` | objet | vide | Charte de nommage des sujets (voir « Charte de nommage ») |
+| `title_template` | texte | `{type_a} x {type_b}` | Gabarit du titre des sujets (voir « Titre des sujets ») |
+| `mappings` | objet | vide | Tables de correspondance `building`, `storey`, `trade`, `type` |
 | `threads` | entier | settings, sinon min(4, CPU) | Threads de calcul de la géométrie |
 | `bcf` | booléen | `false` | Produit `conflits.bcf` |
 | `bcf_author` | texte | `deskgate` | Auteur des sujets BCF |
@@ -37,33 +38,46 @@ refusé (`invalid_params`).
 
 En `hard`, `distance` est la profondeur de pénétration. En `clearance`, un contact est une distance 0.
 
-## Charte de nommage
+## Titre des sujets
 
-Le titre de chaque sujet BCF est `<trigramme>/<étage>/<techniques>/<sujet>`, par exemple
-`BaJ/P01/CVC-ARC/Gaine x Faux-plafond`. La charte du projet est passée en paramètre `charter` :
+Le titre de chaque sujet BCF vient d'un gabarit `title_template` et de tables `mappings` fournis par le job :
+Deskgate ne contient aucun libellé ni code métier. Champs admis dans le gabarit (liste fermée) :
 
-- `buildings` : nom de bâtiment IFC vers trigramme ;
-- `levels` : nom d'étage IFC vers code court ;
-- `trades.a` et `trades.b` : code technique des côtés A et B ;
-- `labels` : libellé du sujet par classe IFC, clé `Classe` ou `Classe/TYPE`.
+| Champ | Valeur brute |
+|---|---|
+| `building` | nom de l'`IfcBuilding` de l'élément principal A |
+| `storey` | nom du niveau dont la cote encadre le point du conflit |
+| `trade_a` / `trade_b` | nom de fichier de la maquette A / B, sans extension |
+| `type_a` / `type_b` | nom du type d'objet IFC de l'élément principal, sinon sa classe |
 
-Bornes : 500 entrées au plus par table, codes de 32 caractères au plus. L'appariement est d'abord exact,
-puis insensible à la casse. L'étage est celui de la cote du point de conflit ; le bâtiment est celui de
-l'élément principal du côté A. Une technique absente de la charte est déduite du nom de fichier (codes
-de `TRADE_CODES`), à défaut du nom tronqué. Le titre ne porte pas de « (+N) ». Une entrée absente de la
-charte garde sa valeur IFC brute et ajoute l'avertissement `charter_missing`.
+Tables de `mappings` : `building`, `storey`, `trade` (sert `trade_a` et `trade_b`, clé = nom de fichier sans
+extension) et `type` (sert `type_a` et `type_b`). Pour `type`, les clés sont essayées dans l'ordre
+`<ClasseType>:<NomType>`, `<NomType>`, `<Classe>/<PREDEFINI>`, `<Classe>`, sur la classe du type, la classe de
+l'élément puis ses surclasses.
 
-Exemple (projet pilote) :
+Règles :
+
+- champ inconnu ou accolade orpheline dans le gabarit : erreur `invalid_params` ;
+- valeur absente d'une table fournie : valeur brute et avertissement `mapping_missing` ;
+- champ introuvable : « ? » et avertissement `naming_incomplete` ;
+- les tables ne changent que le texte : GUID et regroupement restent identiques ;
+- un « / » dans une valeur est remplacé par « - » ; pas de suffixe « (+N) ».
+
+Les paramètres complets du projet pilote PIC sont dans `n8n/examples/ifc-clash-params.json`. Extrait :
 
 ```json
 {
-  "charter": {
-    "buildings": { "Jura": "BaJ", "Tour": "BaT" },
-    "levels": { "J_10_P00": "P00", "J_11_P01": "P01", "J_12_P02": "P02" },
-    "trades": { "a": "CVC", "b": "ARC" }
+  "title_template": "{building}/{storey}/{trade_a}-{trade_b}/{type_a} x {type_b}",
+  "mappings": {
+    "building": { "Jura": "BaJ", "Tour": "BaT" },
+    "storey": { "J_10_P00": "P00", "J_11_P01": "P01" },
+    "trade": { "PIC-EXE-AW-CVC-MNQ-BaJ-SUP-30701-IFC4": "CVC", "PIC_REV_HRS_ARC_MNQ_BaJ_SUP_30400": "ARC" },
+    "type": { "IfcDuctSegment": "Gaine", "IfcCovering/CEILING": "Faux-plafond" }
   }
 }
 ```
+
+Ce qui donne par exemple `BaJ/P01/CVC-ARC/Gaine x Faux-plafond`.
 
 ## Sélecteurs
 
@@ -89,7 +103,7 @@ géométrie n'est pas une erreur : un avertissement `selection_a_empty` ou `sele
   et au moins un conflit). Sans conflit, l'avertissement `bcf_skipped_no_clash` est ajouté.
 
 Avertissements possibles : `clashes_truncated`, `data_pairs_omitted`, `data_groups_omitted`,
-`charter_missing`, `label_fallback`, `naming_unavailable`, `snapshots_unavailable`,
+`mapping_missing`, `naming_incomplete`, `naming_unavailable`, `snapshots_unavailable`,
 `selection_a_empty`, `selection_b_empty`, `context_unavailable`, `bcf_skipped_no_clash`.
 
 ## Conventions BCF

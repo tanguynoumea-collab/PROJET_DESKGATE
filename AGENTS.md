@@ -127,12 +127,13 @@ Consignes :
 
 ### Mettre à jour les plugins
 
-Les paquets des plugins sont installés par un `uv sync` ordinaire, **pas en mode éditable** : toute
-nouvelle dépendance (par exemple Pillow en phase 5.1) comme tout changement de code d'un plugin exige de
+Les paquets des plugins (`deskgate-bim`, `deskgate-bcf`) sont installés **en mode éditable** : les fichiers
+`_editable_impl_deskgate_bim.pth` et `_editable_impl_deskgate_bcf.pth` pointent vers le dépôt. Un changement de
+code d'un plugin est donc pris au prochain job, sans redémarrage du runner (le plugin est lancé à chaque
+tâche). Seule une dépendance modifiée (`pyproject.toml` ou `uv.lock`, par exemple Pillow en phase 5.1) exige de
 relancer les deux `uv sync --locked --package ... --no-dev` de la section précédente, avec
 `UV_PROJECT_ENVIRONMENT` et `UV_PYTHON` définis, depuis un terminal hors application MSIX (qui
-virtualise `%LOCALAPPDATA%`). Aucun redémarrage du runner n'est nécessaire : le plugin est lancé à
-chaque tâche.
+virtualise `%LOCALAPPDATA%`).
 
 ## 5. Brancher n8n
 
@@ -164,9 +165,12 @@ Le nœud communautaire `n8n-nodes-deskgate` n'arrive qu'en v0.3.
 
 Déposer un IFC d'exemple dans `C:\BIM\depot\`, puis `POST http://127.0.0.1:5679/webhook/deskgate-ifc-clash`
 (corps `{"params": {...}, "timeout": 14400}` ; un 404 juste après la publication : réessayer), ou lancer
-`uv run python scripts/recette/recette.py smoke`. Exemple de corps avec charte de nommage (détails : [`plugins/bim/README.md`](plugins/bim/README.md)) :
+`uv run python scripts/recette/recette.py smoke`. Exemple de corps avec gabarit de titre et tables (détails : [`plugins/bim/README.md`](plugins/bim/README.md)) :
 `{"params": {"ifc_a": "...", "selector_a": "IfcWall", "mode": "hard", "tolerance": 0.01, "bcf": true,
-"charter": {"buildings": {"Jura": "BaJ"}, "levels": {"J_11_P01": "P01"}, "trades": {"a": "CVC", "b": "ARC"}}}}`.
+"title_template": "{building}/{storey}/{trade_a}-{trade_b}/{type_a} x {type_b}",
+"mappings": {"building": {"Jura": "BaJ"}, "storey": {"J_11_P01": "P01"},
+"trade": {"PIC-EXE-AW-CVC-MNQ-BaJ-SUP-30701-IFC4": "CVC", "PIC_REV_HRS_ARC_MNQ_BaJ_SUP_30400": "ARC"}}}}`.
+Les paramètres complets du projet pilote sont dans `n8n/examples/ifc-clash-params.json`.
 Le workflow se met en attente puis reprend avec un
 résumé et le chemin d'un BCF. Si `recette.py` tourne dans un contexte virtualisé, donner `--out`
 explicitement (dossier hors `%LOCALAPPDATA%`, par exemple sous `C:\BIM\recette`).
