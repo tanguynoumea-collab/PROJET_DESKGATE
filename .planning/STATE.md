@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05.1-10-PLAN.md
-last_updated: "2026-10-22T08:37:50.411Z"
+stopped_at: Completed 05.1-12-PLAN.md
+last_updated: "2026-10-22T08:43:00.613Z"
 last_activity: 2026-10-22
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 51
-  completed_plans: 49
+  completed_plans: 50
   percent: 0
 ---
 
@@ -95,6 +95,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.1 P09 | 40min | 3 tasks | 7 files |
 | Phase 05.1 P11 | 20min | 2 tasks | 0 files |
 | Phase 05.1 P10 | 25min | 3 tasks | 8 files |
+| Phase 05.1 P12 | 25min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -141,6 +142,7 @@ Recent decisions affecting current work:
 - [Phase 5.1]: Nommage générique : Deskgate reçoit du job un gabarit de titre (champs bâtiment, étage, techniques, types) et des tables de correspondance ; aucun libellé ni code métier en dur dans le plugin (table française et liste de techniques retirées). La charte PIC, les libellés et les codes vivent dans le pipeline n8n (exemple) — Décision utilisateur du 2026-10-22 : Deskgate est une passerelle, pas un pipeline
 - [Phase 5.1]: Vue 2 du BCF : le contexte gris transparent doit couvrir tout ce qui est visible ; les éléments hors contexte ne doivent pas rester dans leurs couleurs d'origine — 04-D1 rejoué le 2026-10-22 : certains éléments non grisés
 - [Phase 5.1]: Vue 2 : approche A retenue (DefaultVisibility false, exceptions = conflit + contexte à 5 m, contexte gris transparent, reste masqué) — Choix utilisateur du 2026-10-22 dans BIMcollab Zoom (zoom-tests-v2), B1 de 05.1-12 levé
+- [Phase 05.1]: Vue 2 : approche A (isolé) retenue par l'utilisateur après essai dans Zoom
 
 ### Roadmap Evolution
 
@@ -163,6 +165,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-22T08:30:10.651Z
-Stopped at: Completed 05.1-10-PLAN.md
+Last session: 2026-10-22T08:43:00.609Z
+Stopped at: Completed 05.1-12-PLAN.md
 Resume file: None
