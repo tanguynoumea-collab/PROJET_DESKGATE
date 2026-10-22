@@ -124,3 +124,39 @@ def test_required_files_interdit_pour_mcp() -> None:
 def test_required_files_nom_invalide() -> None:
     with pytest.raises(ConfigError):
         _parse(_PY + 'required_files = ["a-b"]\n')
+
+
+_SRV = "[mcp_servers.srv]\ncommand = 'C:/p.exe'\n"
+
+
+def test_path_arguments_valide() -> None:
+    cfg = _parse(
+        _SRV + 'allowed_tools = ["read_file", "fs.write-v2"]\n'
+        'path_arguments = { read_file = ["path"], "fs.write-v2" = ["path", "dest"] }\n'
+    )
+    assert cfg.mcp_servers["srv"].path_arguments["fs.write-v2"] == ["path", "dest"]
+
+
+def test_path_arguments_outil_non_autorise() -> None:
+    with pytest.raises(ConfigError) as e:
+        _parse(_SRV + 'allowed_tools = ["echo"]\npath_arguments = { read_file = ["path"] }\n')
+    assert "path_arguments" in str(e.value)
+
+
+def test_path_arguments_liste_vide() -> None:
+    with pytest.raises(ConfigError):
+        _parse(_SRV + 'allowed_tools = ["read_file"]\npath_arguments = { read_file = [] }\n')
+
+
+def test_path_arguments_nom_argument_invalide() -> None:
+    with pytest.raises(ConfigError):
+        _parse(
+            _SRV + 'allowed_tools = ["read_file"]\npath_arguments = { read_file = ["a-b"] }\n'
+        )
+
+
+def test_mcp_path_arguments() -> None:
+    cfg = _parse(
+        _SRV + 'allowed_tools = ["read_file"]\npath_arguments = { read_file = ["path"] }\n'
+    )
+    assert cfg.mcp_path_arguments() == {"srv": {"read_file": ["path"]}}

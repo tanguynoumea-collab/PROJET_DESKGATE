@@ -14,6 +14,7 @@ from collections.abc import Callable, Sequence
 from collections.abc import Mapping as AbcMapping
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
 Resolver = Callable[[str], str]
 
@@ -199,4 +200,28 @@ def convert_path_params(
             raise PathDenied(
                 _INVALID, f"Le paramètre {key} doit être un chemin ou une liste de chemins."
             )
+    return out
+
+
+def convert_mcp_arguments(
+    params: AbcMapping[str, object],
+    path_arguments: AbcMapping[str, AbcMapping[str, Sequence[str]]],
+    mappings: Sequence[Mapping],
+    roots: Sequence[str],
+    resolver: Resolver = default_resolver,
+) -> dict[str, object]:
+    """Convertit les arguments de chemin déclarés d'un appel mcp.call (premier niveau seulement).
+
+    Serveur, outil ou arguments inconnus ou mal typés : params renvoyés tels quels (le worker produit
+    déjà invalid_params, server_not_declared ou tool_not_allowed). Les arguments non déclarés restent opaques.
+    """
+    out: dict[str, object] = dict(params)
+    server, tool, args = params.get("server"), params.get("tool"), params.get("arguments")
+    if not isinstance(server, str) or not isinstance(tool, str) or not isinstance(args, dict):
+        return out
+    keys = path_arguments.get(server, {}).get(tool, ())
+    if not keys:
+        return out
+    typed_args = cast("dict[str, object]", args)
+    out["arguments"] = convert_path_params(typed_args, list(keys), mappings, roots, resolver)
     return out

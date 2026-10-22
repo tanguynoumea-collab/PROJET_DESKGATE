@@ -112,6 +112,7 @@ _ENTRY = r"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*:[A-Za-z_][A-Za-z0-
 Scalar = str | int | float | bool
 SettingValue = Scalar | list[Scalar]
 Ident = Annotated[str, StringConstraints(pattern=_IDENT)]
+ToolName = Annotated[str, StringConstraints(min_length=1, max_length=128)]
 
 
 class Capability(Strict):
@@ -169,7 +170,26 @@ class McpServer(Strict):
     command: Annotated[str, AfterValidator(_host_root)]
     args: list[str] = []
     env: dict[Ident, str] = {}
-    allowed_tools: list[Annotated[str, StringConstraints(min_length=1, max_length=128)]] = []
+    allowed_tools: list[ToolName] = []
+    # Arguments de premier niveau convertis et validés (règle 4), par outil.
+    path_arguments: dict[ToolName, list[Ident]] = {}
+
+    @model_validator(mode="after")
+    def _path_arguments(self) -> McpServer:
+        for tool, keys in self.path_arguments.items():
+            if tool not in self.allowed_tools:
+                raise PydanticCustomError(
+                    "path_arguments_tool_not_allowed",
+                    "path_arguments : l'outil {tool} ne figure pas dans allowed_tools",
+                    {"tool": tool},
+                )
+            if not keys:
+                raise PydanticCustomError(
+                    "path_arguments_empty",
+                    "path_arguments : liste vide pour l'outil {tool}",
+                    {"tool": tool},
+                )
+        return self
 
 
 class CallbackConfig(Strict):
@@ -223,6 +243,12 @@ class RunnerConfig(Strict):
         if ipaddress.IPv4Address(self.host).is_loopback:
             return ()
         return ("listen_non_loopback",)
+
+    def mcp_path_arguments(self) -> dict[str, dict[str, list[str]]]:
+        return {
+            name: {tool: list(keys) for tool, keys in s.path_arguments.items()}
+            for name, s in self.mcp_servers.items()
+        }
 
     def mappings(self) -> tuple[Mapping, ...]:
         return tuple(Mapping(container=m.container, host=m.host) for m in self.paths.mapping)
