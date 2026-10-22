@@ -42,3 +42,6 @@
 {"ts":"2026-10-22T13:30","type":"fermeture","ref":"remote-ci, ci-e2e-kill-tree, gate-portes-na","commit":"d689cbe","note":"CI verte 3.11/3.13 ; kill_tree corrige (quick 261022-iea) ; portes declarees au gate"}
 {"ts":"2026-10-22T13:30","type":"transition","ref":"GATE -> AUDIT_COUNCIL","commit":"d689cbe","note":"cycle sans impact UI : DESIGN_REVIEW sautee"}
 {"ts":"2026-10-22T14:00","type":"rapport","ref":"AUDIT_COUNCIL pre-vol","commit":"af030cb","note":"outillage ephemere verifie, roster retenu, dispatch a lancer"}
+{"ts":"2026-10-22T16:30","type":"rapport","ref":"audits/saas-council-2026-10-22.md","commit":"b3902a8","note":"saas-council complet : 0 bloquant, 3 majeurs (ARC-001, SEC-001, LIV-001), 28 mineurs, 29 info ; SEC-001 arbitre 3/3"}
+{"ts":"2026-10-22T16:30","type":"fermeture","ref":"clash-troncature","commit":"b3902a8","note":"certifie par saas-tests : test_clash_limits.py:84-95"}
+{"ts":"2026-10-22T16:30","type":"fermeture","ref":"clash-reservations","commit":"b3902a8","note":"certifie avec reserve par saas-tests : test_clash_openings.py:27-53 ; cas IfcElement = TST-002 (mineur)"}

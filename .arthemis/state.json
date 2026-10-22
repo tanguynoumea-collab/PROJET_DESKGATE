@@ -20,7 +20,7 @@
   },
   "route": "full",
   "phase": "AUDIT_COUNCIL",
-  "phase_status": "en_cours",
+  "phase_status": "attente_humaine",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -54,7 +54,7 @@
   "iterations": {
     "cadrage_tours": 1,
     "design_review": 0,
-    "audit_council": 0,
+    "audit_council": 1,
     "max": 3
   },
   "checkpoints": {
@@ -127,9 +127,45 @@
       "statut": "ouvert",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-21",
-      "source": "execution 05-06 tache 3",
-      "ref": "src/deskgate/doctor.py",
+      "source": "execution 05-06 tache 3 ; confirme par audits/saas-council-2026-10-22.md",
+      "ref": "LIV-001",
       "condition_levee": "doctor detecte ou init refuse un home virtualise ; teste"
+    },
+    {
+      "id": "ARC-001",
+      "type": "finding",
+      "titre": "Mort d'un thread engine/sender : runner arrete avec code 0, non relance ; rappels bloques jusqu'a la session suivante",
+      "gravite": "majeur",
+      "statut": "ouvert",
+      "proprietaire": "ia",
+      "ouvert_le": "2026-10-22",
+      "source": "audits/saas-council-2026-10-22.md",
+      "ref": "ARC-001",
+      "condition_levee": "code de sortie non nul + relance prouvee + test e2e ; certifie par -role fiabilite"
+    },
+    {
+      "id": "SEC-001",
+      "type": "finding",
+      "titre": "Executeur mcp : arguments transmis sans conversion ni validation allowed_roots (regle 4)",
+      "gravite": "majeur",
+      "statut": "ouvert",
+      "proprietaire": "ia",
+      "ouvert_le": "2026-10-22",
+      "source": "audits/saas-council-2026-10-22.md",
+      "ref": "SEC-001",
+      "condition_levee": "path_params par outil mcp convertis et valides + tests obligatoires ; certifie par -role securite"
+    },
+    {
+      "id": "triage-council-1",
+      "type": "decision",
+      "titre": "triage a faire : 3 majeurs (ARC-001, SEC-001, LIV-001), 28 mineurs",
+      "gravite": "majeur",
+      "statut": "en_attente_decision",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-22",
+      "source": "audits/saas-council-2026-10-22.md",
+      "ref": "checkpoints.triage",
+      "condition_levee": "triage date par l'utilisateur (retenus en phase inseree, reportes en backlog)"
     },
     {
       "id": "acc01-duree",
@@ -142,30 +178,6 @@
       "source": "05-08-SUMMARY.md",
       "ref": "ACC-01",
       "condition_levee": "certification a la DoD (critere revu, palier 4 et recettes 5.1)"
-    },
-    {
-      "id": "clash-troncature",
-      "type": "finding",
-      "titre": "ifc.clash : max_clashes=1000 par defaut tronque clashes.json et le BCF en silence (21227 -> 1000 au palier 3)",
-      "gravite": "majeur",
-      "statut": "corrige_non_certifie",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-21",
-      "source": "recette ACC-01 palier 3",
-      "ref": "plugins/bim/src/deskgate_bim/params.py:34",
-      "condition_levee": "certification a l'AUDIT_COUNCIL (corrige en 05.1-04, recettes p51/p52)"
-    },
-    {
-      "id": "clash-reservations",
-      "type": "finding",
-      "titre": "ifc.clash : un selecteur IfcElement inclut IfcOpeningElement, d'ou de faux conflits gaine/reservation",
-      "gravite": "majeur",
-      "statut": "corrige_non_certifie",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-21",
-      "source": "recette ACC-01 palier 3 (1490 reservations ARC)",
-      "ref": "plugins/bim/src/deskgate_bim/clash.py",
-      "condition_levee": "certification a l'AUDIT_COUNCIL (corrige en 05.1-04, recettes p51/p52)"
     }
   ],
   "livraisons": [],
@@ -223,6 +235,6 @@
   },
   "maj": {
     "le": "2026-10-22",
-    "commit": "c29fd6b"
+    "commit": "b3902a8"
   }
 }
