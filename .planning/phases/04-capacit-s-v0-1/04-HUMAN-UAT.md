@@ -1,9 +1,9 @@
 ---
-status: partial
+status: complete
 phase: 04-capacit-s-v0-1
 source: [04-07-PLAN.md, 05.1-VERIFICATION.md]
 started: 2026-10-20T00:00:00Z
-updated: 2026-10-22T14:00:00Z
+updated: 2026-10-22T15:00:00Z
 queue: deferred
 horizon: none
 overrides_bloquant: []
@@ -14,13 +14,14 @@ overrides_bloquant: []
 number: 1
 name: Rendu du BCF ifc.clash dans BIMcollab Zoom (deux vues, contexte gris transparent, couleurs)
 expected: Vue 1 : seuls les deux objets du conflit visibles, rouge et bleu ; vue 2 : maquette visible, contexte gris transparent, objets du conflit colorés ; caméra cadrée sur le conflit
-awaiting: user response
+awaiting: none
 
 ## Tests
 
 ### 1. Rendu du BCF ifc.clash dans BIMcollab Zoom (deux vues, contexte gris transparent, couleurs)
 expected: Vue 1 : seuls les deux objets du conflit visibles, rouge et bleu ; vue 2 : maquette visible, contexte gris transparent, objets du conflit colorés ; caméra cadrée sur le conflit
-result: pending
+result: pass
+verdict: "04-D1 validé sur le BCF 835bfaaa2745 : deux points de vue par sujet avec image, vue 2 = conflit rouge/bleu + contexte gris transparent, rien d'autre, cadrage et titres corrects." (utilisateur, 2026-10-22)
 previous_report_2: "La vue 2 n'est pas validée car certains éléments ne sont pas grisés et en transparence." (utilisateur, 2026-10-22, BCF 610f3831da29)
 severity: major
 diagnostic_2: la vue 2 ne grise que les voisins du conflit (context_radius 5 m, max_context 500) ; tout le reste reste visible dans ses couleurs d'origine (DefaultVisibility true)
@@ -37,9 +38,9 @@ if_fail: gap, /gsd:plan-phase 4 --gaps
 ## Summary
 
 total: 1
-passed: 0
+passed: 1
 issues: 0
-pending: 1
+pending: 0
 skipped: 0
 blocked: 0
 
