@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import sqlite3
@@ -15,6 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import psutil
 import pytest
 from tests._support.jobs import FAKE_PLUGINS
 
@@ -107,9 +109,24 @@ def start_runner(env: dict[str, str], log_path: Path | None = None) -> subproces
 
 
 def kill_tree(p: subprocess.Popen[bytes]) -> None:
-    """Tue l'arbre entier (le lanceur de venv crée un processus enfant)."""
-    subprocess.run(["taskkill", "/F", "/T", "/PID", str(p.pid)], capture_output=True)
+    """Tue l'arbre entier et attend sa mort complète.
+
+    Le lanceur de venv crée un runner Python enfant qui tient `deskgate.db` (WAL) : on collecte
+    donc les descendants AVANT `taskkill`, puis on attend le lanceur et chacun d'eux.
+    """
+    try:
+        enfants = psutil.Process(p.pid).children(recursive=True)
+    except psutil.NoSuchProcess:
+        enfants = []
+    subprocess.run(["taskkill", "/F", "/T", "/PID", str(p.pid)], capture_output=True, check=False)
     p.wait(10)
+    _, vivants = psutil.wait_procs(enfants, timeout=10)
+    if vivants:
+        pids = sorted(proc.pid for proc in vivants)
+        for proc in vivants:
+            with contextlib.suppress(psutil.NoSuchProcess):
+                proc.kill()
+        pytest.fail(f"Processus du runner encore vivants après taskkill : {pids}")
 
 
 def wait_health(
