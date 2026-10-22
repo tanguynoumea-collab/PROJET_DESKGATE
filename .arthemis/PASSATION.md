@@ -1,31 +1,30 @@
-[PASSATION arthemis web_saas 2026-10-21T09:41 HEAD=ff5cba0 branche=main ahead=n/a behind=n/a propre=oui remote=aucun gsd=1.30.0]
+[PASSATION arthemis web_saas 2026-10-22T14:05 HEAD=c29fd6b branche=main ahead=0 behind=0 propre=oui remote=origin gsd=1.30.0]
 Projet : Deskgate | racine : C:\Users\Tanguy\Documents\PROGRAMMES\DEV\PROJET DESKGATE | skill : arthemis-orchestrator
-Milestone : v0.1 Runner minimal | phases 4/5 | plans 29/29 | certifiées 4
-Pipeline : IMPLEMENTATION/en_cours | route full | cycle 1 | checkpoints cadrage ✓2026-10-20 | plan_design – | triage – | go_publication – | roadmap – | itérations cadrage_tours 1/3, design_review 0/3, audit_council 0/3
-Position GSD : phase courante 05 installation-et-int-gration-n8n (contexte + recherche faits, non planifiée) | plans faits aucun | restants à planifier
-Tâche : aucune (entre deux plans)
-Prochaine commande : écrire 05-VALIDATION.md depuis 05-RESEARCH.md § Validation Architecture, puis /gsd:plan-phase 5
-Exigences : 29/47 | Pending INS-01 INS-02 INS-03 INS-04 INS-05 ACC-01 ACC-02 SOC-01..03 AUD-01..03 PUB-01..05 | Dropped aucune | citées non cochées aucune
+Milestone : v0.1 Runner minimal | phases 6/6 (1 à 5, 5.1) | plans 51/51 | certifiées 6
+Pipeline : AUDIT_COUNCIL/en_cours | route full | cycle 1 | checkpoints cadrage ✓2026-10-20 | plan_design – | triage – | go_publication – | roadmap – | itérations cadrage_tours 1/3, design_review 0/3, audit_council 0/3
+Position GSD : aucune phase ouverte (phases 5 et 5.1 terminées le 2026-10-22)
+Tâche : aucune (audit council : pré-vol fait, dispatch des auditeurs à lancer)
+Prochaine commande : /saas-council (roster et outillage déjà décidés, voir STATE.md décision du 2026-10-22)
+Exigences : 38/49 | Pending SOC-01..03 AUD-01..03 PUB-01..05 | Dropped aucune | citées non cochées aucune
 Livraison : aucun tag | tag sur HEAD : non | version cible v0.1.0
-Items ouverts : 0 bloquants, 0 majeurs, 0 corrigés non certifiés, 0 en attente de décision (3 mineurs : 04-D1, gate-portes-na, odm-backlog)
+Items ouverts : 0 bloquants, 1 majeur (05-06-msix), 3 corrigés non certifiés (acc01-duree, clash-troncature, clash-reservations), 1 en attente de décision (uv-pythons) ; mineur odm-backlog
 Attend l'humain :
-- 04-D1 uat : rendu du BCF ifc.clash dans BIMcollab Zoom | levée quand résultat saisi dans 04-HUMAN-UAT.md (après le calcul réel de la phase 5)
+- uv-pythons decision : réparer les Pythons gérés par uv (Roaming\uv\python) | levée quand réparation faite ou refus consigné
+- 05-D1 verify (05-HUMAN-UAT.md) : runner démarré seul à l'ouverture de session | différable, blocks none
+- 05-D2 verify (05-HUMAN-UAT.md) : recette du workflow sur le n8n de l'utilisateur (2.42.5, 5678) | différable, blocks none
 Dérives à corriger en premier :
-- dépôt sans remote (CI windows-latest jamais exécutée, Python 3.12/3.13 non testés) → décision utilisateur
+- aucune
 Derniers commits :
-ff5cba0 docs(state): phase 5 recherchée, prête à planifier
-cdcdd9a docs(phase-5): recherche installation et intégration n8n
-cdb30ec docs(arthemis): point de passation
-f04eb9b docs(state): point de passation, phase 5 en recherche
-167c9bf docs(state): record phase 5 context session
+c29fd6b docs(arthemis): pré-vol de l'audit council
+af030cb docs(state): pré-vol de l'audit council, roster et outillage
+a09a623 docs(arthemis): gate cycle 1 phase 05.1 vert
+d689cbe docs(quick-261022-iea): attendre tout l'arbre dans kill_tree
+b233760 test(quick-261022-iea): attendre tout l'arbre dans kill_tree
 Non écrit sur disque [transcript] :
-- Accords système (C:\BIM, %LOCALAPPDATA%\Deskgate, tâche planifiée) donnés le 2026-10-21 : écrits dans STATE.md et 05-CONTEXT.md D-01
-- Pythons gérés par uv cassés (AppData\Roaming\uv\python 3.13/3.14) par une recherche de la phase 1 ; non réparés, réparation proposée à l'utilisateur sans réponse ; utiliser UV_PYTHON=C:\Users\Tanguy\AppData\Local\Python\pythoncore-3.14-64\python.exe
-- Exécution des plans : séquentielle dans l'arbre principal (pas de worktree), un gsd-executor à la fois ; n8n de l'utilisateur (pipelines-n8n, 2.42.5, port 5678) à ne pas modifier
+- aucun
 À lire avant d'agir, dans l'ordre :
 .arthemis/state.json
 .planning/STATE.md
-.planning/phases/05-installation-et-int-gration-n8n/05-CONTEXT.md
-.planning/phases/05-installation-et-int-gration-n8n/05-RESEARCH.md
-.arthemis/dod/cycle-1.md
-Consigne : tu es arthemis-orchestrator. Exécute la section « Réception d'une passation » de SKILL.md. Ouvre avec /gsd:progress. Compare HEAD à ff5cba0 ; si le dépôt a avancé, repars du disque, pas du prompt. Écris d'abord la section « Non écrit sur disque ». Corrige les dérives dans l'ordre. Ne relis ni .arthemis/legacy, ni les rapports, ni le journal au-delà de 20 commits. Annonce en 3 lignes. Propose la prochaine commande et une alternative.
+.arthemis/reports/gate-1-05.1.log
+CLAUDE.md
+Consigne : tu es arthemis-orchestrator. Exécute la section « Réception d'une passation » de SKILL.md. Ouvre avec /gsd:progress. Compare HEAD à c29fd6b ; si le dépôt a avancé, repars du disque, pas du prompt. Écris d'abord la section « Non écrit sur disque ». Corrige les dérives dans l'ordre. Ne relis ni .arthemis/legacy, ni les rapports, ni le journal au-delà de 20 commits. Annonce en 3 lignes. Propose la prochaine commande et une alternative.
