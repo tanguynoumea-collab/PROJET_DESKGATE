@@ -194,7 +194,7 @@ deskgate doctor > <fichier>
 | Runner arrêté après un arrêt brutal | Pas de relance automatique : `deskgate task run` |
 | Aucun journal | Vérifier `logs\runner.log` ; sinon erreur de configuration : `deskgate doctor` |
 | Tâche planifiée en `0x8007010B` | Installation faite depuis une application MSIX : refaire depuis un terminal normal (signalé par `deskgate doctor`) |
-| Tâche planifiée en code 6 | Thread du runner en échec répété : lire `logsunner.log`, corriger, puis `deskgate task run` |
+| Tâche planifiée en code 6 | Thread du runner en échec répété : lire `logs\runner.log`, corriger, puis `deskgate task run` |
 | Jeton refusé après `init` | Fichier écrit en UTF-16 par `>` de PowerShell 5.1 : utiliser `cmd /c` |
 | Webhook 404 juste après la publication | Enregistrement en cours : réessayer après quelques secondes |
 | Wait expiré | Branche « Echec ou delai » : rappel absent ; voir `n8n/README.md` |

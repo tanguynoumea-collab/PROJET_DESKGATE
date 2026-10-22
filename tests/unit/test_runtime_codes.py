@@ -19,3 +19,12 @@ def test_exit_codes_alignes() -> None:
         runtime.EXIT_THREAD_FAILED,
     ]
     assert codes == [2, 3, 4, 5, 6]
+
+
+def test_message_abandon_sans_retour_chariot() -> None:
+    from pathlib import Path
+
+    chemin = Path("C:/dg/logs/runner.log")
+    msg = runtime.give_up_message("engine", 6, chemin)
+    assert msg == (f"Runner arrêté : thread engine en échec répété (code 6). Voir {chemin}.")
+    assert "\r" not in msg

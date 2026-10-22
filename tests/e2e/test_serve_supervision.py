@@ -100,4 +100,6 @@ def test_pannes_repetees_sortie_code_6(data_home: Path, instance_name: str, free
         texte = log_path(data_home).read_text(encoding="utf-8", errors="replace")
         assert "abandon" in texte
         assert "engine" in texte
-        assert "code 6" in startup_log_path(data_home).read_text(encoding="utf-8", errors="replace")
+        texte_demarrage = startup_log_path(data_home).read_text(encoding="utf-8", errors="replace")
+        assert "code 6" in texte_demarrage
+        assert str(log_path(data_home)) in texte_demarrage

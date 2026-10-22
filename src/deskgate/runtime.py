@@ -129,6 +129,11 @@ def _err(message: str) -> None:
     startup_logger.error("%s", message)
 
 
+def give_up_message(cause: str | None, code: int, log_file: Path) -> str:
+    """Message d'abandon en code 6 (P-06) : chemin réel du journal, aucun retour chariot."""
+    return f"Runner arrêté : thread {cause} en échec répété (code {code}). Voir {log_file}."
+
+
 def serve(config_override: Path | None = None) -> int:
     """Lance le runner ; renvoie le code de sortie du processus."""
     home = resolve_home()
@@ -263,8 +268,5 @@ def _serve(home: Path, config_override: Path | None) -> int:
         holder.sender.stop()  # KeyboardInterrupt ; la voie CTRL_BREAK passe par le lifespan
     code = exit_code(gave_up=supervisor.gave_up)
     if code != 0:
-        _err(
-            f"Runner arrêté : thread {supervisor.last_cause} en échec répété (code {code}). "
-            "Voir logs\runner.log."
-        )
+        _err(give_up_message(supervisor.last_cause, code, log_path(home)))
     return code
