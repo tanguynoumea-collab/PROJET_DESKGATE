@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05.1-13-PLAN.md
-last_updated: "2026-10-22T10:14:43.271Z"
-last_activity: 2026-10-22
+stopped_at: "AUDIT_COUNCIL : pré-vol fait (outillage éphémère vérifié), dispatch des auditeurs à lancer"
+last_updated: "2026-10-22T11:58:38.879Z"
+last_activity: "2026-10-22 - Completed quick task 261022-iea: Attendre tout l'arbre dans kill_tree des tests e2e"
 progress:
   total_phases: 6
   completed_phases: 6
@@ -144,6 +144,7 @@ Recent decisions affecting current work:
 - [Phase 5.1]: Vue 2 du BCF : le contexte gris transparent doit couvrir tout ce qui est visible ; les éléments hors contexte ne doivent pas rester dans leurs couleurs d'origine — 04-D1 rejoué le 2026-10-22 : certains éléments non grisés
 - [Phase 5.1]: Vue 2 : approche A retenue (DefaultVisibility false, exceptions = conflit + contexte à 5 m, contexte gris transparent, reste masqué) — Choix utilisateur du 2026-10-22 dans BIMcollab Zoom (zoom-tests-v2), B1 de 05.1-12 levé
 - [Phase 05.1]: Vue 2 : approche A (isolé) retenue par l'utilisateur après essai dans Zoom
+- [Phase 5.1]: AUDIT_COUNCIL cycle 1 : /saas-council complet ; outillage en exécution éphémère (uvx pip-audit 2.10.1, semgrep 1.182.1, radon 6.0.1, uv run --with pytest-cov, npx jscpd), gitleaks NON VÉRIFIÉ (recherche de secrets par rg, déclarée) ; roster Tier 1 + Tier 2 (tenancy, sécurité, fiabilité, données) + Tier 3 pertinence et livraison ; perfcout sauté (runner local, aucun coût d'exécution) ; billing, conformité, IA, SEO non activés (aucune dépendance de paiement, aucune donnée personnelle, aucun SDK de modèle, aucune page publique) — Choix utilisateur du 2026-10-22 au pré-vol du council ; audit pas encore lancé
 
 ### Roadmap Evolution
 
@@ -167,6 +168,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-22T09:02:05.763Z
-Stopped at: Completed 05.1-13-PLAN.md
-Resume file: None
+Last session: 2026-10-22T11:58:38.874Z
+Stopped at: AUDIT_COUNCIL : pré-vol fait (outillage éphémère vérifié), dispatch des auditeurs à lancer
+Resume file: .arthemis/PASSATION.md
