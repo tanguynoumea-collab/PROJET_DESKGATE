@@ -20,6 +20,7 @@ import xml.etree.ElementTree as ET
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 TASK_NAME = "Deskgate"
 TASK_NS = "http://schemas.microsoft.com/windows/2004/02/mit/task"
@@ -313,3 +314,94 @@ def end_task(name: str) -> bool:
 
 def delete_task(name: str) -> bool:
     return _run("/Delete", "/TN", name, "/F").returncode == 0
+
+
+# --- Dernier résultat de la tâche -----------------------------------------------------------
+
+SCHED_S_TASK_RUNNING = 0x00041301
+SCHED_S_TASK_HAS_NOT_RUN = 0x00041303
+RESULT_VIRTUALIZED = 0x8007010B
+POWERSHELL = os.path.join(
+    os.environ.get("SYSTEMROOT", r"C:\Windows"),
+    "System32",
+    "WindowsPowerShell",
+    "v1.0",
+    "powershell.exe",
+)
+_TASK_NAME_RE = re.compile(r"^[A-Za-z0-9._-]+$")
+_RUNNER_EXIT = {
+    2: "configuration invalide",
+    3: "runner déjà en cours",
+    4: "port indisponible",
+    5: "base de données inaccessible",
+    6: "thread engine ou sender en échec répété",
+}
+
+
+@dataclass(frozen=True)
+class TaskResult:
+    kind: Literal["ok", "running", "never", "virtualized", "runner_exit", "failure", "unreadable"]
+    level: Literal["ok", "avertissement", "echec"]
+    message: str
+
+
+def last_task_result(name: str = TASK_NAME, *, timeout: float = 20.0) -> int | None:
+    """Dernier résultat numérique de la tâche (Get-ScheduledTaskInfo, indépendant de la langue).
+
+    Commande fixe : le nom passe par l'environnement de l'enfant, jamais par la ligne de commande.
+    """
+    if not _TASK_NAME_RE.fullmatch(name):
+        return None
+    argv = [
+        POWERSHELL,
+        "-NoProfile",
+        "-NonInteractive",
+        "-Command",
+        "(Get-ScheduledTaskInfo -TaskName $env:DESKGATE_TASK_NAME).LastTaskResult",
+    ]
+    env = {**os.environ, "DESKGATE_TASK_NAME": name}
+    try:
+        res = subprocess.run(  # noqa: S603
+            argv,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            check=False,
+            env=env,
+            creationflags=subprocess.CREATE_NO_WINDOW,
+        )
+        return int(res.stdout.strip()) & 0xFFFFFFFF
+    except (subprocess.TimeoutExpired, OSError, ValueError):
+        return None
+
+
+def classify_task_result(code: int | None) -> TaskResult:
+    """Classe un dernier résultat : « en cours », « jamais exécutée » et 0 ne sont pas des échecs."""
+    if code is None:
+        return TaskResult(
+            "unreadable",
+            "avertissement",
+            "dernier résultat de la tâche illisible (PowerShell indisponible ou tâche absente)",
+        )
+    if code == 0:
+        return TaskResult("ok", "ok", "dernière exécution réussie")
+    if code == SCHED_S_TASK_RUNNING:
+        return TaskResult("running", "ok", "tâche en cours")
+    if code == SCHED_S_TASK_HAS_NOT_RUN:
+        return TaskResult("never", "ok", "tâche jamais exécutée")
+    if code == RESULT_VIRTUALIZED:
+        return TaskResult(
+            "virtualized",
+            "echec",
+            "dernier résultat 0x8007010B : dossier de travail introuvable pour le Planificateur, "
+            "cause probable une installation virtualisée par une application MSIX ; refaire "
+            "`deskgate init` depuis un terminal normal (AGENTS.md, « Terminal normal obligatoire »)",
+        )
+    if code in _RUNNER_EXIT:
+        return TaskResult(
+            "runner_exit",
+            "avertissement",
+            f"le runner est sorti avec le code {code} ({_RUNNER_EXIT[code]}) ; "
+            "voir logs\startup.log et logs\runner.log",
+        )
+    return TaskResult("failure", "avertissement", f"dernier résultat 0x{code:08X}")
