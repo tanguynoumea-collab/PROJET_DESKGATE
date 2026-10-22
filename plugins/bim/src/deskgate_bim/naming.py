@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Nommage des sujets BCF (D-04 à D-09, D-16) : fonctions pures, stdlib seule."""
+"""Nommage générique des sujets BCF (D-04 à D-07, D-16, D-17) : fonctions pures, stdlib seule."""
 
 from __future__ import annotations
 
@@ -9,65 +9,21 @@ from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
 TITLE_MAX = 512
-FILENAME_FALLBACK_MAX = 12
 MESSAGE_MAX = 2000
 
-TRADE_CODES: tuple[str, ...] = (
-    "ARC",
-    "STR",
-    "CVC",
-    "CHA",
-    "VEN",
-    "CLI",
-    "PLB",
-    "SAN",
-    "ELE",
-    "SPK",
-    "FAC",
-    "VRD",
-)
-
-# Clé « Classe » ou « Classe/TYPEPREDEFINI » -> libellé français.
-LABELS: dict[str, str] = {
-    "IfcDuctSegment": "Gaine",
-    "IfcDuctSegment/FLEXIBLESEGMENT": "Gaine flexible",
-    "IfcPipeSegment": "Canalisation",
-    "IfcDuctFitting": "Raccord de gaine",
-    "IfcDuctFitting/BEND": "Coude de gaine",
-    "IfcPipeFitting": "Raccord de tuyauterie",
-    "IfcAirTerminal": "Bouche d'air",
-    "IfcValve": "Vanne",
-    "IfcDamper": "Clapet",
-    "IfcDamper/FIREDAMPER": "Clapet coupe-feu",
-    "IfcLightFixture": "Luminaire",
-    "IfcCableCarrierSegment": "Chemin de câbles",
-    "IfcCovering/INSULATION": "Isolant",
-    "IfcCovering/CEILING": "Faux-plafond",
-    "IfcCovering/FLOORING": "Revêtement de sol",
-    "IfcCovering": "Revêtement",
-    "IfcWall": "Mur",
-    "IfcSlab": "Dalle",
-    "IfcBeam": "Poutre",
-    "IfcColumn": "Poteau",
-    "IfcMember": "Ossature",
-    "IfcPlate": "Panneau",
-    "IfcPlate/CURTAIN_PANEL": "Panneau de façade",
-    "IfcDoor": "Porte",
-    "IfcWindow": "Fenêtre",
-    "IfcStair": "Escalier",
-    "IfcRailing": "Garde-corps",
-    "IfcRoof": "Toiture",
-    "IfcBuildingElementProxy": "Objet générique",
-    "IfcFlowSegment": "Conduit",
-    "IfcFlowFitting": "Raccord",
-    "IfcFlowTerminal": "Terminal",
-    "IfcFlowController": "Régulation",
-    "IfcFlowTreatmentDevice": "Traitement",
-    "IfcEnergyConversionDevice": "Équipement de production",
-    "IfcFlowMovingDevice": "Ventilateur ou pompe",
-    "IfcDistributionElement": "Équipement",
-    "IfcOpeningElement": "Réservation",
+FIELDS: tuple[str, ...] = ("building", "storey", "trade_a", "trade_b", "type_a", "type_b")
+TABLE_OF: dict[str, str] = {
+    "building": "building",
+    "storey": "storey",
+    "trade_a": "trade",
+    "trade_b": "trade",
+    "type_a": "type",
+    "type_b": "type",
 }
+TABLES: tuple[str, ...] = ("building", "storey", "trade", "type")
+DEFAULT_TEMPLATE = "{type_a} x {type_b}"
+_PLACEHOLDER = re.compile(r"\{([^{}]*)\}")
+_ADMITTED = "building, storey, trade_a, trade_b, type_a, type_b"
 
 
 def sanitize(value: str | None) -> str:
@@ -93,27 +49,63 @@ def lookup(mapping: Mapping[str, str], key: str | None) -> str | None:
     return None
 
 
-def element_label(info: Mapping[str, Any], overrides: Mapping[str, str]) -> tuple[str, bool]:
-    """Libellé d'un élément : charte, puis table intégrée, sinon classe brute.
+def template_fields(template: str) -> list[str]:
+    """Champs du gabarit dans l'ordre d'apparition ; ValueError si le gabarit est invalide."""
+    names = _PLACEHOLDER.findall(template)
+    for name in names:
+        if name not in FIELDS:
+            raise ValueError(
+                f"gabarit de titre : champ inconnu « {name} » (champs admis : {_ADMITTED})"
+            )
+    if "{" in _PLACEHOLDER.sub("", template) or "}" in _PLACEHOLDER.sub("", template):
+        raise ValueError("gabarit de titre : accolade non appariée")
+    if not names:
+        raise ValueError(f"gabarit de titre : aucun champ (champs admis : {_ADMITTED})")
+    return list(dict.fromkeys(names))
 
-    Renvoie (libellé, repli) où repli vaut True si la classe IFC brute est utilisée.
-    """
+
+def render_title(template: str, values: Mapping[str, str]) -> str:
+    """Remplace chaque {champ} par sa valeur assainie ; tronque à TITLE_MAX."""
+    text = _PLACEHOLDER.sub(lambda m: sanitize(values.get(m.group(1))), template)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text[:TITLE_MAX] or "?"
+
+
+def resolve(
+    table: Mapping[str, str] | None, candidates: Sequence[str], raw: str
+) -> tuple[str, bool]:
+    """Valeur affichée d'après la table ; (brute, True) si la table ne la connaît pas."""
+    if table is None:
+        return raw, False
+    for candidate in candidates:
+        found = lookup(table, candidate)
+        if found:
+            return found, False
+    return raw, True
+
+
+def type_candidates(info: Mapping[str, Any]) -> list[str]:
+    """Clés de recherche d'un type d'objet, de la plus précise à la plus générale."""
+    keys: list[str] = []
+    name = info.get("type_name")
+    if name:
+        keys.append(f"{info.get('type_ifc_class')}:{name}")
+        keys.append(str(name))
+    predefined = info.get("predefined")
     classes: list[str] = []
     for cls in [info.get("type_class"), info.get("ifc_class"), *(info.get("supertypes") or [])]:
         if cls and cls not in classes:
             classes.append(cls)
-    predefined = info.get("predefined")
-    keys: list[str] = []
     for cls in classes:
         if predefined:
             keys.append(f"{cls}/{predefined}")
         keys.append(cls)
-    for source in (overrides, LABELS):
-        for key in keys:
-            found = lookup(source, key)
-            if found:
-                return sanitize(found), False
-    return str(info["ifc_class"]), True
+    return list(dict.fromkeys(keys))
+
+
+def type_raw(info: Mapping[str, Any]) -> str:
+    """Valeur brute du type : nom du type d'objet, sinon classe IFC."""
+    return str(info.get("type_name") or info["ifc_class"])
 
 
 def bracket_storey(levels: Sequence[tuple[float, str]], z: float, tol: float = 0.01) -> str | None:
@@ -146,48 +138,21 @@ def pick_principal(
     return best[0], best[1], first[best][1]
 
 
-def trade_code(charter_value: str | None, filename_stem: str) -> tuple[str, str | None]:
-    """Technique : charte, sinon code connu du nom de fichier, sinon nom tronqué (+ note)."""
-    if charter_value and charter_value.strip():
-        return sanitize(charter_value), None
-    for token in re.split(r"[^A-Za-z0-9]+", filename_stem):
-        code = token.upper()
-        if code in TRADE_CODES:
-            return code, f"code « {code} » repéré dans le nom de fichier « {filename_stem} »"
-    return (
-        sanitize(filename_stem)[:FILENAME_FALLBACK_MAX],
-        f"nom de fichier tronqué « {filename_stem} »",
-    )
-
-
-def build_title(
-    building: str, storey: str, trade_a: str, trade_b: str, label_a: str, label_b: str
-) -> str:
-    """Titre `<bâtiment>/<étage>/<techniques>/<sujet>`, sans suffixe de comptage."""
-    title = "/".join(
-        [
-            sanitize(building),
-            sanitize(storey),
-            f"{sanitize(trade_a)}-{sanitize(trade_b)}",
-            f"{sanitize(label_a)} x {sanitize(label_b)}",
-        ]
-    )
-    return title[:TITLE_MAX]
-
-
 def missing_message(entries: Iterable[str]) -> str:
-    """Avertissement listant les valeurs absentes de la charte."""
+    """Avertissement listant les valeurs absentes des tables de correspondance."""
     text = (
-        "Valeurs absentes de la charte (valeur brute dans le titre) : "
+        "Valeurs absentes des tables de correspondance (valeur brute dans le titre) : "
         + " ; ".join(sorted(set(entries)))
         + "."
     )
     return text[:MESSAGE_MAX]
 
 
-def fallback_message(classes: Iterable[str]) -> str:
-    """Avertissement listant les classes IFC utilisées faute de libellé."""
+def incomplete_message(fields: Iterable[str]) -> str:
+    """Avertissement listant les champs du titre introuvables dans les maquettes."""
     text = (
-        "Libellé inconnu, classe IFC brute dans le titre : " + ", ".join(sorted(set(classes))) + "."
+        "Champs du titre introuvables dans les maquettes (« ? » dans le titre) : "
+        + ", ".join(sorted(set(fields)))
+        + "."
     )
     return text[:MESSAGE_MAX]

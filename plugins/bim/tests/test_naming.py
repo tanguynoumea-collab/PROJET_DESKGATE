@@ -189,8 +189,7 @@ def test_missing_message():
 
 def test_incomplete_message():
     assert n.incomplete_message(["storey", "building", "storey"]) == (
-        "Champs du titre introuvables dans les maquettes (« ? » dans le titre) : "
-        "building, storey."
+        "Champs du titre introuvables dans les maquettes (« ? » dans le titre) : building, storey."
     )
 
 
