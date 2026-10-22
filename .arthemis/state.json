@@ -20,7 +20,7 @@
   },
   "route": "full",
   "phase": "AUDIT_COUNCIL",
-  "phase_status": "attente_humaine",
+  "phase_status": "retour_gsd",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -39,7 +39,8 @@
       "4",
       "5",
       "5.1",
-      "5.2"
+      "5.2",
+      "5.3"
     ],
     "quick_ids": [
       "261021-e6p",
@@ -55,7 +56,7 @@
   "iterations": {
     "cadrage_tours": 1,
     "design_review": 0,
-    "audit_council": 1,
+    "audit_council": 2,
     "max": 3
   },
   "checkpoints": {
@@ -188,6 +189,6 @@
   },
   "maj": {
     "le": "2026-10-22",
-    "commit": "f853b33"
+    "commit": "bec51a5"
   }
 }
