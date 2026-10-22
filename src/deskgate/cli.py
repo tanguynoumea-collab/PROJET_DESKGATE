@@ -121,6 +121,7 @@ def init(
     """Crée la configuration, les dossiers, le jeton et (avec accord) la tâche planifiée."""
     home = resolve_home()
     try:
+        installer.refuse_if_packaged()
         normalized = installer.normalize_root(root)
         result = installer.init_config(home, normalized, force=force, now=datetime.now())
     except installer.InitError as exc:

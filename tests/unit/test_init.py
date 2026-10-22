@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from deskgate import installer
+from deskgate import installer, scheduler
 from deskgate.cli import app
 from deskgate.core.config import load_config
 from deskgate.core.tokens import hash_token
@@ -132,3 +132,34 @@ def test_refus_interactif(
     # CliRunner recopie la saisie simulée dans stdout ; la question, elle, est sur stderr.
     assert len(res.stdout.splitlines()[0]) >= 43
     assert "Installer la tâche" in res.stderr
+
+
+_RAISON = "écritures sous %LOCALAPPDATA% redirigées vers le paquet Claude_x"
+
+
+def test_init_refuse_en_contexte_empaquete(
+    data_home: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(scheduler, "packaged_context", lambda: _RAISON)
+    res = runner.invoke(app, ["init", "--root", _root(tmp_path), "--no-task"])
+    assert res.exit_code == 2
+    assert "Terminal normal obligatoire" in res.stderr
+    assert "AGENTS.md" in res.stderr
+    assert list(data_home.iterdir()) == []
+    assert not (tmp_path / "bim").exists()
+
+
+def test_init_refuse_meme_avec_force(
+    data_home: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    pythonw: Path,
+    created_tasks: list[tuple[str, bytes]],
+) -> None:
+    monkeypatch.setattr(scheduler, "packaged_context", lambda: _RAISON)
+    res = runner.invoke(app, ["init", "--root", _root(tmp_path), "--force", "--yes"])
+    assert res.exit_code == 2
+    assert "Terminal normal obligatoire" in res.stderr
+    assert list(data_home.iterdir()) == []
+    assert not (tmp_path / "bim").exists()
+    assert created_tasks == []

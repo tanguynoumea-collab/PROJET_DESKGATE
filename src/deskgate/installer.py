@@ -6,11 +6,13 @@ Aucune dépendance à Typer : la logique reste testable, la CLI ne fait que l'af
 from __future__ import annotations
 
 import shutil
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from importlib import resources
 from pathlib import Path
 
+from deskgate import scheduler
 from deskgate.core.config import ConfigError, load_config
 from deskgate.core.paths import PathDenied, normalize_host_path
 from deskgate.core.tokens import generate_token, hash_token
@@ -34,6 +36,14 @@ SHARE_DIRS = ("depot", "travail", "livrables")
 ZERO_HASH = "0" * 64
 
 
+PACKAGED_MESSAGE = (
+    "Contexte empaqueté détecté ({reason}) : deskgate init écrirait dans un stockage virtualisé "
+    "que la tâche planifiée ne voit pas. Relancez-le depuis un terminal normal (PowerShell ou "
+    "Terminal Windows ouvert hors de toute application MSIX) : voir "
+    "« Terminal normal obligatoire » dans AGENTS.md. Rien n'a été écrit."
+)
+
+
 class InitError(Exception):
     """Échec de l'installation ; ``message`` est en français."""
 
@@ -44,6 +54,13 @@ class InitError(Exception):
 
 def load_template() -> str:
     return (resources.files("deskgate") / "runner.example.toml").read_text(encoding="utf-8")
+
+
+def refuse_if_packaged(detect: Callable[[], str | None] | None = None) -> None:
+    """D-15 : refus avant toute écriture ; aucun contournement (--force ne change rien)."""
+    reason = (detect or scheduler.packaged_context)()
+    if reason:
+        raise InitError(PACKAGED_MESSAGE.format(reason=reason))
 
 
 def normalize_root(raw: str) -> str:

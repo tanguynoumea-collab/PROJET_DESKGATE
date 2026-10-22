@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from deskgate import doctor, installer
+from deskgate import doctor, installer, scheduler
 from deskgate.core.config import RunnerConfig, load_config
 from deskgate.locations import config_path
 
@@ -41,7 +41,7 @@ def test_configuration_absente_est_un_echec(tmp_path: Path) -> None:
     checks = doctor.run_all(tmp_path / "vide", with_task=False)
     assert [c.name for c in checks if c.level == "echec"] == ["Configuration"]
     assert doctor.exit_code(checks) == 1
-    assert all(c.name in ("Configuration", "Environnement") for c in checks)
+    assert all(c.name in ("Contexte d'exécution", "Configuration", "Environnement") for c in checks)
 
 
 def test_configuration_invalide(tmp_path: Path) -> None:
@@ -200,3 +200,24 @@ def test_exit_code() -> None:
     bad = doctor.Check("c", "echec", "")
     assert doctor.exit_code([ok, warn]) == 0
     assert doctor.exit_code([ok, bad]) == 1
+
+
+def test_doctor_contexte_empaquete() -> None:
+    check = doctor.check_context(detect=lambda: "processus empaqueté (paquet P)")
+    assert check.name == "Contexte d'exécution"
+    assert check.level == "echec"
+    assert "terminal normal" in check.message
+
+
+def test_doctor_contexte_normal() -> None:
+    assert doctor.check_context(detect=lambda: None).level == "ok"
+
+
+def test_run_all_contexte_en_tete(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(scheduler, "packaged_context", lambda: "processus empaqueté (paquet P)")
+    home = tmp_path / "home"
+    home.mkdir()
+    checks = doctor.run_all(home, with_task=False)
+    assert checks[0].name == "Contexte d'exécution"
+    assert checks[0].level == "echec"
+    assert doctor.exit_code(checks) == 1

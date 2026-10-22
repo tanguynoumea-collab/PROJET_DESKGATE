@@ -173,10 +173,22 @@ def check_task(
     return checks
 
 
+def check_context(detect: Callable[[], str | None] | None = None) -> Check:
+    reason = (detect or scheduler.packaged_context)()
+    if reason:
+        return Check(
+            "Contexte d'exécution",
+            "echec",
+            f"{reason} : installation et diagnostic faussés ; relancez depuis un terminal normal "
+            "(AGENTS.md, « Terminal normal obligatoire »)",
+        )
+    return Check("Contexte d'exécution", "ok", "processus non empaqueté")
+
+
 def run_all(
     home: Path, config_override: Path | None = None, *, with_task: bool = True
 ) -> list[Check]:
-    checks = [check_home_env()]
+    checks = [check_context(), check_home_env()]
     cfg_check, cfg = check_config(config_path(home, config_override))
     checks.append(cfg_check)
     if cfg is None:
