@@ -247,3 +247,12 @@ Plans:
 
 Plans:
 - [ ] TBD (promote with /gsd:review-backlog when ready)
+
+### Phase 999.7: Diagnostic et doc : refus d'init documente, sonde MSIX indeterminee, progression perdue sous verrou, racine C:\BIM en dur (LIVR-N2-003, FIAB-N2-001, PER-N2-001) (BACKLOG)
+
+**Goal:** [Captured for future planning]
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd:review-backlog when ready)
