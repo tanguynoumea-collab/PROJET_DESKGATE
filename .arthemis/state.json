@@ -73,10 +73,10 @@
       "differe": false
     },
     "triage": {
-      "valide": false,
-      "le": null,
-      "commit": null,
-      "preuve": null,
+      "valide": true,
+      "le": "2026-10-22",
+      "commit": "4943155",
+      "preuve": ".arthemis/events.jsonl (checkpoint triage, citation utilisateur)",
       "differe": false
     },
     "go_publication": {
@@ -154,18 +154,6 @@
       "source": "audits/saas-council-2026-10-22.md",
       "ref": "SEC-001",
       "condition_levee": "path_params par outil mcp convertis et valides + tests obligatoires ; certifie par -role securite"
-    },
-    {
-      "id": "triage-council-1",
-      "type": "decision",
-      "titre": "triage a faire : 3 majeurs (ARC-001, SEC-001, LIV-001), 28 mineurs",
-      "gravite": "majeur",
-      "statut": "en_attente_decision",
-      "proprietaire": "humain",
-      "ouvert_le": "2026-10-22",
-      "source": "audits/saas-council-2026-10-22.md",
-      "ref": "checkpoints.triage",
-      "condition_levee": "triage date par l'utilisateur (retenus en phase inseree, reportes en backlog)"
     },
     {
       "id": "acc01-duree",
