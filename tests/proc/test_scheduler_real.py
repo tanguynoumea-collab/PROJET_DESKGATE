@@ -12,9 +12,11 @@ from deskgate.scheduler import (
     SchedulerError,
     TaskSpec,
     build_task_xml,
+    classify_task_result,
     create_task,
     current_user,
     delete_task,
+    last_task_result,
     launcher_command,
     parse_task_xml,
     query_task_xml,
@@ -74,5 +76,29 @@ def test_xml_invalide_leve_scheduler_error(tmp_path: Path) -> None:
         with pytest.raises(SchedulerError) as exc:
             create_task(nom, b"pas du xml", tmp_path)
         assert "refusée" in exc.value.message
+    finally:
+        delete_task(nom)
+
+
+@pytest.mark.timeout(90)
+def test_dossier_de_travail_inexistant_donne_0x8007010B(tmp_path: Path) -> None:
+    nom = f"DeskgateTest-{uuid.uuid4().hex}"
+    spec = TaskSpec(
+        user=current_user(),
+        command=launcher_command(),
+        arguments="-c pass",
+        working_dir=str(tmp_path / "absent"),
+    )
+    try:
+        create_task(nom, build_task_xml(spec), tmp_path)
+        assert last_task_result(nom) == 0x41303
+        assert run_task(nom) is True
+        fin = time.monotonic() + 20
+        code = last_task_result(nom)
+        while code != 0x8007010B and time.monotonic() < fin:
+            time.sleep(1)
+            code = last_task_result(nom)
+        assert code == 0x8007010B
+        assert classify_task_result(code).kind == "virtualized"
     finally:
         delete_task(nom)

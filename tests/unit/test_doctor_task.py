@@ -92,3 +92,36 @@ def test_commande_autre_que_pythonw(tmp_path: Path) -> None:
 def test_arguments_differents(tmp_path: Path) -> None:
     xml = _xml(tmp_path).replace("-m deskgate serve", "-m autre")
     assert any("arguments" in m for m in _echecs(_check(xml)))
+
+
+def test_resultat_virtualise_est_un_echec(tmp_path: Path) -> None:
+    checks = doctor.check_task(query=lambda _n: _xml(tmp_path), result=lambda _n: 0x8007010B)
+    assert any(c.level == "echec" and "0x8007010B" in c.message for c in checks)
+
+
+def test_resultat_en_cours_conforme(tmp_path: Path) -> None:
+    checks = doctor.check_task(query=lambda _n: _xml(tmp_path), result=lambda _n: 0x41301)
+    assert [c.level for c in checks] == ["ok"]
+
+
+def test_resultat_code_6_avertissement(tmp_path: Path) -> None:
+    checks = doctor.check_task(query=lambda _n: _xml(tmp_path), result=lambda _n: 6)
+    assert [c for c in checks if c.level == "echec"] == []
+    assert any(c.level == "avertissement" and "échec répété" in c.message for c in checks)
+
+
+def test_resultat_illisible_avertissement(tmp_path: Path) -> None:
+    checks = doctor.check_task(query=lambda _n: _xml(tmp_path), result=lambda _n: None)
+    assert [c for c in checks if c.level == "echec"] == []
+    assert any(c.level == "avertissement" for c in checks)
+
+
+def test_tache_absente_pas_de_lecture() -> None:
+    appels: list[str] = []
+
+    def espion(nom: str) -> int | None:
+        appels.append(nom)
+        return 0
+
+    doctor.check_task(query=lambda _n: None, result=espion)
+    assert appels == []

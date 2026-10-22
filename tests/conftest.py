@@ -94,8 +94,8 @@ def _contexte_non_empaquete(
 ) -> None:
     """La suite tourne aussi depuis une application MSIX (session Claude).
 
-    Le détecteur réel est neutralisé, sauf pour les tests `scheduler` qui interrogent le vrai poste. Le dernier résultat de la vraie
-    tâche n'est jamais lu hors de ces tests.
+    Le détecteur réel est neutralisé, sauf pour les tests `scheduler` qui interrogent le vrai
+    poste. Le dernier résultat de la vraie tâche n'est jamais lu hors de ces tests.
     """
     if request.node.get_closest_marker("scheduler") is None:
         monkeypatch.setattr(scheduler, "packaged_context", lambda: None)

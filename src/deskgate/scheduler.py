@@ -376,7 +376,7 @@ def last_task_result(name: str = TASK_NAME, *, timeout: float = 20.0) -> int | N
 
 
 def classify_task_result(code: int | None) -> TaskResult:
-    """Classe un dernier résultat : « en cours », « jamais exécutée » et 0 ne sont pas des échecs."""
+    """Classe un résultat : « en cours », « jamais exécutée » et 0 ne sont pas des échecs."""
     if code is None:
         return TaskResult(
             "unreadable",
@@ -395,13 +395,14 @@ def classify_task_result(code: int | None) -> TaskResult:
             "echec",
             "dernier résultat 0x8007010B : dossier de travail introuvable pour le Planificateur, "
             "cause probable une installation virtualisée par une application MSIX ; refaire "
-            "`deskgate init` depuis un terminal normal (AGENTS.md, « Terminal normal obligatoire »)",
+            "`deskgate init` depuis un terminal normal "
+            "(AGENTS.md, « Terminal normal obligatoire »)",
         )
     if code in _RUNNER_EXIT:
         return TaskResult(
             "runner_exit",
             "avertissement",
             f"le runner est sorti avec le code {code} ({_RUNNER_EXIT[code]}) ; "
-            "voir logs\startup.log et logs\runner.log",
+            "voir logs\\startup.log et logs\\runner.log",
         )
     return TaskResult("failure", "avertissement", f"dernier résultat 0x{code:08X}")

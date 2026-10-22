@@ -142,9 +142,10 @@ def check_home_env(environ: Mapping[str, str] | None = None) -> Check:
 
 
 def check_task(
-    query: Callable[[str], str | None] = scheduler.query_task_xml,
+    query: Callable[[str], str | None] | None = None,
+    result: Callable[[str], int | None] | None = None,
 ) -> list[Check]:
-    xml = query(TASK_NAME)
+    xml = (query or scheduler.query_task_xml)(TASK_NAME)
     if xml is None:
         return [Check("Tâche", "echec", "absente (deskgate task install)")]
     s = read_settings(parse_task_xml(xml))
@@ -168,6 +169,9 @@ def check_task(
                 f"arguments inattendus : {s.arguments!r} (attendu {SERVE_ARGUMENTS!r})",
             )
         )
+    outcome = scheduler.classify_task_result((result or scheduler.last_task_result)(TASK_NAME))
+    if outcome.level != "ok":
+        checks.append(Check("Tâche", outcome.level, outcome.message))
     if not checks:
         return [Check("Tâche", "ok", f"conforme ({s.command} {s.arguments})")]
     return checks
