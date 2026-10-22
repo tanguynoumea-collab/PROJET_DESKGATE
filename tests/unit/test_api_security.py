@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable, Mapping
 
 import httpx2
 import pytest
@@ -10,6 +11,7 @@ from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
 from deskgate.api import create_app
+from deskgate.core.health import ThreadState
 from deskgate.core.tokens import hash_token
 
 pytestmark = pytest.mark.unit
@@ -23,8 +25,13 @@ class Echo(BaseModel):
     n: int
 
 
-def _build(warnings: tuple[str, ...] = ()) -> TestClient:
-    app = create_app(token_sha256=hash_token(TOKEN), version=VERSION, warnings=warnings)
+def _build(
+    warnings: tuple[str, ...] = (),
+    threads: Callable[[], Mapping[str, ThreadState]] | None = None,
+) -> TestClient:
+    app = create_app(
+        token_sha256=hash_token(TOKEN), version=VERSION, warnings=warnings, threads=threads
+    )
 
     def echo(body: Echo) -> dict[str, int]:
         return {"n": body.n}
@@ -53,7 +60,29 @@ def _assert_erreur(r: httpx2.Response, status: int, code: str) -> None:
 def test_health_sans_jeton(client: TestClient) -> None:
     r = client.get("/health")
     assert r.status_code == 200
-    assert r.json() == {"status": "ok", "version": VERSION, "warnings": []}
+    assert r.json() == {
+        "status": "ok",
+        "version": VERSION,
+        "warnings": [],
+        "engine": "ok",
+        "sender": "ok",
+    }
+
+
+def test_health_degrade() -> None:
+    r = _build(threads=lambda: {"engine": "stale", "sender": "ok"}).get("/health")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["status"] == "degraded"
+    assert body["engine"] == "stale"
+    assert body["sender"] == "ok"
+
+
+def test_health_sans_chemin_ni_secret(client: TestClient) -> None:
+    texte = client.get("/health").text
+    assert ":\\" not in texte
+    assert ":/" not in texte
+    assert "token" not in texte
 
 
 def test_health_porte_les_avertissements() -> None:

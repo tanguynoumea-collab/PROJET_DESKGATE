@@ -50,6 +50,7 @@ def test_configuration_invalide(tmp_path: Path) -> None:
     check, cfg = doctor.check_config(config_path(home))
     assert cfg is None
     assert check.level == "echec"
+    assert "startup.log" in check.message
     assert "deskgate serve" in check.message
 
 
@@ -78,6 +79,36 @@ def test_jeton_du_gabarit(tmp_path: Path) -> None:
     zero = cfg.model_copy(update={"token_sha256": installer.ZERO_HASH})
     assert doctor.check_token(zero).level == "echec"
     assert doctor.check_token(cfg).level == "ok"
+
+
+def test_port_runner_degrade(tmp_path: Path) -> None:
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self) -> None:
+            body = json.dumps(
+                {"status": "degraded", "version": "9.9", "engine": "failed", "sender": "ok"}
+            ).encode()
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, format: str, *args: object) -> None:
+            pass
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        home, _ = _setup(tmp_path, server.server_address[1])
+        cfg = load_config(config_path(home))
+        check = doctor.check_port(cfg)
+    finally:
+        server.shutdown()
+        server.server_close()
+    assert check.level == "echec"
+    assert "dégradé" in check.message
+    assert "engine failed" in check.message
+    assert "occupé" not in check.message
 
 
 def test_port_runner_joignable(tmp_path: Path) -> None:

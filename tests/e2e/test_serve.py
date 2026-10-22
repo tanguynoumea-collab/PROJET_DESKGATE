@@ -54,8 +54,9 @@ def _serve(env: dict[str, str], timeout: float = 60) -> subprocess.CompletedProc
 def test_health_sans_jeton(runner: Runner) -> None:
     status, body = _get(runner.port, "/health")
     assert status == 200
-    assert set(body) == {"status", "version", "warnings"}
+    assert set(body) == {"status", "version", "warnings", "engine", "sender"}
     assert body["warnings"] == []
+    assert body["engine"] == body["sender"] == "ok"
     texte = json.dumps(body)
     assert str(runner.home) not in texte
     assert "token" not in texte

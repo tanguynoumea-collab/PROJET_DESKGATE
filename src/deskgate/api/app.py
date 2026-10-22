@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator, Callable, Sequence
+from collections.abc import AsyncIterator, Callable, Mapping, Sequence
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -11,6 +11,7 @@ from deskgate.api.handlers import install_handlers
 from deskgate.api.middleware import BearerAuthMiddleware, HostCheckMiddleware
 from deskgate.api.routes_health import router as health_router
 from deskgate.api.routes_jobs import router as jobs_router
+from deskgate.core.health import ThreadState
 from deskgate.jobs import JobsService
 
 
@@ -21,6 +22,7 @@ def create_app(
     warnings: Sequence[str] = (),
     jobs: JobsService | None = None,
     on_shutdown: Callable[[], None] | None = None,
+    threads: Callable[[], Mapping[str, ThreadState]] | None = None,
 ) -> FastAPI:
     """Construit l'application : Host contrôlé, puis jeton, puis routage."""
 
@@ -34,6 +36,7 @@ def create_app(
     app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
     app.state.version = version
     app.state.warnings = tuple(warnings)
+    app.state.threads = threads
     install_handlers(app)
     app.include_router(health_router)
     if jobs is not None:

@@ -232,6 +232,10 @@ def _serve(home: Path, config_override: Path | None) -> int:
         warnings=warnings,
         jobs=jobs,
         on_shutdown=_shutdown,
+        threads=lambda: {
+            "engine": holder.engine.status(),
+            "sender": holder.sender.status(),
+        },
     )
     if warnings:
         logger.warning(

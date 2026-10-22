@@ -15,6 +15,8 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Protocol
 
+from deskgate.core.health import ThreadState
+
 logger = logging.getLogger(__name__)
 
 EXIT_THREAD_FAILED = 6
@@ -60,6 +62,7 @@ class Restartable(Protocol):
     def start(self) -> None: ...
     def stop(self, timeout: float = 5.0) -> None: ...
     def wake(self) -> None: ...
+    def status(self) -> ThreadState: ...
 
 
 @dataclass

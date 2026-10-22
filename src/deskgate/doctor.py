@@ -38,7 +38,7 @@ class Check:
 
 _CONSOLE_HINT = (
     " (un runner lancé par la tâche n'affiche pas cette erreur : "
-    "lancez `deskgate serve` en console pour la voir)"
+    "voir logs\\startup.log, ou lancez `deskgate serve` en console)"
 )
 
 
@@ -89,6 +89,14 @@ def check_port(cfg: RunnerConfig, *, timeout: float = 2.0) -> Check:
             body = json.loads(resp.read(65536))
             if resp.status == 200 and body.get("status") == "ok":
                 return Check("Port", "ok", f"runner joignable (version {body.get('version', '?')})")
+            if body.get("status") == "degraded":
+                return Check(
+                    "Port",
+                    "echec",
+                    "runner joignable mais dégradé : "
+                    f"engine {body.get('engine', '?')}, sender {body.get('sender', '?')} "
+                    "(voir logs\\runner.log)",
+                )
     except (OSError, TimeoutError, ValueError, AttributeError):
         pass
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

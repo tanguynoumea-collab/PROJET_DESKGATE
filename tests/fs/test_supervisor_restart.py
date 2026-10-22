@@ -11,6 +11,7 @@ import pytest
 from _support.jobs import FakeClock, FakeLauncher, get, make_config, submit
 from deskgate import store
 from deskgate.core.config import RunnerConfig
+from deskgate.core.health import ThreadState
 from deskgate.engine import Engine
 from deskgate.supervisor import Holder, Restartable, Supervisor
 
@@ -37,6 +38,9 @@ class DummySender:
 
     def wake(self) -> None:
         self.woken += 1
+
+    def status(self) -> ThreadState:
+        return "ok"
 
 
 class Env:
