@@ -64,7 +64,8 @@ d'étapes. Une tâche = un appel d'un plugin. L'enchaînement est le rôle de n8
   `RestartOnFailure` ne couvre que les échecs de démarrage : il ne relance ni un runner tué, ni un runner
   sorti avec un code non nul (constaté en phase 5.2). Dans le processus, un superviseur recrée un thread
   engine ou sender mort après avoir conclu la tâche courante en `interrupted` ; au-delà de 3 recréations
-  en 10 min, le runner sort avec le code 6. Les échecs de démarrage sont écrits dans `logs\startup.log`
+  effectives en 10 min, ou de 10 échecs consécutifs de la conclusion des tâches (base verrouillée :
+  nouvel essai après 2, 4, 8, 16 puis 30 s), le runner sort avec le code 6. Les échecs de démarrage sont écrits dans `logs\startup.log`
   (même sous `pythonw`). Un runner tué reste arrêté jusqu'à `deskgate task run` ou la prochaine ouverture
   de session ; la recovery `interrupted` rend cette relance sûre (constaté : runner tué, relancé, rappel
   `interrupted` reçu par n8n). Pas de service Windows : un

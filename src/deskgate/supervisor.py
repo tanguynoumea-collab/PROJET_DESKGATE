@@ -107,7 +107,13 @@ class Supervisor:
         period: float = 1.0,
         max_restarts: int = MAX_RESTARTS,
         window_s: float = WINDOW_S,
+        max_recover_failures: int = MAX_RECOVER_FAILURES,
+        recover_backoff_cap_s: float = RECOVER_BACKOFF_CAP_S,
     ) -> None:
+        self._max_recover_failures = max_recover_failures
+        self._recover_backoff_cap_s = recover_backoff_cap_s
+        self.recover_failures: int = 0
+        self.recover_retry_at: float = 0.0
         self._holder = holder
         self._make_engine = make_engine
         self._make_sender = make_sender
@@ -144,43 +150,66 @@ class Supervisor:
                 sender_failed=self._holder.sender.failed,
                 recent_restarts=len(self._times),
                 max_restarts=self._max_restarts,
+                recover_failures=self.recover_failures,
+                max_recover_failures=self._max_recover_failures,
             )
             if d.give_up:
                 self.gave_up = True
-                logger.error(
-                    "Superviseur : abandon après %d recréation(s) en %.0f s "
-                    "(dernière cause : %s) ; arrêt du runner (code %d).",
-                    len(self._times),
-                    self._window_s,
-                    self.last_cause,
-                    EXIT_THREAD_FAILED,
-                )
+                if self.recover_failures >= self._max_recover_failures:
+                    logger.error(
+                        "Superviseur : abandon après %d échec(s) consécutif(s) de la conclusion "
+                        "des tâches interrompues (base inaccessible) ; arrêt du runner (code %d).",
+                        self.recover_failures,
+                        EXIT_THREAD_FAILED,
+                    )
+                else:
+                    logger.error(
+                        "Superviseur : abandon après %d recréation(s) en %.0f s "
+                        "(dernière cause : %s) ; arrêt du runner (code %d).",
+                        len(self._times),
+                        self._window_s,
+                        self.last_cause,
+                        EXIT_THREAD_FAILED,
+                    )
                 self._on_give_up()
                 return
-            if d.restart_engine:
-                self._times.append(now)
-                self._restart_engine()
+            if d.restart_engine and now >= self.recover_retry_at:
+                self._restart_engine(now)
             if d.restart_sender:
-                self._times.append(now)
-                self._restart_sender()
+                self._restart_sender(now)
 
-    def _restart_engine(self) -> None:
+    def _restart_engine(self, now: float) -> bool:
         old = self._holder.engine
         self.last_cause = "engine"
         old.stop()
         try:
             ids = self._recover()
         except Exception:
-            logger.exception(
-                "Superviseur : conclusion des tâches interrompues impossible ; "
-                "nouvel essai au prochain passage."
-            )
+            self.recover_failures += 1
+            delay = recover_delay(self.recover_failures, self._recover_backoff_cap_s)
+            self.recover_retry_at = now + delay
             self.last_cause = "engine (recovery impossible)"
-            return
+            logger.exception(
+                "Superviseur : conclusion des tâches interrompues impossible (échec %d/%d) ; "
+                "nouvel essai dans %.0f s.",
+                self.recover_failures,
+                self._max_recover_failures,
+                delay,
+            )
+            return False
+        self.recover_failures = 0
+        self.recover_retry_at = 0.0
+        if self._stop.is_set():
+            logger.info("Superviseur arrêté pendant la conclusion des tâches : aucune recréation.")
+            return False
         new = self._make_engine()
         new.on_fatal = self.notify
         new.start()
         self._holder.engine = new
+        if self._stop.is_set():
+            new.stop()
+            return False
+        self._times.append(now)
         self._holder.sender.wake()
         logger.warning(
             "Thread engine recréé (%d/%d en %.0f s) ; %d tâche(s) conclue(s) en interrupted.",
@@ -189,21 +218,29 @@ class Supervisor:
             self._window_s,
             len(ids),
         )
+        return True
 
-    def _restart_sender(self) -> None:
+    def _restart_sender(self, now: float) -> bool:
         old = self._holder.sender
         self.last_cause = "sender"
         old.stop()
+        if self._stop.is_set():
+            return False
         new = self._make_sender()
         new.on_fatal = self.notify
         new.start()
         self._holder.sender = new
+        if self._stop.is_set():
+            new.stop()
+            return False
+        self._times.append(now)
         logger.warning(
             "Thread sender recréé (%d/%d en %.0f s).",
             len(self._times),
             self._max_restarts,
             self._window_s,
         )
+        return True
 
     def run(self) -> None:
         while not self._stop.is_set():
@@ -227,7 +264,11 @@ class Supervisor:
         thread.start()
 
     def stop(self, timeout: float = 5.0) -> None:
-        """Arrête le superviseur ; l'appelant arrête ensuite engine et sender courants."""
+        """Pose `_stop` sans prendre le verrou (un recover peut durer plusieurs secondes).
+
+        Une recréation en cours revérifie `_stop` avant et après le démarrage du thread neuf.
+        L'appelant arrête ensuite engine et sender courants.
+        """
         self._stop.set()
         self._event.set()
         thread = self._thread

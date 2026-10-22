@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import threading
 import time
 from collections.abc import Callable, Iterator
 from pathlib import Path
@@ -29,11 +30,15 @@ class DummySender:
         self.started = 0
         self.stopped = 0
         self.woken = 0
+        self.stop_sleep: float = 0.0
+        self.stopping = threading.Event()
 
     def start(self) -> None:
         self.started += 1
 
     def stop(self, timeout: float = 5.0) -> None:
+        self.stopping.set()
+        time.sleep(self.stop_sleep)
         self.stopped += 1
 
     def wake(self) -> None:
@@ -52,6 +57,10 @@ class Env:
         self.clock = FakeClock(0.0)
         self.gave_up = 0
         self.recover_error: Exception | None = None
+        self.recover_calls = 0
+        self.recover_failures_left = 0
+        self.recover_sleep = 0.0
+        self.recover_started = threading.Event()
         self.engines: list[Engine] = []
         self.senders: list[DummySender] = []
         first = self.new_engine()
@@ -88,8 +97,14 @@ class Env:
         return sender
 
     def recover(self) -> list[str]:
+        self.recover_calls += 1
+        self.recover_started.set()
+        time.sleep(self.recover_sleep)
         if self.recover_error is not None:
             raise self.recover_error
+        if self.recover_failures_left > 0:
+            self.recover_failures_left -= 1
+            raise RuntimeError("base verrouillée")
         conn = store.connect(self.db)
         try:
             return store.recover_interrupted(conn)
@@ -210,10 +225,49 @@ def test_recover_qui_leve(env: Env) -> None:
     assert env.holder.engine is first
     assert len(env.engines) == 1
     assert env.sup.last_cause == "engine (recovery impossible)"
-    for _ in range(4):
+    assert env.recover_calls == 1
+    assert env.sup.recover_failures == 1
+    assert env.sup.recover_retry_at == 2.0
+    env.clock.t = 1.0
+    env.sup.check()
+    assert env.recover_calls == 1
+    delays = (4.0, 8.0, 16.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0)
+    for n, delay in enumerate(delays, start=2):
+        env.clock.t = env.sup.recover_retry_at
         env.sup.check()
+        assert env.recover_calls == n
+        assert env.sup.recover_retry_at - env.clock.t == delay
+    assert env.sup.recover_failures == 10
+    assert env.sup.gave_up is False
+    env.clock.t = env.sup.recover_retry_at
+    env.sup.check()
     assert env.sup.gave_up is True
     assert env.gave_up == 1
+    assert env.recover_calls == 10
+    assert len(env.engines) == 1
+    assert len(env.sup._times) == 0
+
+
+def test_recover_retabli_ne_consomme_qu_une_place(env: Env) -> None:
+    env.recover_failures_left = 2
+    for t in (0.0, 2.0, 6.0):
+        env.clock.t = t
+        fail_engine(env)
+        env.sup.check()
+    assert env.sup.recover_failures == 0
+    assert len(env.engines) == 2
+    assert len(env.sup._times) == 1
+    for t in (7.0, 8.0):
+        env.clock.t = t
+        fail_engine(env)
+        env.sup.check()
+    assert len(env.engines) == 4
+    assert env.sup.gave_up is False
+    env.clock.t = 9.0
+    fail_engine(env)
+    env.sup.check()
+    assert env.sup.gave_up is True
+    assert len(env.engines) == 4
 
 
 def test_thread_superviseur_reveille_par_on_fatal(env: Env) -> None:
@@ -241,6 +295,52 @@ def test_stop_bloque_les_recreations(env: Env) -> None:
     time.sleep(1.5)
     assert env.holder.engine is before
     assert len(env.engines) == 1
+
+
+def test_stop_pendant_recover_lent(env: Env) -> None:
+    env.recover_sleep = 1.0
+    env.sup.start()
+    first = env.holder.engine
+    fail_engine(env)
+    env.sup.notify()
+    assert env.recover_started.wait(3)
+    env.sup.stop(timeout=0.1)
+    assert env.sup._thread is not None
+    env.sup._thread.join(5)
+    assert not env.sup._thread.is_alive()
+    assert len(env.engines) == 1
+    assert env.holder.engine is first
+
+
+def test_stop_pendant_arret_lent_du_sender(env: Env) -> None:
+    old = env.holder.sender
+    assert isinstance(old, DummySender)
+    old.stop_sleep = 1.0
+    env.sup.start()
+    old.failed = True
+    env.sup.notify()
+    assert old.stopping.wait(3)
+    env.sup.stop(timeout=0.1)
+    assert env.sup._thread is not None
+    env.sup._thread.join(5)
+    assert not env.sup._thread.is_alive()
+    assert len(env.senders) == 1
+    assert env.holder.sender is old
+
+
+def test_stop_apres_demarrage_arrete_le_nouvel_engine(env: Env) -> None:
+    def make() -> Engine:
+        engine = env.new_engine()
+        env.sup.stop(timeout=0)
+        return engine
+
+    env.sup._make_engine = make
+    fail_engine(env)
+    env.sup.check()
+    last = env.engines[-1]
+    assert len(env.engines) == 2
+    assert last._thread is None or not last._thread.is_alive()
+    assert len(env.sup._times) == 0
 
 
 def test_protocol_satisfait(env: Env) -> None:
