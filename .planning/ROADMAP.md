@@ -139,6 +139,16 @@ Plans:
 | 4. Capacités v0.1 | 0/0 | Complete    | 2026-10-20 |
 | 5. Installation et intégration n8n | 6/9 | Complete    | 2026-10-22 |
 
+### Phase 05.2: corrections audit council 1 : reprise du runner, chemins MCP, installation MSIX (INSERTED)
+
+**Goal:** [Urgent work - to be planned]
+**Requirements**: TBD
+**Depends on:** Phase 5
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 05.2 to break down)
+
 ### Phase 05.1: BCF exploitable dans BIMcollab et nommage des sujets (INSERTED)
 
 **Goal:** Le BCF d'`ifc.clash` s'ouvre dans BIMcollab Zoom avec ses deux points de vue par sujet, chaque sujet est titré selon la convention de tri du projet, et aucun conflit n'est perdu ni inventé par les réservations.
