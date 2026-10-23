@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
-stopped_at: decision-ds-1 tranchée (exposer data) ; retour GSD de DS-ARCH-1 à insérer
-last_updated: "2026-10-23T06:54:45.172Z"
+stopped_at: Phase 5.4 context gathered
+last_updated: "2026-10-23T07:26:17.551Z"
 last_activity: 2026-10-22
 progress:
-  total_phases: 15
+  total_phases: 16
   completed_phases: 8
   total_plans: 63
   completed_plans: 63
@@ -199,6 +199,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-23T06:54:45.165Z
-Stopped at: decision-ds-1 tranchée (exposer data) ; retour GSD de DS-ARCH-1 à insérer
-Resume file: .arthemis/PASSATION.md
+Last session: 2026-10-23T07:26:17.545Z
+Stopped at: Phase 5.4 context gathered
+Resume file: .planning/phases/05.4-corrections-audit-senior-1-contrat-data-expos-sender-isol-nan-refus-s-r-tention-doc-livr-cible/05.4-CONTEXT.md
