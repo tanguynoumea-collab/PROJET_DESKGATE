@@ -140,6 +140,16 @@ Plans:
 | 4. Capacités v0.1 | 0/0 | Complete    | 2026-10-20 |
 | 5. Installation et intégration n8n | 6/9 | Complete    | 2026-10-22 |
 
+### Phase 05.4: corrections audit senior 1 : contrat data exposé, sender isolé, NaN refusés, rétention, doc livré/cible (INSERTED)
+
+**Goal:** [Urgent work - to be planned]
+**Requirements**: TBD
+**Depends on:** Phase 5
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 05.4 to break down)
+
 ### Phase 05.3: corrections audit council 1 passe 2 : superviseur, refus MSIX de task install, messages et test doctor (INSERTED)
 
 **Goal:** Un verrou passager de la base ne fait plus sortir le runner en code 6 et un arrêt pendant une recréation ne laisse aucun thread orphelin ; le message d'abandon et AGENTS.md sont sans retour chariot parasite ; `deskgate task install` refuse en contexte MSIX comme `init` ; le câblage par défaut de `doctor` vers le dernier résultat de la tâche est testé. Corrige les six Mineurs de la certification du council 1 (`audits/saas-council-certification-2026-10-22.md` §2), et eux seuls.

@@ -179,6 +179,7 @@ Recent decisions affecting current work:
 - Phase 05.1 inserted after Phase 5: BCF exploitable dans BIMcollab et nommage des sujets (URGENT)
 - Phase 05.2 inserted after Phase 5: corrections audit council 1 : reprise du runner, chemins MCP, installation MSIX (URGENT)
 - Phase 05.3 inserted after Phase 5: corrections audit council 1 passe 2 : superviseur, refus MSIX de task install, messages et test doctor (URGENT)
+- Phase 05.4 inserted after Phase 5: corrections audit senior 1 : contrat data exposé (DS-ARCH-1), sender isolé par rappel (DS-ARCH-2), NaN/Infinity refusés (DS-ARCH-3), rétention de data (DS-SCAL-1), ARCHITECTURE.md livré/cible (DS-MAINT-1) (URGENT)
 
 ### Pending Todos
 
