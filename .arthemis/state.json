@@ -19,8 +19,8 @@
     "roadmap_projet": "docs/passation/04-FEUILLE-DE-ROUTE.md"
   },
   "route": "full",
-  "phase": "AUDIT_COUNCIL",
-  "phase_status": "terminee",
+  "phase": "AUDIT_SENIOR",
+  "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -189,6 +189,6 @@
   },
   "maj": {
     "le": "2026-10-23",
-    "commit": "5103c53"
+    "commit": "b66d326"
   }
 }
