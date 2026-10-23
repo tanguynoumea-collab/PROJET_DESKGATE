@@ -20,7 +20,7 @@
   },
   "route": "full",
   "phase": "AUDIT_SENIOR",
-  "phase_status": "retour_gsd",
+  "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -139,60 +139,60 @@
       "type": "finding",
       "titre": "mcp.call : resultat range dans data, jamais transmis a n8n ; decision : exposer data (<=1 Mio, repli fichier)",
       "gravite": "bloquant",
-      "statut": "ouvert",
+      "statut": "corrige_non_certifie",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-23",
       "source": ".arthemis/reports/dev-senior-1-1.md",
       "ref": "DS-ARCH-1",
-      "condition_levee": "data expose dans le rappel et GET /jobs/{id} (<=1 Mio, repli fichier) ; teste et certifie"
+      "condition_levee": "certification 05.4-D1 par l auditeur d origine"
     },
     {
       "id": "DS-ARCH-2",
       "type": "finding",
       "titre": "sender : un rappel en erreur deterministe bloque les autres puis code 6 apres ~2 min",
       "gravite": "majeur",
-      "statut": "ouvert",
+      "statut": "corrige_non_certifie",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-23",
       "source": ".arthemis/reports/dev-senior-1-1.md",
       "ref": "DS-ARCH-2",
-      "condition_levee": "P-01 isoler l'echec par rappel ; teste"
+      "condition_levee": "certification 05.4-D1 par l auditeur d origine"
     },
     {
       "id": "DS-ARCH-3",
       "type": "finding",
       "titre": "NaN/Infinity d'un plugin traversent le contrat : rappel JSON invalide, GET /jobs 500",
       "gravite": "majeur",
-      "statut": "ouvert",
+      "statut": "corrige_non_certifie",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-23",
       "source": ".arthemis/reports/dev-senior-1-1.md",
       "ref": "DS-ARCH-3",
-      "condition_levee": "P-02 refus a la frontiere ; teste"
+      "condition_levee": "certification 05.4-D1 par l auditeur d origine"
     },
     {
       "id": "DS-SCAL-1",
       "type": "finding",
       "titre": "ifc.clash : ~0,8 Mio de data par tache en base, non purgeable (500 taches = 399 Mio)",
       "gravite": "majeur",
-      "statut": "ouvert",
+      "statut": "corrige_non_certifie",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-23",
       "source": ".arthemis/reports/dev-senior-1-1.md",
       "ref": "DS-SCAL-1",
-      "condition_levee": "contrat data tranche + retention (999.2)"
+      "condition_levee": "certification 05.4-D1 par l auditeur d origine"
     },
     {
       "id": "DS-MAINT-1",
       "type": "finding",
       "titre": "ARCHITECTURE.md presente la cible v0.2-0.3 comme livree (P4 non tenu)",
       "gravite": "majeur",
-      "statut": "ouvert",
+      "statut": "corrige_non_certifie",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-23",
       "source": ".arthemis/reports/dev-senior-1-1.md",
       "ref": "DS-MAINT-1",
-      "condition_levee": "P-08 separer livre et cible ; 999.6"
+      "condition_levee": "certification 05.4-D1 par l auditeur d origine"
     }
   ],
   "livraisons": [],
@@ -250,6 +250,6 @@
   },
   "maj": {
     "le": "2026-10-23",
-    "commit": "948ff18"
+    "commit": "a0fc0ae"
   }
 }

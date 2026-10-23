@@ -66,3 +66,4 @@
 {"ts":"2026-10-23T01:40","type":"rapport","ref":".arthemis/reports/dev-senior-1-1.md","commit":"5a670b2","note":"dev-senior : 1 critique, 4 majeurs, 13 mineurs ; P1 et P5 tenus avec reserves, P2 et P3 tenus, P4 non tenu (doc)"}
 {"ts":"2026-10-23T02:00","type":"fermeture","ref":"decision-ds-1","commit":"5ab8c65","note":"Tanguy : « exposer le champ data (dans le rappel et GET /jobs/{id}, dans la limite de 1 Mio, repli fichier au-dela) »"}
 {"ts":"2026-10-23T09:20","type":"transition","ref":"AUDIT_SENIOR -> retour GSD (phase 5.4)","commit":"948ff18","note":"phase 5.4 inseree : DS-ARCH-1, DS-ARCH-2, DS-ARCH-3, DS-SCAL-1, DS-MAINT-1"}
+{"ts":"2026-10-23T14:30","type":"transition","ref":"retour GSD (phase 5.4) -> AUDIT_SENIOR","commit":"a0fc0ae","note":"phase 5.4 terminee, gate vert ; 5 findings corriges, certification 05.4-D1 en file"}
