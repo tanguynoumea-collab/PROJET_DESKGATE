@@ -113,3 +113,44 @@ def test_settings_default_and_carried() -> None:
     assert _winput().settings == {}
     assert _winput(settings={"a": [1, 2]}).settings == {"a": [1, 2]}
     assert "settings" in CONTRACT["input_keys"]
+
+
+_RES = b'{"protocol":1,"ok":true,"summary":{"d":%s}}'
+
+
+@pytest.mark.parametrize("valeur", [b"NaN", b"Infinity", b"-Infinity", b"1e999", b"-1e999"])
+def test_result_non_fini_refuse(valeur: bytes) -> None:
+    assert parse_result(_RES % valeur) == ("invalid", None)
+
+
+def test_result_non_fini_imbrique_dans_data() -> None:
+    raw = b'{"protocol":1,"ok":true,"data":{"a":[1,{"b":NaN}]}}'
+    assert parse_result(raw) == ("invalid", None)
+
+
+def test_result_flottants_finis_acceptes() -> None:
+    state, res = parse_result(b'{"protocol":1,"ok":true,"summary":{"d":1.5e300,"e":-0.0,"f":10}}')
+    assert state == "valid"
+    assert isinstance(res, ResultOk)
+    assert res.summary["d"] == 1.5e300
+
+
+def test_entier_enorme_accepte() -> None:
+    raw = b'{"protocol":1,"ok":true,"summary":{"n":1' + b"0" * 400 + b"}}"
+    state, res = parse_result(raw)
+    assert state == "valid"
+    assert isinstance(res, ResultOk)
+    assert res.summary["n"] == 10**400
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        b'{"type":"progress","pct":NaN}',
+        b'{"type":"progress","pct":Infinity}',
+        b'{"type":"progress","pct":1e999}',
+        b'{"type":"artifact","kind":"k","path":"p","x":NaN}',
+    ],
+)
+def test_event_non_fini_refuse(line: bytes) -> None:
+    assert parse_event(line) is None
