@@ -4,7 +4,7 @@ Milestone : v0.1 Runner minimal | phases 8/8 (1 à 5, 5.1, 5.2, 5.3) | plans 63/
 Pipeline : AUDIT_SENIOR/attente_humaine | route full | cycle 1 | checkpoints cadrage ✓2026-10-20 | plan_design – | triage ✓2026-10-22 | go_publication – | roadmap – | itérations cadrage_tours 1/3, design_review 0/3, audit_council 2/3
 Position GSD : aucune phase ouverte (phases 5.2 et 5.3 terminées, gates verts, findings council certifiés)
 Tâche : aucune (audit senior rendu, décisions à prendre)
-Prochaine commande : trancher decision-ds-1 (contrat data, P-03/P-04 du rapport dev-senior), puis /gsd:insert-phase 5 "corrections audit senior 1" (audit_council 3/3)
+Prochaine commande : trancher decision-ds-1, puis /gsd:insert-phase 5 "corrections audit senior 1"
 Exigences : 38/49 | Pending SOC-01..03 AUD-01..03 PUB-01..05 | Dropped aucune | citées non cochées aucune
 Livraison : aucun tag | tag sur HEAD : non | version cible v0.1.0
 Items ouverts : 2 bloquants (DS-ARCH-1, decision-ds-1), 4 majeurs (DS-ARCH-2, DS-ARCH-3, DS-SCAL-1, DS-MAINT-1), 1 corrigé non certifié (acc01-duree), 2 en attente de décision (decision-ds-1, uv-pythons) ; mineur odm-backlog
