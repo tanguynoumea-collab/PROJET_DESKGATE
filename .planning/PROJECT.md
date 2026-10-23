@@ -21,6 +21,7 @@ soit le résultat (succès, échec, délai dépassé, annulation, redémarrage d
 - ✓ File SQLite persistante, `POST/GET /jobs`, `/logs`, `/cancel`, exécution une à la fois dans un Job Object, délai avec arbre tué, `interrupted` après arrêt brutal, idempotence minimale — Validated in Phase 2: Cœur d'exécution
 - ✓ Rappel vers la `resumeUrl` (au moins une fois, outbox durable, politique n8n 2.43.8, plafond 1 Mio, hôtes autorisés, signature masquée partout, audit complet) — Validated in Phase 3: Rappel fiable
 - ✓ `ifc.clash` (hard/clearance, groupes, GlobalId, BCF 2.1 via `deskgate-bcf` GPL-3 en sous-processus) et `mcp.call` (serveur stdio déclaré, dans le Job Object) — Validated in Phase 4: Capacités v0.1
+- ✓ Résultat `data` d'un plugin (dont `mcp.call`) transmis à n8n dans le rappel et `GET /jobs/{id}` (≤ 1 Mio, repli `data.json`), rappels isolés par ligne, `NaN`/`Infinity` refusés, `deskgate purge`, `ARCHITECTURE.md` livré/cible — Validated in Phase 5.4: corrections audit senior 1 (certification par l'auditeur en attente, 05.4-D1)
 
 ### Active
 
@@ -108,4 +109,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-20 after Phase 4*
+*Last updated: 2026-10-23 after Phase 5.4*
