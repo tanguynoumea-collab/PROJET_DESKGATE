@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
-status: verifying
-stopped_at: Phase 5.4 context gathered
-last_updated: "2026-10-23T07:26:17.551Z"
-last_activity: 2026-10-22
+status: executing
+stopped_at: Completed 05.4-01-PLAN.md
+last_updated: "2026-10-23T10:15:20.001Z"
+last_activity: 2026-10-23
 progress:
   total_phases: 16
   completed_phases: 8
-  total_plans: 63
-  completed_plans: 63
+  total_plans: 68
+  completed_plans: 64
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-20)
 
 **Core value:** n8n délègue une tâche longue au PC Windows et reprend fiablement quand elle se termine, quel que soit le résultat (succès, échec, délai dépassé, annulation, redémarrage du runner).
-**Current focus:** Phase 5.3 — corrections-audit-council-1-passe-2-superviseur-refus-msix-de-task-install-messages-et-test-doctor
+**Current focus:** Phase 05.4 — corrections audit senior 1
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-10-22
+Phase: 05.4 (corrections audit senior 1) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-10-23
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -109,6 +109,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.2 P10 | 75min | 2 tasks | 10 files |
 | Phase 05.3 P01 | 20min | 2 tasks | 4 files |
 | Phase 05.3 P02 | 40min | 3 tasks | 9 files |
+| Phase 05.4 P01 | 25min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -173,6 +174,7 @@ Recent decisions affecting current work:
 - [Phase 05.3]: P-06/P-07/P-08 : message d'abandon avec chemin réel, test d'octets CR, task install refuse en MSIX
 - [Phase 5.3]: AUDIT_SENIOR cycle 1 : AUDIT_POINTS.md validé (5 points) ; dev-senior (.arthemis/reports/dev-senior-1-1.md) : DS-ARCH-1 critique (résultat de mcp.call jamais transmis à n8n, contrat data à trancher P-03/P-04), majeurs DS-ARCH-2 (sender non isolé par rappel), DS-ARCH-3 (NaN/Infinity), DS-SCAL-1 (data en base non purgeable), DS-MAINT-1 (ARCHITECTURE.md = cible) ; P2 et P3 tenus, P1 et P5 avec réserves, P4 non tenu sur la doc — Audit externe du 2026-10-23 ; décision produit sur le champ data attendue de l'utilisateur avant v0.1
 - [Phase 5.3]: decision-ds-1 : exposer le champ data du résultat de plugin dans le rappel n8n et dans GET /jobs/{id}, dans la limite de 1 Mio ; au-delà, repli sur un fichier artefact (comme summary.json). Ferme le contrat de DS-ARCH-1 ; correction à faire en phase insérée — Décision utilisateur du 2026-10-23 (audit senior, P-03/P-04)
+- [Phase 05.4]: Sender: exception de ligne = essai internal_error ; erreurs de base remontent (DS-ARCH-2)
 
 ### Roadmap Evolution
 
@@ -199,6 +201,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-23T07:26:17.545Z
-Stopped at: Phase 5.4 context gathered
-Resume file: .planning/phases/05.4-corrections-audit-senior-1-contrat-data-expos-sender-isol-nan-refus-s-r-tention-doc-livr-cible/05.4-CONTEXT.md
+Last session: 2026-10-23T10:15:19.996Z
+Stopped at: Completed 05.4-01-PLAN.md
+Resume file: None
