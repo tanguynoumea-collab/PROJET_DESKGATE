@@ -89,6 +89,35 @@ def test_exception_du_plugin(tmp_path: Path) -> None:
     assert "ValueError" in (work / "job.log").read_text(encoding="utf-8")
 
 
+def test_resultat_nan_refuse_par_le_sdk(tmp_path: Path) -> None:
+    job, p = _lancer(tmp_path, "nan_result", {})
+    try:
+        assert p.wait(30) == 1
+    finally:
+        job.terminate()
+        job.close()
+    work = tmp_path / "work"
+    res = _resultat(work)
+    assert isinstance(res, ResultError)
+    assert res.error.type == "ValueError"
+    assert b"NaN" not in (work / "result.json").read_bytes()
+
+
+def test_progression_nan_refusee(tmp_path: Path) -> None:
+    job, p = _lancer(tmp_path, "nan_progress", {})
+    try:
+        assert p.wait(30) == 1
+    finally:
+        job.terminate()
+        job.close()
+    work = tmp_path / "work"
+    res = _resultat(work)
+    assert isinstance(res, ResultError)
+    assert res.error.type == "ValueError"
+    events = work / "events.jsonl"
+    assert b"NaN" not in (events.read_bytes() if events.exists() else b"")
+
+
 def test_resultat_non_dict(tmp_path: Path) -> None:
     job, p = _lancer(tmp_path, "bad_result", {"mode": "not_dict"})
     try:

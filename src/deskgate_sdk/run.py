@@ -55,8 +55,9 @@ def _replace(src: str, dst: str) -> None:
 
 def _write_atomic(path: str, obj: dict[str, Any]) -> None:
     tmp = path + ".tmp"
+    text = json.dumps(obj, ensure_ascii=False, allow_nan=False)
     with open(tmp, "w", encoding="utf-8", newline="\n") as f:
-        json.dump(obj, f, ensure_ascii=False)
+        f.write(text)
         f.flush()
         os.fsync(f.fileno())
     _replace(tmp, path)
@@ -77,7 +78,7 @@ class Ctx:
         self._flag = os.path.join(self.work_dir, "cancel.flag")
 
     def _emit(self, **ev: Any) -> None:
-        self._events.write((json.dumps(ev, ensure_ascii=False) + "\n").encode("utf-8"))
+        self._events.write((json.dumps(ev, ensure_ascii=False, allow_nan=False) + "\n").encode("utf-8"))
 
     def log(self, msg: str) -> None:
         print(f"[{time.strftime('%H:%M:%S')}] {msg}", file=sys.stderr, flush=True)

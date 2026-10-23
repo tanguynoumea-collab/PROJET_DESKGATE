@@ -47,6 +47,12 @@ def bad_result(params: dict[str, Any], ctx: Any) -> Any:
     if mode == "garbage":
         with open(path, "w", encoding="utf-8") as f:
             f.write("{")
+    elif mode == "nan":
+        with open(path, "w", encoding="utf-8") as f:
+            f.write('{"protocol":1,"ok":true,"summary":{"d":NaN},"data":{},"artifacts":[]}')
+    elif mode == "inf_exp":
+        with open(path, "w", encoding="utf-8") as f:
+            f.write('{"protocol":1,"ok":true,"summary":{},"data":{"v":1e999},"artifacts":[]}')
     elif mode == "huge":
         import json
 
@@ -60,6 +66,15 @@ def bad_result(params: dict[str, Any], ctx: Any) -> Any:
         with open(path, "w", encoding="utf-8") as f:
             json.dump(doc, f)
     os._exit(0)
+
+
+def nan_result(params: dict[str, Any], ctx: Any) -> dict[str, Any]:
+    return {"summary": {"d": float("nan")}}
+
+
+def nan_progress(params: dict[str, Any], ctx: Any) -> dict[str, Any]:
+    ctx.progress(float("nan"))
+    return {"summary": {}}
 
 
 def chatty(params: dict[str, Any], ctx: Any) -> dict[str, Any]:

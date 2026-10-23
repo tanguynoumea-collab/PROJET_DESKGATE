@@ -59,6 +59,8 @@ def test_artifact_outside(real_engine: Env) -> None:
     ("mode", "code"),
     [
         ("garbage", "invalid_result"),
+        ("nan", "invalid_result"),
+        ("inf_exp", "invalid_result"),
         ("missing", "missing_result"),
         ("huge", "result_too_large"),
         ("not_dict", "plugin_error"),

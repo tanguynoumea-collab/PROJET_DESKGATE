@@ -93,3 +93,10 @@ def test_minimal_copie() -> None:
     assert {k: v for k, v in petit.items() if k != "summary"} == {
         k: v for k, v in body.items() if k != "summary"
     }
+
+
+def test_encode_refuse_non_fini() -> None:
+    with pytest.raises(ValueError):
+        encode({"summary": {"d": float("nan")}})
+    with pytest.raises(ValueError):
+        encode({"x": float("inf")})

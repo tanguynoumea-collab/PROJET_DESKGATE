@@ -119,10 +119,10 @@ async def _call(params: dict[str, Any], ctx: Any) -> dict[str, Any]:
         "structured_content": r.structured_content,
         "content": [_content(c) for c in r.content],
     }
-    if len(json.dumps(data, ensure_ascii=False)) > DATA_MAX_BYTES:
+    if len(json.dumps(data, ensure_ascii=False, allow_nan=False)) > DATA_MAX_BYTES:
         path = os.path.join(ctx.work_dir, "mcp-result.json")
         with open(path, "w", encoding="utf-8", newline="\n") as f:
-            json.dump(data, f, ensure_ascii=False)
+            json.dump(data, f, ensure_ascii=False, allow_nan=False)
         ctx.artifact(path, "mcp_result")
         data = {"truncated": True}
     return {"summary": {"server": name, "tool": tool, "is_error": False}, "data": data}

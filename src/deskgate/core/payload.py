@@ -22,8 +22,10 @@ def duration_s(started_at: str | None, finished_at: str | None) -> float | None:
 
 
 def encode(body: Mapping[str, Any]) -> bytes:
-    """JSON compact en UTF-8 non échappé."""
-    return json.dumps(body, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    """JSON compact en UTF-8 non échappé ; lève ValueError sur un flottant non fini."""
+    return json.dumps(body, ensure_ascii=False, allow_nan=False, separators=(",", ":")).encode(
+        "utf-8"
+    )
 
 
 def minimal(body: Mapping[str, Any]) -> dict[str, Any]:

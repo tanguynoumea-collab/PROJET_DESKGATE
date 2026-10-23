@@ -547,6 +547,7 @@ class Engine:
             result_json = json.dumps(
                 {"summary": parsed.summary, "data": parsed.data, "artifacts": artifacts},
                 ensure_ascii=False,
+                allow_nan=False,
             )
             result_json = self._cap_summary(cur, parsed.summary, result_json)
         return outcome, result_json
@@ -576,13 +577,13 @@ class Engine:
                 type(exc).__name__,
             )
             result["summary"] = {"truncated": True, "error": "summary_write_failed"}
-        return json.dumps(result, ensure_ascii=False)
+        return json.dumps(result, ensure_ascii=False, allow_nan=False)
 
     def _write_summary(self, cur: _Running, summary: object) -> str:
         tmp = cur.work_dir / "summary.json.tmp"
         try:
             with open(tmp, "wb") as f:
-                f.write(json.dumps(summary, ensure_ascii=False).encode("utf-8"))
+                f.write(json.dumps(summary, ensure_ascii=False, allow_nan=False).encode("utf-8"))
                 f.flush()
                 os.fsync(f.fileno())
             os.replace(tmp, cur.work_dir / "summary.json")
