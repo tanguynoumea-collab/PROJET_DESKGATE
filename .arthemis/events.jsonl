@@ -64,3 +64,4 @@
 {"ts":"2026-10-23T00:40","type":"fermeture","ref":"ARC-N2-001, ARC-N2-002, MNT-N2-001, LIVR-N2-001, LIVR-N2-002, TST-N2-001","commit":"5103c53","note":"certifies par /saas-council-role apres re-gate vert 05.3"}
 {"ts":"2026-10-23T00:55","type":"transition","ref":"AUDIT_COUNCIL -> AUDIT_SENIOR","commit":"b66d326","note":"AUDIT_POINTS.md valide par Tanguy le 2026-10-23"}
 {"ts":"2026-10-23T01:40","type":"rapport","ref":".arthemis/reports/dev-senior-1-1.md","commit":"5a670b2","note":"dev-senior : 1 critique, 4 majeurs, 13 mineurs ; P1 et P5 tenus avec reserves, P2 et P3 tenus, P4 non tenu (doc)"}
+{"ts":"2026-10-23T02:00","type":"fermeture","ref":"decision-ds-1","commit":"5ab8c65","note":"Tanguy : « exposer le champ data (dans le rappel et GET /jobs/{id}, dans la limite de 1 Mio, repli fichier au-dela) »"}
