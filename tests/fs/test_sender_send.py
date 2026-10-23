@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from _support.fake_n8n import SIG, FakeN8n, Step
-from _support.jobs import make_config
+from _support.jobs import get, make_config
 from _support.sender_helpers import (
     FakeWall,
     advance_to_next,
@@ -20,12 +20,13 @@ from _support.sender_helpers import (
     make_terminal,
 )
 from deskgate import store
+from deskgate.jobs import job_view
 
 pytestmark = pytest.mark.fs
 
-KEYS = ["job_id", "capability", "status", "duration_s", "summary", "artifacts", "error"]
+KEYS = ["job_id", "capability", "status", "duration_s", "summary", "data", "artifacts", "error"]
 RESULT = json.dumps(
-    {"summary": {"n": 1}, "data": {"secret": "DATA-XYZ"}, "artifacts": []}, ensure_ascii=False
+    {"summary": {"n": 1}, "data": {"valeur": "DATA-XYZ"}, "artifacts": []}, ensure_ascii=False
 )
 
 
@@ -57,7 +58,9 @@ def test_statut_terminal_livre_exactement(tmp_path: Path, fake_n8n: FakeN8n, sta
     assert body["job_id"] == job_id
     if status == "cancelled":
         assert body["duration_s"] is None
-    assert "DATA-XYZ" not in req.body.decode("utf-8")
+    expected = {"valeur": "DATA-XYZ"} if status == "succeeded" else {}
+    assert body["data"] == expected
+    assert body["data"] == job_view(get(db, job_id))["data"]
     assert callback_row(db, job_id)["state"] == "delivered"
     assert job_callback_url(db, job_id) == ""
     assert sender.tick() is False

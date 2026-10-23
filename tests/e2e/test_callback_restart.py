@@ -30,7 +30,7 @@ pytestmark = [
     pytest.mark.skipif(sys.platform != "win32", reason="Windows seul"),
 ]
 
-CLES = {"job_id", "capability", "status", "duration_s", "summary", "artifacts", "error"}
+CLES = {"job_id", "capability", "status", "duration_s", "summary", "data", "artifacts", "error"}
 
 
 def _close(p: subprocess.Popen[bytes]) -> None:

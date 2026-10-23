@@ -14,7 +14,7 @@ from _support.jobs import CALLBACK_URL, get, run_until_terminal
 from _support.mcp_env import MINI, SECRET, mcp_config, mcp_engine
 from deskgate.core.config import RunnerConfig
 from deskgate.core.jobspec import JobRequestError, SubmitRequest
-from deskgate.jobs import JobsService
+from deskgate.jobs import JobsService, job_view
 
 pytestmark = [pytest.mark.proc, pytest.mark.mcp]
 
@@ -164,7 +164,7 @@ def test_env_serveur_vise_avec_deux_serveurs(tmp_path: Path) -> None:
     finally:
         engine.stop()
     assert row.status == "succeeded", row.error_message
-    data = json.loads(row.result_json or "{}")["data"]
+    data = job_view(row)["data"]
     values = data["structured_content"]["values"]
     assert values["MINI_SECRET"] == SECRET
     assert values["AUTRE_SECRET"] is None
