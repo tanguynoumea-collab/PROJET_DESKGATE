@@ -25,7 +25,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path, PureWindowsPath
-from typing import Protocol
+from typing import Any, Protocol
 
 from deskgate import store
 from deskgate.core.config import RunnerConfig
@@ -549,49 +549,68 @@ class Engine:
                 ensure_ascii=False,
                 allow_nan=False,
             )
-            result_json = self._cap_summary(cur, parsed.summary, result_json)
+            result_json = self._cap_result(cur, parsed, result_json)
         return outcome, result_json
 
-    def _cap_summary(self, cur: _Running, summary: object, result_json: str) -> str:
-        """Déporte le résumé dans summary.json si le corps du rappel dépasserait le plafond."""
-        body = build_callback(
-            job_id=cur.job_id,
-            capability=cur.capability,
-            status=SUCCEEDED,
-            started_at=None,
-            finished_at=None,
-            result_json=result_json,
-            error_code=None,
-            error_message=None,
-            max_bytes=None,
-        )
-        if len(encode(body)) <= self._callback_max_bytes:
+    def _cap_result(self, cur: _Running, parsed: ResultOk, result_json: str) -> str:
+        """Déporte data puis summary dans data.json / summary.json si le corps dépasse le plafond.
+
+        Décidé une fois, figé dans result_json : rappel et GET ont la même forme.
+        """
+
+        def size(rj: str) -> int:
+            body = build_callback(
+                job_id=cur.job_id,
+                capability=cur.capability,
+                status=SUCCEEDED,
+                started_at=None,
+                finished_at=None,
+                result_json=rj,
+                error_code=None,
+                error_message=None,
+                max_bytes=None,
+            )
+            return len(encode(body))
+
+        if size(result_json) <= self._callback_max_bytes:
             return result_json
         result = json.loads(result_json)
+        if parsed.data:  # un data vide n'est jamais écrit
+            result["data"] = self._offload(cur, "data.json", parsed.data, "data_write_failed")
+            rj = json.dumps(result, ensure_ascii=False, allow_nan=False)
+            if size(rj) <= self._callback_max_bytes:
+                return rj
+        result["summary"] = self._offload(
+            cur, "summary.json", parsed.summary, "summary_write_failed"
+        )
+        return json.dumps(result, ensure_ascii=False, allow_nan=False)
+
+    def _offload(self, cur: _Running, name: str, obj: object, error_code: str) -> dict[str, Any]:
+        """Écrit obj dans le dossier de la tâche ; marqueur de repli, dégradé si échec."""
         try:
-            result["summary"] = {"path": self._write_summary(cur, summary), "truncated": True}
+            return {"path": self._write_json_file(cur, name, obj), "truncated": True}
         except OSError as exc:
             logger.warning(
-                "Écriture de summary.json impossible pour la tâche %s : %s.",
+                "Écriture de %s impossible pour la tâche %s : %s.",
+                name,
                 cur.job_id,
                 type(exc).__name__,
             )
-            result["summary"] = {"truncated": True, "error": "summary_write_failed"}
-        return json.dumps(result, ensure_ascii=False, allow_nan=False)
+            return {"truncated": True, "error": error_code}
 
-    def _write_summary(self, cur: _Running, summary: object) -> str:
-        tmp = cur.work_dir / "summary.json.tmp"
+    def _write_json_file(self, cur: _Running, name: str, obj: object) -> str:
+        tmp = cur.work_dir / f"{name}.tmp"
         try:
             with open(tmp, "wb") as f:
-                f.write(json.dumps(summary, ensure_ascii=False, allow_nan=False).encode("utf-8"))
+                f.write(json.dumps(obj, ensure_ascii=False, allow_nan=False).encode("utf-8"))
                 f.flush()
                 os.fsync(f.fileno())
-            os.replace(tmp, cur.work_dir / "summary.json")
+            os.replace(tmp, cur.work_dir / name)
         except OSError:
             with contextlib.suppress(OSError):
                 tmp.unlink()
             raise
-        host = str(cur.work_dir).replace("\\", "/") + "/summary.json"
+        host = str(cur.work_dir).replace("\\", "/") + "/" + name
         try:
             return host_to_container(host, self._config.mappings())
         except PathDenied:
