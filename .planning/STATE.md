@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05.4-01-PLAN.md
-last_updated: "2026-10-23T10:15:20.001Z"
+stopped_at: Completed 05.4-02-PLAN.md
+last_updated: "2026-10-23T10:23:39.123Z"
 last_activity: 2026-10-23
 progress:
   total_phases: 16
   completed_phases: 8
   total_plans: 68
-  completed_plans: 64
+  completed_plans: 65
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 05.4 (corrections audit senior 1) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-10-23
 
@@ -110,6 +110,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.3 P01 | 20min | 2 tasks | 4 files |
 | Phase 05.3 P02 | 40min | 3 tasks | 9 files |
 | Phase 05.4 P01 | 25min | 2 tasks | 2 files |
+| Phase 05.4 P02 | 30min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -175,6 +176,7 @@ Recent decisions affecting current work:
 - [Phase 5.3]: AUDIT_SENIOR cycle 1 : AUDIT_POINTS.md validé (5 points) ; dev-senior (.arthemis/reports/dev-senior-1-1.md) : DS-ARCH-1 critique (résultat de mcp.call jamais transmis à n8n, contrat data à trancher P-03/P-04), majeurs DS-ARCH-2 (sender non isolé par rappel), DS-ARCH-3 (NaN/Infinity), DS-SCAL-1 (data en base non purgeable), DS-MAINT-1 (ARCHITECTURE.md = cible) ; P2 et P3 tenus, P1 et P5 avec réserves, P4 non tenu sur la doc — Audit externe du 2026-10-23 ; décision produit sur le champ data attendue de l'utilisateur avant v0.1
 - [Phase 5.3]: decision-ds-1 : exposer le champ data du résultat de plugin dans le rappel n8n et dans GET /jobs/{id}, dans la limite de 1 Mio ; au-delà, repli sur un fichier artefact (comme summary.json). Ferme le contrat de DS-ARCH-1 ; correction à faire en phase insérée — Décision utilisateur du 2026-10-23 (audit senior, P-03/P-04)
 - [Phase 05.4]: Sender: exception de ligne = essai internal_error ; erreurs de base remontent (DS-ARCH-2)
+- [Phase 05.4]: NaN/Infinity/1e999 refusés à la lecture (parse_constant + parse_float) et jamais écrits (allow_nan=False)
 
 ### Roadmap Evolution
 
@@ -201,6 +203,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-23T10:15:19.996Z
-Stopped at: Completed 05.4-01-PLAN.md
+Last session: 2026-10-23T10:23:39.117Z
+Stopped at: Completed 05.4-02-PLAN.md
 Resume file: None
