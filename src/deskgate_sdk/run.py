@@ -78,7 +78,9 @@ class Ctx:
         self._flag = os.path.join(self.work_dir, "cancel.flag")
 
     def _emit(self, **ev: Any) -> None:
-        self._events.write((json.dumps(ev, ensure_ascii=False, allow_nan=False) + "\n").encode("utf-8"))
+        self._events.write(
+            (json.dumps(ev, ensure_ascii=False, allow_nan=False) + "\n").encode("utf-8")
+        )
 
     def log(self, msg: str) -> None:
         print(f"[{time.strftime('%H:%M:%S')}] {msg}", file=sys.stderr, flush=True)
