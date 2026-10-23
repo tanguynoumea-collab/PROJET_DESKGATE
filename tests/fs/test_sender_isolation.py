@@ -1,4 +1,4 @@
-"""Sender : une erreur propre à un rappel n'arrête ni les autres rappels ni le thread (DS-ARCH-2)."""
+"""Sender : une erreur propre à un rappel n'arrête ni les autres ni le thread (DS-ARCH-2)."""
 
 from __future__ import annotations
 
@@ -15,8 +15,8 @@ from _support.sender_helpers import (
     FakeWall,
     all_audit_text,
     audit_details,
-    callback_row,
     callback_config,
+    callback_row,
     make_sender,
     make_terminal,
     next_attempt,
@@ -98,8 +98,8 @@ def test_erreur_de_base_propagee(
         with pytest.raises(store.OperationalError):
             sender.tick()
     finally:
-        sender._drop_connection()  # noqa: SLF001
-        sender._client.close()  # noqa: SLF001
+        sender._drop_connection()
+        sender._client.close()
 
 
 def test_stale_transition_propagee(
@@ -116,13 +116,14 @@ def test_stale_transition_propagee(
         with pytest.raises(store.StaleTransition):
             sender.tick()
     finally:
-        sender._drop_connection()  # noqa: SLF001
-        sender._client.close()  # noqa: SLF001
+        sender._drop_connection()
+        sender._client.close()
     assert audit_details(db, "callback.attempt") == []
 
 
 def test_ligne_empoisonnee_abandonnee_hors_fenetre(tmp_path: Path, fake_n8n: FakeN8n) -> None:
-    db, cfg, wall, j1, _ = _deux(tmp_path, fake_n8n, max_window_s=3)
+    db, cfg, wall, j1, _ = _deux(tmp_path, fake_n8n, max_window_s=60)
+    wall.advance(57)  # 59 s sur 60 : le délai d'essai dépasse la fenêtre
     sender = make_sender(db, cfg, wall)
     assert sender.tick() is True
     assert callback_row(db, j1)["state"] == "abandoned_exhausted"
@@ -131,7 +132,11 @@ def test_ligne_empoisonnee_abandonnee_hors_fenetre(tmp_path: Path, fake_n8n: Fak
 def test_run_ne_passe_pas_failed(tmp_path: Path, fake_n8n: FakeN8n) -> None:
     db, cfg, wall, _, _ = _deux(tmp_path, fake_n8n)
     sender = Sender(
-        db_path=db, config=cfg, wall=wall, rng=random.Random(0), poll=0.05  # noqa: S311
+        db_path=db,
+        config=cfg,
+        wall=wall,
+        rng=random.Random(0),  # noqa: S311
+        poll=0.05,
     )
     sender.start()
     try:

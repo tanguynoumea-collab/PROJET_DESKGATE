@@ -6,8 +6,10 @@ Concurrence 1. L'état vit en base (table `callbacks`) : un redémarrage reprend
 importe `httpx2`. La `resumeUrl` est un secret : elle est passée telle quelle au client et
 n'apparaît jamais dans les journaux, les erreurs enregistrées ni l'audit.
 
-Politique d'erreur : toute exception d'un tour est journalisée, la connexion rouverte et le tour
-rejoué avec back-off ; l'état de chaque rappel vit en base, donc rien n'est perdu ; au-delà de
+Politique d'erreur : une exception propre à un rappel (corps illisible, client qui lève…) est un
+essai en échec de cette ligne (`internal_error`, nom de classe seulement, back-off normal) et le
+tour continue avec les autres ; seules les erreurs de base (`store.DatabaseError`,
+`store.StoreError`) remontent : connexion rouverte, tour rejoué avec back-off, et au-delà de
 `MAX_CONSECUTIVE_ERRORS` erreurs consécutives le thread meurt et le superviseur le recrée.
 """
 
@@ -128,6 +130,51 @@ class Sender:
         claim = store.claim_due_callback(conn, now, max_window_s=self._config.callback.max_window_s)
         if claim is None:
             return False
+        try:
+            return self._process(conn, claim)
+        except (store.DatabaseError, store.StoreError):
+            raise  # erreur de base : politique du thread inchangée
+        except Exception as exc:  # faute propre à cette ligne : elle ne bloque pas les autres
+            self._record_internal_error(conn, claim, exc)
+            return True
+
+    def _schedule(
+        self, claim: store.CallbackClaim, after: datetime, *, short: bool
+    ) -> tuple[str, float, datetime | None]:
+        """État suivant d'une ligne non finale : pending avec échéance, ou abandoned_exhausted."""
+        delay = next_delay(
+            claim.attempt,
+            max_backoff_s=self._config.callback.max_backoff_s,
+            rng=self._rng,
+            short=short,
+        )
+        if after + timedelta(seconds=delay) >= claim.deadline:
+            return ABANDONED_EXHAUSTED, delay, None  # pas de dernier envoi hors fenêtre
+        return "pending", delay, after + timedelta(seconds=delay)
+
+    def _record_internal_error(
+        self, conn: store.Connection, claim: store.CallbackClaim, exc: Exception
+    ) -> None:
+        name = type(exc).__name__
+        logger.exception(
+            "Rappel de la tâche %s : erreur interne (%s), essai compté en échec.",
+            claim.job_id,
+            name,
+        )
+        after = self._wall()
+        state, _delay, next_at = self._schedule(claim, after, short=False)
+        store.record_callback_result(
+            conn,
+            claim,
+            state=state,
+            decision="internal_error",
+            http_status=None,
+            error=name,
+            next_attempt_at=next_at,
+            now=after,
+        )
+
+    def _process(self, conn: store.Connection, claim: store.CallbackClaim) -> bool:
         if not self._host_allowed(claim.callback_url):
             store.abandon_callback(
                 conn,
@@ -163,17 +210,9 @@ class Sender:
         if decision.kind in FINAL:
             state = decision.kind
         else:
-            delay = next_delay(
-                claim.attempt,
-                max_backoff_s=self._config.callback.max_backoff_s,
-                rng=self._rng,
-                short=decision.kind in (RETRY_SHORT, RETRY_MINIMAL),
+            state, delay, next_at = self._schedule(
+                claim, after, short=decision.kind in (RETRY_SHORT, RETRY_MINIMAL)
             )
-            if after + timedelta(seconds=delay) >= claim.deadline:
-                state = ABANDONED_EXHAUSTED  # pas de dernier envoi hors fenêtre
-            else:
-                state = "pending"
-                next_at = after + timedelta(seconds=delay)
         store.record_callback_result(
             conn,
             claim,
