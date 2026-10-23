@@ -11,6 +11,9 @@ par n8n sont signalés « Changement de comportement ».
   `summary` et `artifacts` (`{}` si vide). Au-delà de 1 Mio, `data` est écrit dans `data.json` du dossier de la tâche et
   la clé vaut `{"path": "…/data.json", "truncated": true}` ; si le corps dépasse encore, `summary` suit le même chemin
   (`summary.json`). Après un 413, le renvoi minimal marque `summary` et `data` `{"truncated": true}`.
+- **`deskgate purge [--older-than-days N]`** (DS-SCAL-1) : retire `data` des tâches terminées depuis plus de N
+  jours (défaut 30) dont le rappel est final ; `GET /jobs/{id}` renvoie alors `data: {"purged": true}`. `summary`,
+  artefacts, audit et rappels sont conservés. Purge manuelle, sans migration ; le fichier de base ne rétrécit pas.
 
 ### Changement de comportement
 
