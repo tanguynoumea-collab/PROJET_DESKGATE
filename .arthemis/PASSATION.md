@@ -15,8 +15,8 @@ Attend l'humain :
 Dérives à corriger en premier :
 - 05.2-D3 et 05.3-D1 (certifications /saas-council-role) réalisés le 2026-10-22/23 mais result: pending → /gsd:verify-work 5.2 puis /gsd:verify-work 5.3 (preuve : audits/saas-council-certification-2026-10-22.md)
 Derniers commits :
-195dbe2 docs(arthemis): decision-ds-1 tranchÃ©e, exposer data
-5ab8c65 docs(state): dÃ©cision sur le contrat data (decision-ds-1)
+195dbe2 docs(arthemis): decision-ds-1 tranchée, exposer data
+5ab8c65 docs(state): décision sur le contrat data (decision-ds-1)
 e97a812 docs(arthemis): passation 2026-10-23T01:50, longueur
 2f48b93 docs(arthemis): passation 2026-10-23T01:50
 234c53b docs(state): audit senior cycle 1 et point de passation
