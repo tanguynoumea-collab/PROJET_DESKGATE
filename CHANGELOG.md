@@ -5,6 +5,13 @@ par n8n sont signalés « Changement de comportement ».
 
 ## Non publié
 
+### Ajouté
+
+- **`data` exposé à n8n** (DS-ARCH-1, decision-ds-1) : le corps du rappel et `GET /jobs/{id}` portent `data`, entre
+  `summary` et `artifacts` (`{}` si vide). Au-delà de 1 Mio, `data` est écrit dans `data.json` du dossier de la tâche et
+  la clé vaut `{"path": "…/data.json", "truncated": true}` ; si le corps dépasse encore, `summary` suit le même chemin
+  (`summary.json`). Après un 413, le renvoi minimal marque `summary` et `data` `{"truncated": true}`.
+
 ### Changement de comportement
 
 - **NaN et Infinity refusés** (DS-ARCH-3) : un `result.json` ou un événement de `events.jsonl` contenant `NaN`,
