@@ -6,15 +6,22 @@ import json
 
 import pytest
 
-from deskgate.core.payload import CALLBACK_MAX_BYTES, build_callback, duration_s, encode, minimal
+from deskgate.core.payload import (
+    CALLBACK_MAX_BYTES,
+    build_callback,
+    duration_s,
+    encode,
+    minimal,
+    result_parts,
+)
 
 pytestmark = pytest.mark.unit
 
-CLES = ["job_id", "capability", "status", "duration_s", "summary", "artifacts", "error"]
+CLES = ["job_id", "capability", "status", "duration_s", "summary", "data", "artifacts", "error"]
 DEBUT = "2026-10-20T12:00:00.000Z"
 FIN = "2026-10-20T12:00:01.234Z"
 RESULTAT = (
-    '{"summary":{"n":1},"data":{"secret":"D"},"artifacts":[{"kind":"file","path":"/data/x.txt"}]}'
+    '{"summary":{"n":1},"data":{"valeur":"D"},"artifacts":[{"kind":"file","path":"/data/x.txt"}]}'
 )
 
 
@@ -38,17 +45,19 @@ def test_cles_exactes_pour_les_cinq_statuts(status: str) -> None:
     assert list(_corps(status)) == CLES
 
 
-def test_succes_sans_data() -> None:
+def test_succes_avec_data() -> None:
     body = _corps(result_json=RESULTAT)
     assert body["summary"] == {"n": 1}
+    assert body["data"] == {"valeur": "D"}
     assert body["artifacts"] == [{"kind": "file", "path": "/data/x.txt"}]
     assert body["error"] is None
-    assert b'"D"' not in encode(body)
+    assert b'"D"' in encode(body)
 
 
 def test_echec() -> None:
     body = _corps("failed", error_code="plugin_error", error_message="boum")
     assert body["summary"] == {}
+    assert body["data"] == {}
     assert body["artifacts"] == []
     assert body["error"] == {"code": "plugin_error", "message": "boum"}
 
@@ -81,6 +90,18 @@ def test_plafond_defensif() -> None:
     assert _corps(result_json=result, max_bytes=None)["summary"] == {"x": "a" * 5000}
 
 
+def test_plafond_defensif_data() -> None:
+    result = json.dumps({"summary": {}, "data": {"x": "a" * 2_000_000}})
+    body = _corps(result_json=result)
+    assert body["data"] == {"truncated": True}
+    assert len(encode(body)) <= CALLBACK_MAX_BYTES
+
+
+def test_result_parts() -> None:
+    assert result_parts(None) == ({}, {}, [])
+    assert result_parts('{"summary":{"a":1}}') == ({"a": 1}, {}, [])
+
+
 def test_plafond_par_defaut() -> None:
     assert CALLBACK_MAX_BYTES == 1_048_576
 
@@ -90,8 +111,10 @@ def test_minimal_copie() -> None:
     petit = minimal(body)
     assert body["summary"] == {"n": 1}
     assert petit["summary"] == {"truncated": True}
-    assert {k: v for k, v in petit.items() if k != "summary"} == {
-        k: v for k, v in body.items() if k != "summary"
+    assert petit["data"] == {"truncated": True}
+    assert body["data"] == {"valeur": "D"}
+    assert {k: v for k, v in petit.items() if k not in ("summary", "data")} == {
+        k: v for k, v in body.items() if k not in ("summary", "data")
     }
 
 

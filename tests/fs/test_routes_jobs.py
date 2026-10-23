@@ -8,10 +8,12 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from _support.jobs import make_config
+from _support.jobs import get, make_config
+from _support.sender_helpers import FakeWall, make_terminal
 from deskgate import store
 from deskgate.api import create_app
 from deskgate.core.jobspec import JobRequestError, SubmitRequest
+from deskgate.core.payload import build_callback
 from deskgate.core.tokens import hash_token
 from deskgate.jobs import JobsService, job_view
 
@@ -106,6 +108,7 @@ def test_job_view_forme_et_secret(env: Env) -> None:
         "cancel_requested",
         "progress",
         "summary",
+        "data",
         "artifacts",
         "error",
         "created_at",
@@ -119,6 +122,30 @@ def test_job_view_forme_et_secret(env: Env) -> None:
     dumped = json.dumps(view)
     for forbidden in ("SECRET-SIG", "signature", "params", "travail"):
         assert forbidden not in dumped
+
+
+def test_job_view_et_rappel_meme_data(env: Env) -> None:
+    result = json.dumps(
+        {"summary": {"n": 1}, "data": {"values": [1, 2]}, "artifacts": [{"kind": "file"}]}
+    )
+    job_id = make_terminal(
+        env.db, env.cfg, "succeeded", url=URL, wall=FakeWall(), result_json=result
+    )
+    row = get(env.db, job_id)
+    view = job_view(row)
+    body = build_callback(
+        job_id=row.id,
+        capability=row.capability,
+        status=row.status,
+        started_at=row.started_at,
+        finished_at=row.finished_at,
+        result_json=row.result_json,
+        error_code=row.error_code,
+        error_message=row.error_message,
+    )
+    assert view["data"] == body["data"] == {"values": [1, 2]}
+    assert view["summary"] == body["summary"] == {"n": 1}
+    assert view["artifacts"] == body["artifacts"] == [{"kind": "file"}]
 
 
 def test_logs_service(env: Env) -> None:
