@@ -6,6 +6,7 @@ Les fichiers sont le transport (D-09). Le SDK côté plugin duplique ``CONTRACT`
 from __future__ import annotations
 
 import json
+import math
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -67,10 +68,26 @@ class ResultError(_Strict):
     error: WorkerError
 
 
+def _no_constant(name: str) -> object:
+    raise ValueError(f"constante JSON non standard : {name}")
+
+
+def _finite_float(text: str) -> float:
+    value = float(text)
+    if not math.isfinite(value):
+        raise ValueError("flottant JSON hors limites")
+    return value
+
+
+def _loads_strict(raw: bytes) -> object:
+    """JSON strict (RFC 8259) : NaN, Infinity et flottants hors limites (1e999) refusés."""
+    return json.loads(raw, parse_constant=_no_constant, parse_float=_finite_float)
+
+
 def parse_event(line: bytes) -> ProgressEvent | ArtifactEvent | None:
     """Analyse une ligne de events.jsonl ; ``None`` si JSON ou modèle invalide."""
     try:
-        data = json.loads(line)
+        data = _loads_strict(line)
     except (ValueError, RecursionError):
         return None
     if not isinstance(data, dict):
@@ -95,7 +112,7 @@ def parse_result(
     if len(raw) > max_bytes:
         return "too_large", None
     try:
-        data = json.loads(raw)
+        data = _loads_strict(raw)
     except (ValueError, RecursionError):
         return "invalid", None
     if not isinstance(data, dict):
