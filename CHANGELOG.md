@@ -21,3 +21,13 @@ par n8n sont signalés « Changement de comportement ».
   `Infinity`, `-Infinity` ou un flottant hors limites (`1e999`) est refusé ; la tâche finit `failed` avec le code
   `invalid_result`. Le SDK n'écrit plus de flottant non fini : un plugin qui renvoie `float("nan")` finit en erreur
   `ValueError`, et `ctx.progress(float("nan"))` lève `ValueError`. Remplacer ces valeurs par `null` ou une chaîne.
+
+### Corrigé
+
+- **Rappel empoisonné isolé** (DS-ARCH-2) : une erreur propre à un rappel est un essai en échec `internal_error` de
+  cette ligne ; les autres rappels partent et le runner ne s'arrête plus en code 6 pour cette cause.
+
+### Documentation
+
+- `ARCHITECTURE.md` : section « État livré en v0.1 » (références au code vérifiées par test) et marquage
+  « cible vX » (DS-MAINT-1).

@@ -79,31 +79,33 @@ références.
 
 | Dans ce dépôt | Hors de ce dépôt (projet d'intégration) |
 |---|---|
-| Le runner (API, file, exécuteurs, sécurité, interface locale) | Les workflows n8n complets (coordination, audit, évolution) |
-| Le nœud communautaire `n8n-nodes-deskgate` | Ingestion, registre des maquettes, base et déduplication des conflits |
+| Le runner (API, file, exécuteurs, sécurité ; interface locale : cible v0.3) | Les workflows n8n complets (coordination, audit, évolution) |
+| Le nœud communautaire `n8n-nodes-deskgate` (cible v0.3) | Ingestion, registre des maquettes, base et déduplication des conflits |
 | Les plugins BIM `deskgate-bim` (calcul et logiciels) | Tri et synthèse par IA, Hermes Agent, superviseur, tableau de bord |
-| Des plugins d'exemple (Python, CLI, MCP) et des workflows n8n de démonstration | Toute exposition de Deskgate comme serveur MCP |
+| Des plugins d'exemple (Python, CLI, MCP ; cible v0.4, en v0.1 : `tests/fake_plugins/`, `tests/mcp_fake/`) et des workflows n8n de démonstration | Toute exposition de Deskgate comme serveur MCP |
 
 Deskgate **ne planifie pas et n'enchaîne pas** : pas de DAG, pas de déclencheur, pas de reprise
 d'étapes. Une tâche = un appel d'un plugin. L'enchaînement est le rôle de n8n.
 
 ## 1. Vue d'ensemble
 
+Schéma cible (v0.3). Livré en v0.1 : voir « État livré en v0.1 ».
+
 ```
 ┌──────────── Docker Desktop (WSL2) ─────────────┐
-│  n8n 2.43.8 (+ nœud n8n-nodes-deskgate)        │
+│  n8n 2.43.8 (+ n8n-nodes-deskgate, cible v0.3) │
 │  Postgres                                      │
 └───────────────┬───────────────▲────────────────┘
    POST /jobs   │               │ rappel : POST resumeUrl (signée)
    http://host.docker.internal:8765
 ┌───────────────▼───────────────┴──── Windows natif, session utilisateur ───┐
 │  Deskgate (Python ≥ 3.11)                                                 │
-│   ├─ API HTTP (FastAPI)  : /health /capabilities /jobs /artifacts         │
-│   ├─ Interface web       : /ui (catalogue, tâches, jetons, audit)         │
-│   ├─ File de tâches      : SQLite, ordonnanceur par ressource             │
-│   ├─ Exécuteurs          : python │ cli │ mcp   (sous-processus + Job Object)│
-│   ├─ Registre de plugins : manifestes plugin.yaml + environnements uv     │
-│   └─ Sécurité            : jetons hachés, droits par plugin, audit, chemins│
+│   ├─ API HTTP (FastAPI)  : /health /jobs  (/capabilities : cible v0.2)    │
+│   ├─ Interface web       : /ui (cible v0.3)                               │
+│   ├─ File de tâches      : SQLite, une tâche à la fois (v0.1)             │
+│   ├─ Exécuteurs          : python │ mcp ; cli : cible v0.2 (Job Object)    │
+│   ├─ Registre de plugins : plugin.yaml + env. uv (cible v0.2)             │
+│   └─ Sécurité            : jeton haché, audit, chemins (droits : cible v0.2)│
 │                                                                           │
 │  Plugins (dossiers séparés, un environnement uv chacun)                    │
 │   ifc.clash  ifc.audit  ifc.diff  ifc.quantities  …                       │
@@ -121,8 +123,8 @@ d'étapes. Une tâche = un appel d'un plugin. L'enchaînement est le rôle de n8
   directement dans WSL2 en mode NAT impose d'écouter sur l'interface vEthernet.
 - Conséquence : **tout conteneur local peut joindre le runner**. Le jeton est donc obligatoire sur
   toutes les routes sauf `/health`, même en local.
-- **Persistance SQLite** (mode WAL) : tâches, journaux de tâche, audit, jetons hachés, état des
-  plugins. Au redémarrage, les tâches `running` passent `interrupted` et leur rappel est envoyé.
+- **Persistance SQLite** (mode WAL) : tâches, rappels et audit (tables `jobs`, `callbacks`, `audit`) ; journaux de
+  tâche en fichiers ; jetons hachés multiples et état des plugins : cible v0.2. Au redémarrage, les tâches `running` passent `interrupted` et leur rappel est envoyé.
 - **Démarrage** : tâche du Planificateur de tâches Windows créée par `schtasks /Create /XML`, sans
   élévation : ouverture de session, `InteractiveToken`, `LeastPrivilege`, `ExecutionTimeLimit=PT0S`,
   batterie autorisée, `IgnoreNew`. L'action est `pythonw.exe -m deskgate serve` du venv de l'outil (pas de
@@ -137,7 +139,8 @@ d'étapes. Une tâche = un appel d'un plugin. L'enchaînement est le rôle de n8
   `interrupted` reçu par n8n). Pas de service Windows : un
   service ne voit pas le bureau et ne peut pas piloter de logiciel graphique.
 - **Configuration** : `runner.toml` (port, racines autorisées, correspondance des chemins,
-  concurrence par ressource, dossier des plugins, jetons en v0.1).
+  capacités et serveurs MCP, un jeton `token_sha256` ; concurrence par ressource et dossier des plugins :
+  cible v0.2).
 
 ## 3. File de tâches et ordonnancement
 
@@ -147,27 +150,27 @@ celles qui ont un mode multi-processus sont fragiles sous Windows (rapport de l'
 reste le plan B.
 
 - Cycle de vie : `queued → running → succeeded | failed | timeout | cancelled | interrupted`.
-- Chaque plugin déclare une **ressource** ; chaque ressource a une **concurrence maximale** :
-  `gui-session` = 1, `cpu-heavy` = 1 (défaut), `light` = N.
-- **Idempotence** : si une tâche réussie a la même `idempotency_key`, son résultat est renvoyé
-  sans recalcul (désactivable par le client).
+- Cible v0.2 : chaque plugin déclare une **ressource** ; chaque ressource a une **concurrence maximale** :
+  `gui-session` = 1, `cpu-heavy` = 1 (défaut), `light` = N. En v0.1 : une tâche à la fois.
+- **Idempotence** : en v0.1, une clé est refusée (409) tant qu'une tâche `queued`/`running` la porte. Cible v0.2 :
+  renvoi du résultat d'une tâche réussie sans recalcul (désactivable par le client).
 - Plafond de mémoire et de threads transmis aux plugins par variables d'environnement.
 
 ## 4. Exécution des plugins
 
-### Trois types
+### Types d'exécution
 
 | Type | Ce que le runner exécute |
 |---|---|
 | `python` | `module:fonction(params, ctx) -> dict`, dans l'environnement uv du plugin, **dans un sous-processus** (jamais dans le processus du runner) |
-| `cli` | Un exécutable et un **gabarit d'arguments déclaré** ; pas de shell, pas de concaténation libre |
-| `mcp` | Un outil d'un serveur MCP (stdio lancé par le runner, ou Streamable HTTP), appelé avec le SDK `mcp` officiel, sans LLM |
+| `cli` (cible v0.2) | Un exécutable et un **gabarit d'arguments déclaré** ; pas de shell, pas de concaténation libre |
+| `mcp` | Un outil d'un serveur MCP, appelé avec le SDK `mcp` officiel, sans LLM : stdio, serveurs déclarés dans `[mcp_servers]` de `runner.toml` ; Streamable HTTP : cible v0.2 |
 
 ### Isolation et arrêt
 
 - Chaque tâche tourne dans un **Job Object Windows** : processus créé suspendu
   (`CREATE_SUSPENDED`), assigné au job, puis repris. La sortie du job (`breakaway`) n'est jamais
-  autorisée. Au délai maximum ou à l'annulation, `TerminateJobObject` tue tout l'arbre, y compris
+  autorisée. Au délai maximum ou à l'annulation (coopérative d'abord : `cancel.flag`, délai de grâce), `TerminateJobObject` tue tout l'arbre, y compris
   les petits-enfants orphelins que `psutil` ne voit pas.
 - Limite connue : un logiciel lancé via COM (Revit, Excel) n'appartient pas au job. Un plugin qui
   pilote un logiciel par COM doit le fermer lui-même et le déclarer dans son manifeste.
@@ -183,11 +186,16 @@ déjà convertis au format Windows et validés contre les racines autorisées.
 
 ```json
 { "summary":   { "...": "petit résumé lisible" },
-  "data":      { "...": "conforme à output_schema" },
+  "data":      { "...": "sortie structurée du plugin" },
   "artifacts": [ { "kind": "bcf", "path": "C:/BIM/travail/a1b2/conflits.bcf" } ] }
 ```
 
-## 5. Manifeste `plugin.yaml` (v0.2)
+`data` est transmis à n8n (rappel) et à `GET /jobs/{id}` tel quel, sans masquage : un plugin n'y met jamais de
+secret. `output_schema` : cible v0.2. Les valeurs `NaN`, `Infinity` et les flottants hors limites sont refusés
+(tâche `failed/invalid_result`). `mcp.call` déporte déjà une réponse > 900 000 octets dans l'artefact
+`mcp-result.json` ; l'engine applique ensuite son propre repli (`data.json`) : deux mécanismes coexistent.
+
+## 5. Manifeste `plugin.yaml` (cible v0.2)
 
 ```yaml
 id: ifc.clash
@@ -224,18 +232,19 @@ format `plugin.yaml` arrive en v0.2.
 
 ## 6. Protocole HTTP
 
-Toutes les routes sauf `/health` exigent `Authorization: Bearer <jeton>`. OpenAPI générée.
+Toutes les routes sauf `/health` exigent `Authorization: Bearer <jeton>`. OpenAPI non publiée en v0.1
+(`openapi_url=None`).
 
-| Méthode | Route | Rôle |
-|---|---|---|
-| GET | `/health` | État du runner, sans détail sensible |
-| GET | `/capabilities` | Plugins autorisés pour ce jeton, schémas et disponibilité |
-| GET | `/capabilities/{id}` | Détail d'un plugin |
-| POST | `/jobs` | Soumettre une tâche → `202 { job_id, status: "queued" }` |
-| GET | `/jobs/{id}` | État, progression, résumé, artefacts |
-| GET | `/jobs/{id}/logs` | Journaux de la tâche |
-| POST | `/jobs/{id}/cancel` | Annulation |
-| GET | `/jobs/{id}/artifacts/{name}` | Téléchargement d'un artefact |
+| Méthode | Route | Rôle | v0.1 |
+|---|---|---|---|
+| GET | `/health` | État du runner, sans détail sensible | livré |
+| GET | `/capabilities` | Plugins autorisés pour ce jeton, schémas et disponibilité | cible v0.2 |
+| GET | `/capabilities/{id}` | Détail d'un plugin | cible v0.2 |
+| POST | `/jobs` | Soumettre une tâche → `202 { job_id, status: "queued" }` | livré |
+| GET | `/jobs/{id}` | État, progression, résumé, données, artefacts | livré |
+| GET | `/jobs/{id}/logs` | Journaux de la tâche | livré |
+| POST | `/jobs/{id}/cancel` | Annulation | livré |
+| GET | `/jobs/{id}/artifacts/{name}` | Téléchargement d'un artefact | cible (non planifiée) |
 
 ```json
 POST /jobs
@@ -250,14 +259,20 @@ POST /jobs
 
 ```json
 { "job_id": "a1b2c3d4", "capability": "ifc.clash", "status": "succeeded",
-  "duration_s": 742, "summary": {}, "artifacts": [], "error": null }
+  "duration_s": 742, "summary": {}, "data": {}, "artifacts": [], "error": null }
 ```
 
 - `status` ∈ `succeeded | failed | timeout | cancelled | interrupted`.
 - L'URL de reprise n8n porte un jeton `?signature=…` : le runner l'appelle **telle quelle**, sans
   jamais la reconstruire (sinon 401), et la **masque** dans l'audit et les journaux.
-- n8n accepte 16 Mio par défaut (`N8N_PAYLOAD_SIZE_MAX`). Le runner plafonne le rappel à **1 Mio** ;
-  au-delà, `summary` est écrit dans `summary.json` et le rappel ne porte que son chemin.
+- n8n accepte 16 Mio par défaut (`N8N_PAYLOAD_SIZE_MAX`). Le runner plafonne le rappel à **1 Mio** : au-delà,
+  `data` est écrit dans `data.json` du dossier de la tâche et la clé vaut `{"path": "…/data.json", "truncated": true}` ;
+  si le corps dépasse encore, `summary` suit le même chemin (`summary.json`). Après un 413, le renvoi minimal marque
+  `summary` et `data` `{"truncated": true}`.
+- Une erreur propre à un rappel (corps illisible…) est un essai en échec de cette ligne (`internal_error`) : elle ne
+  bloque pas les autres rappels.
+- Rétention : `deskgate purge --older-than-days N` remplace `data` par `{"purged": true}` pour les tâches au rappel
+  final ; le fichier de base ne rétrécit pas.
 - Réessais avec délai croissant si n8n ne répond pas ; abandon tracé dans l'audit.
 
 ## 7. Chemins et dossier partagé
@@ -284,13 +299,13 @@ reçoit un chemin hôte absolu ; un lien créé ensuite sous la racine reste hor
 ## 8. Sécurité (un runner par PC)
 
 - Écoute locale, jeton obligatoire, **jetons par client** stockés hachés, chacun avec la liste des
-  plugins autorisés (v0.2) et des quotas éventuels.
+  plugins autorisés et des quotas éventuels (cible v0.2 ; v0.1 : un jeton, client `bearer`).
 - **Journal d'audit** : client, plugin, paramètres (sans secrets ni signature de rappel), début,
   fin, statut, durée, refus.
 - **Aucune commande libre** : seules les capacités déclarées sont appelables.
 - Secrets des plugins dans le gestionnaire d'identifiants Windows ou des variables
   d'environnement, jamais dans les manifestes ni les journaux.
-- Un plugin s'installe uniquement sur action explicite (`deskgate plugin add`).
+- Un plugin s'installe uniquement sur action explicite (`deskgate plugin add`, cible v0.2).
 
 ## 9. Intégration n8n
 
@@ -304,12 +319,12 @@ reçoit un chemin hôte absolu ; un lien créé ensuite sous la racine reste hor
 - **v0.3** : nœud communautaire `n8n-nodes-deskgate`, **un seul nœud** qui soumet et attend : un
   nœud communautaire peut se mettre en attente comme `Wait` (webhook `restartWebhook: true`,
   `putExecutionToWait`, méthode `webhook()`), vérifié dans le code de n8n 2.43.8. Liste des
-  capacités chargée depuis `/capabilities`, champs générés depuis `input_schema`, sortie = JSON du
+  capacités chargée depuis `/capabilities` (cible v0.3), champs générés depuis `input_schema`, sortie = JSON du
   rappel.
 
 ## 10. Interface locale (v0.3)
 
-Servie par le runner sur `http://127.0.0.1:8765/ui`, en français : catalogue par type puis par
+Servie par le runner sur `http://127.0.0.1:8765/ui` (cible v0.3), en français : catalogue par type puis par
 catégorie, statut et prérequis, bouton **Tester** ; tâches, progression, journaux, artefacts ;
 jetons et droits ; audit ; diagnostic (`deskgate doctor`).
 
@@ -346,11 +361,12 @@ La bibliothèque BCF de l'écosystème, `bcf-client`, est sous **GPL-3**. On l'u
 - paquet séparé `plugins/bim/bcf/` (`deskgate-bcf`), avec son propre `LICENSE` GPL-3 ; il importe
   `bcf-client` (BCF 2.1 et 3.0 : sujets, commentaires, points de vue, captures, extensions) ;
 - il est exposé comme **programme en ligne de commande** `deskgate-bcf` : il reçoit un fichier JSON
-  (sujets, GUID, caméras, couleurs) et écrit le `.bcf`, ou lit un `.bcf` et rend du JSON ;
+  (sujets, GUID, caméras, couleurs) et écrit le `.bcf` (v0.1 : sous-commande `write` seule) ; lire un `.bcf` et
+  rendre du JSON : cible v0.2 ;
 - les plugins MIT (`ifc.clash`, `ifc.audit`) **ne l'importent jamais** : ils l'appellent en
   sous-processus, avec des fichiers JSON comme seul échange. Deux programmes distincts, chacun sous
   sa licence ;
-- il est aussi déclaré comme plugin `bcf.write` / `bcf.read` (type `cli`), ce qui permet de
+- il est aussi déclaré comme plugin `bcf.write` / `bcf.read` (type `cli`, cible v0.2), ce qui permet de
   produire ou relire un BCF depuis n8n et sert de cas de test de l'exécuteur `cli`.
 
 Le runner (`deskgate`) et les autres plugins restent MIT. L'export BCF intégré d'`ifcclash` (qui
@@ -364,24 +380,25 @@ enregistrée ; couleurs ARGB.
 
 ```
 deskgate/
-├─ AGENTS.md  CLAUDE.md  README.md  ARCHITECTURE.md  ROADMAP.md  LICENSE
+├─ AGENTS.md  CLAUDE.md  README.md  ARCHITECTURE.md  ROADMAP.md  CHANGELOG.md  LICENSE
 ├─ pyproject.toml               paquet deskgate
-├─ src/deskgate/
-│  ├─ api/          routes FastAPI
-│  ├─ queue/        file SQLite, ordonnanceur par ressource
-│  ├─ executors/    python.py  cli.py  mcp.py  jobobject.py
-│  ├─ plugins/      registre, manifeste, environnements uv, doctor
-│  ├─ security/     jetons, droits, audit, chemins
-│  ├─ ui/           interface web (v0.3)
-│  └─ cli.py        deskgate init | serve | doctor | plugin … | token …
+├─ src/
+│  ├─ deskgate/
+│  │  ├─ store.py  engine.py  sender.py  jobs.py  jobobject.py  scheduler.py
+│  │  ├─ runtime.py  supervisor.py  instance.py  installer.py  doctor.py  locations.py
+│  │  ├─ cli.py        deskgate init | serve | doctor | task … | purge
+│  │  ├─ api/          routes FastAPI (/health, /jobs)
+│  │  ├─ core/         configuration, protocole worker, corps du rappel, chemins
+│  │  └─ workers/      processus de travail des types python et mcp
+│  └─ deskgate_sdk/    SDK des plugins python (contexte, résultat)
 ├─ plugins/
-│  ├─ examples/     plugins minimaux python, cli, mcp
 │  └─ bim/          paquet deskgate-bim (MIT, pyproject propre) + un dossier par plugin
 │     └─ bcf/       paquet deskgate-bcf (GPL-3, LICENSE propre), CLI deskgate-bcf
 ├─ n8n/
 │  ├─ docker-compose.yml   n8n 2.43.8 épinglé + Postgres + montage C:\BIM
-│  ├─ examples/     workflows à importer
-│  └─ node/         n8n-nodes-deskgate (v0.3)
-├─ docs/passation/  cadrage d'origine
+│  └─ examples/     workflows à importer
+├─ docs/            contrats et cadrage d'origine (docs/passation/)
 └─ tests/
 ```
+
+Cible : `n8n/node/` (`n8n-nodes-deskgate`, cible v0.3), `plugins/examples/` (cible v0.4).

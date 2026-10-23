@@ -199,4 +199,5 @@ deskgate doctor > <fichier>
 | Webhook 404 juste après la publication | Enregistrement en cours : réessayer après quelques secondes |
 | Wait expiré | Branche « Echec ou delai » : rappel absent ; voir `n8n/README.md` |
 | Rappel refusé en 401 | `resumeUrl` modifiée : elle doit être transmise telle quelle |
+| Base `deskgate.db` volumineuse | `deskgate purge --older-than-days 30` (retire `data` des tâches au rappel final ; le fichier ne rétrécit pas) |
 | Plugin `requires_session` en échec | Session Windows verrouillée ou fermée |

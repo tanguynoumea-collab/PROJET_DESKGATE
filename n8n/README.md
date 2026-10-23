@@ -55,6 +55,10 @@ n'est fourni dans cette phase.
 
 - Branche « Succes » : `resume`, `artefacts`, et le rapport au chemin
   `/data/travail/<job_id>/conflits.bcf`.
+- Corps du rappel : `$json.body.summary`, `$json.body.data` (sortie du plugin, par exemple `structured_content`
+  pour `mcp.call`), `$json.body.artifacts`. Si `data` vaut `{"path": "…/data.json", "truncated": true}`, lire le
+  fichier à ce chemin (`/data/travail/<job_id>/`) ; `{"purged": true}` signifie que `deskgate purge` l'a retiré de
+  la base.
 - Branche « Echec ou delai » : `failed`, `timeout`, `cancelled`, `interrupted`, ou échéance du Wait
   sans rappel (`delai_depasse_sans_rappel`).
 

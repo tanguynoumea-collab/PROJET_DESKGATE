@@ -20,6 +20,7 @@ CR_ISOLE_TXT = re.compile(r"\r(?!\n)")
 DOCS = [
     "AGENTS.md",
     "ARCHITECTURE.md",
+    "CHANGELOG.md",
     "README.md",
     "CLAUDE.md",
     "ROADMAP.md",

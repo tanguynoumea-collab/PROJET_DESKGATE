@@ -5,7 +5,8 @@
 n8n tourne dans Docker : il ne peut ni lancer un calcul IfcOpenShell de 40 minutes, ni piloter un
 logiciel installé, ni démarrer un serveur MCP en stdio. Deskgate est un petit service local, dans
 votre session Windows, à qui n8n délègue ces tâches : il les met en file, les exécute via des
-plugins déclarés (Python, ligne de commande, MCP), puis rappelle n8n avec le résultat.
+plugins déclarés (fonction Python ou outil MCP en v0.1 ; ligne de
+commande en v0.2), puis rappelle n8n avec le résultat.
 
 > Statut : v0.1, installable sur Windows 10/11.
 
