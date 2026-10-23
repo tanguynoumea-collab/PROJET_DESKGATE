@@ -635,3 +635,40 @@ def abandon_callback(
         ).fetchone()
         if row is not None:
             _close_callback(conn, job_id, state, reason, row["attempts"], now)
+
+
+_PURGED_DATA = '{"purged":true}'
+
+
+def purge_data(
+    conn: sqlite3.Connection, *, older_than: datetime, now: datetime | None = None
+) -> int:
+    """Remplace `$.data` par {"purged": true} (DS-SCAL-1) ; renvoie le nombre de tâches purgées.
+
+    Seulement : tâche terminale, terminée avant `older_than`, rappel final, `data` objet
+    non vide, ni déjà purgé ni marqueur de repli (`truncated`, qui pointe `data.json`). Une ligne au
+    JSON invalide est ignorée. `summary`, `artifacts`, `callbacks` et l'audit existant ne sont pas
+    touchés ; un événement `data.purged` est ajouté si au moins une tâche est purgée. Aucune
+    migration : le fichier ne rétrécit pas (pas de VACUUM).
+    """
+    finals = sorted(CALLBACK_FINAL_STATES)
+    marks = ",".join("?" * len(finals))
+    moment = _now(now)
+    cutoff = iso(older_than)
+    with tx(conn):
+        cur = conn.execute(
+            "UPDATE jobs SET result_json = json_set(result_json, '$.data', json(?)) "  # noqa: S608
+            "WHERE result_json IS NOT NULL AND finished_at IS NOT NULL AND finished_at < ? "
+            "AND status IN ('succeeded','failed','timeout','cancelled','interrupted') "
+            f"AND id IN (SELECT job_id FROM callbacks WHERE state IN ({marks})) "
+            "AND CASE WHEN json_valid(result_json) THEN "
+            "json_type(result_json, '$.data') = 'object' "
+            "AND json_extract(result_json, '$.data') NOT IN ('{}', ?) "
+            "AND json_type(result_json, '$.data.truncated') IS NOT 'true' "
+            "ELSE 0 END",
+            (_PURGED_DATA, cutoff, *finals, _PURGED_DATA),
+        )
+        count = cur.rowcount
+        if count > 0:
+            _audit(conn, "data.purged", None, {"count": count, "older_than": cutoff}, moment)
+    return count
