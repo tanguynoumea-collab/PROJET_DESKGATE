@@ -145,13 +145,13 @@ Plans:
 **Goal:** Le `data` d'un plugin (dont la sortie de `mcp.call`) atteint n8n par le rappel et `GET /jobs/{id}`, avec repli `data.json` au-delà de 1 Mio ; un rappel empoisonné ne bloque plus les autres ni n'arrête le runner ; `NaN`/`Infinity` sont refusés à la frontière worker ; `data` est purgeable par `deskgate purge` sans migration ; `ARCHITECTURE.md` sépare le livré v0.1 de la cible. Ferme les cinq findings de `.arthemis/reports/dev-senior-1-1.md`.
 **Requirements**: aucun (findings DS-ARCH-1, DS-ARCH-2, DS-ARCH-3, DS-SCAL-1, DS-MAINT-1)
 **Depends on:** Phase 5
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 
 Plans:
 - [x] 05.4-01-PLAN.md — Sender : échec d'un rappel isolé à sa ligne (`internal_error`), caractérisation d'abord (DS-ARCH-2) (vague 1)
 - [x] 05.4-02-PLAN.md — NaN/Infinity refusés (`parse_constant` + `parse_float`), écritures `allow_nan=False`, CHANGELOG créé (DS-ARCH-3) (vague 1)
 - [x] 05.4-03-PLAN.md — Contrat `data` : rappel + GET via `result_parts`, repli `data.json` dans l'engine, sortie MCP lue par l'API (DS-ARCH-1) (vague 2)
-- [ ] 05.4-04-PLAN.md — `store.purge_data` + `deskgate purge --older-than-days N`, sans migration (DS-SCAL-1) (vague 3)
+- [x] 05.4-04-PLAN.md — `store.purge_data` + `deskgate purge --older-than-days N`, sans migration (DS-SCAL-1) (vague 3)
 - [ ] 05.4-05-PLAN.md — ARCHITECTURE.md « État livré en v0.1 » verrouillé par test, marquage cible, README/n8n/AGENTS/CHANGELOG, gate complet (DS-MAINT-1) (vague 4)
 
 ### Phase 05.3: corrections audit council 1 passe 2 : superviseur, refus MSIX de task install, messages et test doctor (INSERTED)
