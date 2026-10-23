@@ -9,6 +9,72 @@ Ce document est la référence technique. Les décisions de fond et leur justifi
 [`docs/passation/02-DECISIONS.md`](docs/passation/02-DECISIONS.md) ; les vérifications qui fondent
 les choix ci-dessous sont dans [`.arthemis/reports/`](.arthemis/reports/).
 
+## État livré en v0.1
+
+Ce qui suit décrit le code livré ; le reste du document décrit aussi la cible, marquée « cible vX ».
+Chaque puce cite le code (`fichier:ligne` (`symbole`)) ; `tests/unit/test_architecture_doc.py` vérifie ces
+références.
+
+- API : cinq routes. `/health` n'exige pas de jeton (`src/deskgate/api/routes_health.py:14` (`@router.get("/health")`)) ;
+  `POST /jobs`, `GET /jobs/{id}`, `GET /jobs/{id}/logs` et `POST /jobs/{id}/cancel` l'exigent
+  (`src/deskgate/api/routes_jobs.py:28` (`@router.post("/jobs"`), 
+  `src/deskgate/api/routes_jobs.py:34` (`@router.get("/jobs/{job_id}")`), `src/deskgate/api/routes_jobs.py:39` (`/logs`),
+  `src/deskgate/api/routes_jobs.py:54` (`/cancel`)). OpenAPI et pages de documentation sont désactivées
+  (`src/deskgate/api/app.py:36` (`openapi_url=None`)).
+- Écoute sur `127.0.0.1` par défaut (`src/deskgate/core/config.py:202` (`host: str = "127.0.0.1"`)) ; un seul jeton,
+  stocké haché dans `runner.toml` (`src/deskgate/core/config.py:204` (`token_sha256`)).
+- Deux types d'exécution : `python` et `mcp` (`src/deskgate/core/config.py:119` (`Literal["python", "mcp"]`)). Les
+  serveurs MCP sont lancés en stdio ; ils sont déclarés dans la table `[mcp_servers]` de `runner.toml`
+  (`src/deskgate/core/config.py:168` (`class McpServer`), `src/deskgate/core/config.py:209` (`mcp_servers:`)).
+- Une seule tâche `running` à la fois pour tout le runner
+  (`src/deskgate/store.py:371` (`NOT EXISTS (SELECT 1 FROM jobs WHERE status='running')`)) ; la colonne `resource` est
+  enregistrée mais jamais lue pour ordonnancer (`src/deskgate/store.py:90` (`resource TEXT NOT NULL`)).
+- Idempotence : une clé est refusée (409) tant qu'une tâche `queued` ou `running` la porte
+  (`src/deskgate/store.py:96-97` (`jobs_idem`)) ; le résultat d'une tâche réussie n'est pas réutilisé.
+- Base SQLite : tables `jobs`, `callbacks` et `audit` ; l'audit est en ajout seul
+  (`src/deskgate/store.py:109` (`audit_no_update`)). Au redémarrage, les tâches `running` passent `interrupted`
+  (`src/deskgate/store.py:451` (`def recover_interrupted`)).
+- Isolation : le sous-processus du plugin est créé suspendu dans un Job Object
+  (`src/deskgate/jobobject.py:195` (`CREATE_SUSPENDED`)). L'annulation est d'abord coopérative
+  (`src/deskgate/engine.py:451` (`cancel.flag`)), puis `TerminateJobObject` tue l'arbre
+  (`src/deskgate/jobobject.py:120` (`TerminateJobObject`)).
+- Frontière worker en JSON strict : `NaN`, `Infinity` et `1e999` sont refusés, la tâche finit
+  `failed/invalid_result` (`src/deskgate/core/worker_protocol.py:82` (`def _loads_strict`)).
+- Rappel : le corps porte `job_id`, `capability`, `status`, `duration_s`, `summary`, `data`, `artifacts` et `error`
+  (`src/deskgate/core/payload.py:35` (`def result_parts`), 
+  `src/deskgate/core/payload.py:46` (`def build_callback`)). Plafond de 1 Mio (`src/deskgate/core/payload.py:17` (`CALLBACK_MAX_BYTES`)) : au-delà,
+  `data` puis `summary` sont déportés dans `data.json` puis `summary.json` du dossier de la tâche, la clé valant
+  `{"path": "…", "truncated": true}` (`src/deskgate/engine.py:555` (`def _cap_result`)). Après un 413, le renvoi minimal
+  marque `summary` et `data` `{"truncated": true}` (`src/deskgate/core/payload.py:41` (`def minimal`)). `data` n'est pas
+  masqué. `GET /jobs/{id}` porte le même `data` (`src/deskgate/jobs.py:50` (`def job_view`)).
+- Sender : une erreur propre à un rappel (corps illisible…) est un essai en échec `internal_error` de cette ligne
+  (`src/deskgate/sender.py:155` (`def _record_internal_error`)) ; seules les erreurs de base comptent pour l'arrêt du
+  thread (`src/deskgate/sender.py:53` (`MAX_CONSECUTIVE_ERRORS`)).
+- Superviseur : il recrée un thread mort, puis sort en code 6 au-delà du budget
+  (`src/deskgate/supervisor.py:32` (`EXIT_THREAD_FAILED = 6`)).
+- CLI : `deskgate init`, `serve`, `doctor`, `task …` et `purge`
+  (`src/deskgate/cli.py:54` (`def serve`), `src/deskgate/cli.py:76` (`def doctor`),
+  `src/deskgate/cli.py:147` (`def init`), `src/deskgate/cli.py:205` (`task_app`)). `deskgate purge --older-than-days N`
+  remplace `data` par `{"purged": true}` pour les tâches au rappel final, sans migration
+  (`src/deskgate/cli.py:88` (`def purge`), `src/deskgate/store.py:643` (`def purge_data`)).
+- BCF : `deskgate-bcf` n'offre que la sous-commande `write`
+  (`plugins/bim/bcf/src/deskgate_bcf/cli.py:50` (`sub.add_parser("write"`)).
+
+### Absent en v0.1 (cible)
+
+- Routes `/capabilities` et `/capabilities/{id}` : cible v0.2.
+- Interface locale `/ui` : cible v0.3.
+- Exécuteur `cli` : cible v0.2.
+- Manifestes `plugin.yaml` et `deskgate plugin add` : cible v0.2.
+- Jetons multiples et droits par plugin : cible v0.2.
+- Ressources et concurrence par ressource : cible v0.2.
+- Réutilisation idempotente d'un résultat : cible v0.2.
+- MCP en Streamable HTTP : cible v0.2.
+- Lecture `.bcf` et capacités `bcf.read` / `bcf.write` : cible v0.2.
+- Nœud `n8n-nodes-deskgate` : cible v0.3.
+- Plugins d'exemple : cible v0.4.
+- `/jobs/{id}/artifacts/{name}` et OpenAPI publiée : cible (non planifiée).
+
 ## 0. Périmètre
 
 | Dans ce dépôt | Hors de ce dépôt (projet d'intégration) |
