@@ -5,16 +5,16 @@ from __future__ import annotations
 import io
 import os
 import sys
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Annotated
 
 import typer
 
-from deskgate import __version__, installer, runtime, scheduler
+from deskgate import __version__, installer, runtime, scheduler, store
 from deskgate import doctor as doctor_mod
 from deskgate.core.tokens import generate_token, hash_token
-from deskgate.locations import resolve_home
+from deskgate.locations import db_path, resolve_home
 from deskgate.scheduler import TASK_NAME, SchedulerError
 
 # cp1252 par défaut sous Windows ; sous pythonw le flux vaut None (isinstance l'écarte).
@@ -82,6 +82,46 @@ def doctor(
         label = "échec" if check.level == "echec" else check.level
         typer.echo(f"[{label}] {check.name} : {check.message}")
     raise typer.Exit(doctor_mod.exit_code(checks))
+
+
+@app.command()
+def purge(
+    older_than_days: Annotated[
+        int,
+        typer.Option(
+            "--older-than-days",
+            min=0,
+            help="Purge data des tâches terminées depuis plus de N jours (rappel final).",
+        ),
+    ] = 30,
+) -> None:
+    """Retire `data` des tâches terminées dont le rappel est final (summary conservé)."""
+    path = db_path(resolve_home())
+    if not path.is_file():
+        _err(f"Base introuvable : {path}. Rien à purger.")
+        raise typer.Exit(1)
+    cutoff = datetime.now(UTC) - timedelta(days=older_than_days)
+    conn = store.connect(path)
+    try:
+        version = int(conn.execute("PRAGMA user_version").fetchone()[0])
+        if version > store.SCHEMA_VERSION:
+            _err(str(store.SchemaTooNew(version)))
+            raise typer.Exit(2)
+        if version == 0:
+            _err("Base non initialisée : lancez une fois `deskgate serve`. Rien à purger.")
+            raise typer.Exit(2)
+        count = store.purge_data(conn, older_than=cutoff)
+    except store.OperationalError as exc:
+        _err(
+            f"Base occupée ou illisible ({type(exc).__name__}) : réessayez dans quelques secondes."
+        )
+        raise typer.Exit(1) from exc
+    finally:
+        conn.close()
+    typer.echo(
+        f"{count} tâche(s) purgée(s) : data des tâches terminées avant le "
+        f"{cutoff:%Y-%m-%d %H:%M} UTC, rappel final. Le fichier de base ne rétrécit pas."
+    )
 
 
 def _err(message: str) -> None:
