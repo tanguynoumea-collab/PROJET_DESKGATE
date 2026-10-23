@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05.4-02-PLAN.md
-last_updated: "2026-10-23T10:23:39.123Z"
+stopped_at: Completed 05.4-03-PLAN.md
+last_updated: "2026-10-23T10:32:29.090Z"
 last_activity: 2026-10-23
 progress:
   total_phases: 16
   completed_phases: 8
   total_plans: 68
-  completed_plans: 65
+  completed_plans: 66
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 05.4 (corrections audit senior 1) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-10-23
 
@@ -111,6 +111,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.3 P02 | 40min | 3 tasks | 9 files |
 | Phase 05.4 P01 | 25min | 2 tasks | 2 files |
 | Phase 05.4 P02 | 30min | 2 tasks | 11 files |
+| Phase 05.4 P03 | 40min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -177,6 +178,7 @@ Recent decisions affecting current work:
 - [Phase 5.3]: decision-ds-1 : exposer le champ data du résultat de plugin dans le rappel n8n et dans GET /jobs/{id}, dans la limite de 1 Mio ; au-delà, repli sur un fichier artefact (comme summary.json). Ferme le contrat de DS-ARCH-1 ; correction à faire en phase insérée — Décision utilisateur du 2026-10-23 (audit senior, P-03/P-04)
 - [Phase 05.4]: Sender: exception de ligne = essai internal_error ; erreurs de base remontent (DS-ARCH-2)
 - [Phase 05.4]: NaN/Infinity/1e999 refusés à la lecture (parse_constant + parse_float) et jamais écrits (allow_nan=False)
+- [Phase 05.4]: decision-ds-1: data exposé dans rappel et GET, repli data.json puis summary.json au-delà de 1 Mio; pas d'entrée data.json dans artifacts
 
 ### Roadmap Evolution
 
@@ -203,6 +205,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-23T10:23:39.117Z
-Stopped at: Completed 05.4-02-PLAN.md
+Last session: 2026-10-23T10:32:29.084Z
+Stopped at: Completed 05.4-03-PLAN.md
 Resume file: None
