@@ -59,6 +59,64 @@ def _result(summary: object) -> dict[str, object]:
     return {"protocol": 1, "ok": True, "summary": summary, "data": {}, "artifacts": []}
 
 
+def _result2(summary: object, data: object) -> dict[str, object]:
+    return {"protocol": 1, "ok": True, "summary": summary, "data": data, "artifacts": []}
+
+
+def test_gros_data_deporte_resume_intact(tmp_path: Path) -> None:
+    env = Env(tmp_path, callback_max_bytes=2048)
+    env.result = _result2({"t": "s" * 600}, {"t": "d" * 1800})
+    row = env.run()
+    assert row.status == "succeeded"
+    assert row.result_json is not None
+    result = json.loads(row.result_json)
+    assert result["data"] == {"path": f"/data/travail/{row.id}/data.json", "truncated": True}
+    assert result["summary"] == {"t": "s" * 600}
+    work = Path(row.work_dir)
+    assert json.loads((work / "data.json").read_text(encoding="utf-8")) == {"t": "d" * 1800}
+    assert not (work / "data.json.tmp").exists()
+    assert not (work / "summary.json").exists()
+
+
+def test_data_et_resume_gros_deportes(tmp_path: Path) -> None:
+    env = Env(tmp_path, callback_max_bytes=2048)
+    env.result = _result2({"t": "s" * 3000}, {"t": "d" * 3000})
+    row = env.run()
+    assert row.result_json is not None
+    result = json.loads(row.result_json)
+    assert result["data"] == {"path": f"/data/travail/{row.id}/data.json", "truncated": True}
+    assert result["summary"] == {"path": f"/data/travail/{row.id}/summary.json", "truncated": True}
+    work = Path(row.work_dir)
+    assert json.loads((work / "data.json").read_text(encoding="utf-8")) == {"t": "d" * 3000}
+    assert json.loads((work / "summary.json").read_text(encoding="utf-8")) == {"t": "s" * 3000}
+
+
+def test_resume_seul_gros_data_vide_non_ecrit(tmp_path: Path) -> None:
+    env = Env(tmp_path, callback_max_bytes=2048)
+    env.result = _result2({"t": "x" * 10_000}, {})
+    row = env.run()
+    assert row.result_json is not None
+    result = json.loads(row.result_json)
+    assert result["summary"]["truncated"] is True
+    assert result["data"] == {}
+    assert not (Path(row.work_dir) / "data.json").exists()
+
+
+def test_echec_ecriture_data(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+    def block(spec: LaunchSpec) -> None:
+        Path(spec.cwd, "data.json").mkdir()
+
+    env = Env(tmp_path, before_launch=block, callback_max_bytes=2048)
+    env.result = _result2({"n": 1}, {"t": "SECRET-DATA" * 1000})
+    with caplog.at_level(logging.WARNING, logger="deskgate.engine"):
+        row = env.run()
+    assert row.status == "succeeded"
+    assert row.result_json is not None
+    assert json.loads(row.result_json)["data"] == {"truncated": True, "error": "data_write_failed"}
+    assert "data.json" in caplog.text
+    assert "SECRET-DATA" not in caplog.text
+
+
 def test_petit_plafond_deporte_le_resume(tmp_path: Path) -> None:
     env = Env(tmp_path, callback_max_bytes=2048)
     env.result = _result({"text": "x" * 10_000})
