@@ -67,3 +67,8 @@
 {"ts":"2026-10-23T02:00","type":"fermeture","ref":"decision-ds-1","commit":"5ab8c65","note":"Tanguy : « exposer le champ data (dans le rappel et GET /jobs/{id}, dans la limite de 1 Mio, repli fichier au-dela) »"}
 {"ts":"2026-10-23T09:20","type":"transition","ref":"AUDIT_SENIOR -> retour GSD (phase 5.4)","commit":"948ff18","note":"phase 5.4 inseree : DS-ARCH-1, DS-ARCH-2, DS-ARCH-3, DS-SCAL-1, DS-MAINT-1"}
 {"ts":"2026-10-23T14:30","type":"transition","ref":"retour GSD (phase 5.4) -> AUDIT_SENIOR","commit":"a0fc0ae","note":"phase 5.4 terminee, gate vert ; 5 findings corriges, certification 05.4-D1 en file"}
+{"ts":"2026-10-23T15:00","type":"fermeture","ref":"DS-ARCH-1","commit":"b1ff85f","note":"certifie FERME par dev-senior (.arthemis/reports/dev-senior-1-2-certification.md)"}
+{"ts":"2026-10-23T15:00","type":"fermeture","ref":"DS-ARCH-2","commit":"b1ff85f","note":"certifie FERME par dev-senior (.arthemis/reports/dev-senior-1-2-certification.md)"}
+{"ts":"2026-10-23T15:00","type":"fermeture","ref":"DS-ARCH-3","commit":"b1ff85f","note":"certifie FERME par dev-senior (.arthemis/reports/dev-senior-1-2-certification.md)"}
+{"ts":"2026-10-23T15:00","type":"fermeture","ref":"DS-SCAL-1","commit":"b1ff85f","note":"certifie FERME par dev-senior (.arthemis/reports/dev-senior-1-2-certification.md)"}
+{"ts":"2026-10-23T15:00","type":"rapport","ref":".arthemis/reports/dev-senior-1-2-certification.md","commit":"b1ff85f","note":"4 FERMES, DS-MAINT-1 PARTIEL, candidats mineurs DS2-1..DS2-4"}

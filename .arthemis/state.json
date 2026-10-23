@@ -135,64 +135,16 @@
       "condition_levee": "certification a la DoD (critere revu, palier 4 et recettes 5.1)"
     },
     {
-      "id": "DS-ARCH-1",
-      "type": "finding",
-      "titre": "mcp.call : resultat range dans data, jamais transmis a n8n ; decision : exposer data (<=1 Mio, repli fichier)",
-      "gravite": "bloquant",
-      "statut": "corrige_non_certifie",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-23",
-      "source": ".arthemis/reports/dev-senior-1-1.md",
-      "ref": "DS-ARCH-1",
-      "condition_levee": "certification 05.4-D1 par l auditeur d origine"
-    },
-    {
-      "id": "DS-ARCH-2",
-      "type": "finding",
-      "titre": "sender : un rappel en erreur deterministe bloque les autres puis code 6 apres ~2 min",
-      "gravite": "majeur",
-      "statut": "corrige_non_certifie",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-23",
-      "source": ".arthemis/reports/dev-senior-1-1.md",
-      "ref": "DS-ARCH-2",
-      "condition_levee": "certification 05.4-D1 par l auditeur d origine"
-    },
-    {
-      "id": "DS-ARCH-3",
-      "type": "finding",
-      "titre": "NaN/Infinity d'un plugin traversent le contrat : rappel JSON invalide, GET /jobs 500",
-      "gravite": "majeur",
-      "statut": "corrige_non_certifie",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-23",
-      "source": ".arthemis/reports/dev-senior-1-1.md",
-      "ref": "DS-ARCH-3",
-      "condition_levee": "certification 05.4-D1 par l auditeur d origine"
-    },
-    {
-      "id": "DS-SCAL-1",
-      "type": "finding",
-      "titre": "ifc.clash : ~0,8 Mio de data par tache en base, non purgeable (500 taches = 399 Mio)",
-      "gravite": "majeur",
-      "statut": "corrige_non_certifie",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-23",
-      "source": ".arthemis/reports/dev-senior-1-1.md",
-      "ref": "DS-SCAL-1",
-      "condition_levee": "certification 05.4-D1 par l auditeur d origine"
-    },
-    {
       "id": "DS-MAINT-1",
       "type": "finding",
-      "titre": "ARCHITECTURE.md presente la cible v0.2-0.3 comme livree (P4 non tenu)",
-      "gravite": "majeur",
-      "statut": "corrige_non_certifie",
+      "titre": "ARCHITECTURE.md :157, :250-255, :306-307 presentent encore une cible comme livree (DS2-3)",
+      "gravite": "mineur",
+      "statut": "ouvert",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-23",
       "source": ".arthemis/reports/dev-senior-1-1.md",
       "ref": "DS-MAINT-1",
-      "condition_levee": "certification 05.4-D1 par l auditeur d origine"
+      "condition_levee": "gap 05.4 corrige et recertifie, ou renonciation consignee"
     }
   ],
   "livraisons": [],
@@ -250,6 +202,6 @@
   },
   "maj": {
     "le": "2026-10-23",
-    "commit": "a0fc0ae"
+    "commit": "b1ff85f"
   }
 }
