@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
-status: executing
-stopped_at: Completed 05.4-04-PLAN.md
-last_updated: "2026-10-23T10:40:07.961Z"
+status: verifying
+stopped_at: Completed 05.4-05-PLAN.md
+last_updated: "2026-10-23T10:53:02.192Z"
 last_activity: 2026-10-23
 progress:
   total_phases: 16
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 68
-  completed_plans: 67
+  completed_plans: 68
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 
 Phase: 05.4 (corrections audit senior 1) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-10-23
 
 Progress: [░░░░░░░░░░] 0%
@@ -113,6 +113,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.4 P02 | 30min | 2 tasks | 11 files |
 | Phase 05.4 P03 | 40min | 3 tasks | 11 files |
 | Phase 05.4 P04 | 25min | 2 tasks | 5 files |
+| Phase 05.4 P05 | 40min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -181,6 +182,7 @@ Recent decisions affecting current work:
 - [Phase 05.4]: NaN/Infinity/1e999 refusés à la lecture (parse_constant + parse_float) et jamais écrits (allow_nan=False)
 - [Phase 05.4]: decision-ds-1: data exposé dans rappel et GET, repli data.json puis summary.json au-delà de 1 Mio; pas d'entrée data.json dans artifacts
 - [Phase 05.4]: Purge de data manuelle (deskgate purge), sans migration ni config (DS-SCAL-1)
+- [Phase 05.4]: ARCHITECTURE.md : livré v0.1 séparé de la cible, références fichier:ligne verrouillées par test
 
 ### Roadmap Evolution
 
@@ -207,6 +209,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-23T10:40:07.956Z
-Stopped at: Completed 05.4-04-PLAN.md
+Last session: 2026-10-23T10:53:02.186Z
+Stopped at: Completed 05.4-05-PLAN.md
 Resume file: None
