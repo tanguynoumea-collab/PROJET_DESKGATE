@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: verifying
-stopped_at: Completed 05.3-02-PLAN.md
-last_updated: "2026-10-22T19:09:45.269Z"
+stopped_at: "AUDIT_SENIOR rendu : décision produit sur le contrat data (DS-ARCH-1) et retour GSD des majeurs à trancher"
+last_updated: "2026-10-23T06:40:30.021Z"
 last_activity: 2026-10-22
 progress:
   total_phases: 15
@@ -171,6 +171,7 @@ Recent decisions affecting current work:
 - [Phase 5.3]: Triage des findings N2 (certification du council 1) : phase 5.3 = ARC-N2-001 (budget du superviseur consommé par un recover qui échoue, sans back-off), ARC-N2-002 (stop pendant un recover lent laisse un engine vivant), MNT-N2-001 et LIVR-N2-002 (\r dans runtime.py et AGENTS.md), LIVR-N2-001 (task install sans refus MSIX), TST-N2-001 (chemin par défaut de last_task_result dans doctor non testé) ; Info LIVR-N2-003, FIAB-N2-001, PER-N2-001 en backlog 999.7 ; rapport audits/saas-council-certification-2026-10-22.md — Choix utilisateur du 2026-10-22 au checkpoint triage
 - [Phase 05.3]: Budget du superviseur compté sur recréations effectives; back-off recover min(30s,2^n), abandon après 10 échecs
 - [Phase 05.3]: P-06/P-07/P-08 : message d'abandon avec chemin réel, test d'octets CR, task install refuse en MSIX
+- [Phase 5.3]: AUDIT_SENIOR cycle 1 : AUDIT_POINTS.md validé (5 points) ; dev-senior (.arthemis/reports/dev-senior-1-1.md) : DS-ARCH-1 critique (résultat de mcp.call jamais transmis à n8n, contrat data à trancher P-03/P-04), majeurs DS-ARCH-2 (sender non isolé par rappel), DS-ARCH-3 (NaN/Infinity), DS-SCAL-1 (data en base non purgeable), DS-MAINT-1 (ARCHITECTURE.md = cible) ; P2 et P3 tenus, P1 et P5 avec réserves, P4 non tenu sur la doc — Audit externe du 2026-10-23 ; décision produit sur le champ data attendue de l'utilisateur avant v0.1
 
 ### Roadmap Evolution
 
@@ -196,6 +197,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-22T19:08:21.100Z
-Stopped at: Completed 05.3-02-PLAN.md
-Resume file: None
+Last session: 2026-10-23T06:40:30.016Z
+Stopped at: AUDIT_SENIOR rendu : décision produit sur le contrat data (DS-ARCH-1) et retour GSD des majeurs à trancher
+Resume file: .arthemis/PASSATION.md
