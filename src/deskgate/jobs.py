@@ -36,7 +36,7 @@ from deskgate.core.paths import (
     convert_path_params,
     default_resolver,
 )
-from deskgate.core.payload import duration_s
+from deskgate.core.payload import duration_s, result_parts
 from deskgate.core.redact import redact_signature
 from deskgate.core.states import TERMINAL
 from deskgate.store import IdempotencyConflict, JobRow
@@ -49,7 +49,7 @@ logger = logging.getLogger("deskgate.jobs")
 
 def job_view(row: JobRow) -> dict[str, Any]:
     """Vue publique d'une tâche : sans callback, paramètres ni chemin hôte."""
-    result: dict[str, Any] = json.loads(row.result_json) if row.result_json else {}
+    summary, data, artifacts = result_parts(row.result_json)
     progress: dict[str, Any] | None = None
     if row.progress_pct is not None or row.progress_message is not None:
         progress = {"pct": row.progress_pct, "message": row.progress_message}
@@ -62,8 +62,9 @@ def job_view(row: JobRow) -> dict[str, Any]:
         "status": row.status,
         "cancel_requested": row.cancel_requested,
         "progress": progress,
-        "summary": result.get("summary", {}),
-        "artifacts": result.get("artifacts", []),
+        "summary": summary,
+        "data": data,
+        "artifacts": artifacts,
         "error": error,
         "created_at": row.created_at,
         "started_at": row.started_at,
