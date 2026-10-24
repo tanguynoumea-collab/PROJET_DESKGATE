@@ -72,3 +72,4 @@
 {"ts":"2026-10-23T15:00","type":"fermeture","ref":"DS-ARCH-3","commit":"b1ff85f","note":"certifie FERME par dev-senior (.arthemis/reports/dev-senior-1-2-certification.md)"}
 {"ts":"2026-10-23T15:00","type":"fermeture","ref":"DS-SCAL-1","commit":"b1ff85f","note":"certifie FERME par dev-senior (.arthemis/reports/dev-senior-1-2-certification.md)"}
 {"ts":"2026-10-23T15:00","type":"rapport","ref":".arthemis/reports/dev-senior-1-2-certification.md","commit":"b1ff85f","note":"4 FERMES, DS-MAINT-1 PARTIEL, candidats mineurs DS2-1..DS2-4"}
+{"ts":"2026-10-24T09:00","type":"transition","ref":"AUDIT_SENIOR -> retour GSD (gaps 5.4 : plans 06, 07)","commit":"3acdb41","note":"DS2-2 et DS-MAINT-1 en gap ; DS2-1, DS2-3 hors doc, DS2-4 au backlog 999.8 (choix utilisateur)"}

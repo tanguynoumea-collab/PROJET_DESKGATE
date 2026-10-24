@@ -20,7 +20,7 @@
   },
   "route": "full",
   "phase": "AUDIT_SENIOR",
-  "phase_status": "en_cours",
+  "phase_status": "retour_gsd",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -144,7 +144,19 @@
       "ouvert_le": "2026-10-23",
       "source": ".arthemis/reports/dev-senior-1-1.md",
       "ref": "DS-MAINT-1",
-      "condition_levee": "gap 05.4 corrige et recertifie, ou renonciation consignee"
+      "condition_levee": "plan 05.4-07 execute et recertifie (05.4-D4)"
+    },
+    {
+      "id": "DS2-2",
+      "type": "finding",
+      "titre": "Apres un 413, le renvoi minimal perd les marqueurs {path, truncated} de data et summary",
+      "gravite": "mineur",
+      "statut": "ouvert",
+      "proprietaire": "ia",
+      "ouvert_le": "2026-10-24",
+      "source": ".arthemis/reports/dev-senior-1-2-certification.md",
+      "ref": "DS2-2",
+      "condition_levee": "plan 05.4-06 execute et recertifie (05.4-D3)"
     }
   ],
   "livraisons": [],
@@ -201,7 +213,7 @@
     }
   },
   "maj": {
-    "le": "2026-10-23",
-    "commit": "b1ff85f"
+    "le": "2026-10-24",
+    "commit": "3acdb41"
   }
 }
