@@ -145,7 +145,7 @@ Plans:
 **Goal:** Le `data` d'un plugin (dont la sortie de `mcp.call`) atteint n8n par le rappel et `GET /jobs/{id}`, avec repli `data.json` au-delà de 1 Mio ; un rappel empoisonné ne bloque plus les autres ni n'arrête le runner ; `NaN`/`Infinity` sont refusés à la frontière worker ; `data` est purgeable par `deskgate purge` sans migration ; `ARCHITECTURE.md` sépare le livré v0.1 de la cible. Ferme les cinq findings de `.arthemis/reports/dev-senior-1-1.md`.
 **Requirements**: aucun (findings DS-ARCH-1, DS-ARCH-2, DS-ARCH-3, DS-SCAL-1, DS-MAINT-1)
 **Depends on:** Phase 5
-**Plans:** 5/5 plans complete
+**Plans:** 5/7 plans complete
 
 Plans:
 - [x] 05.4-01-PLAN.md — Sender : échec d'un rappel isolé à sa ligne (`internal_error`), caractérisation d'abord (DS-ARCH-2) (vague 1)
@@ -153,6 +153,8 @@ Plans:
 - [x] 05.4-03-PLAN.md — Contrat `data` : rappel + GET via `result_parts`, repli `data.json` dans l'engine, sortie MCP lue par l'API (DS-ARCH-1) (vague 2)
 - [x] 05.4-04-PLAN.md — `store.purge_data` + `deskgate purge --older-than-days N`, sans migration (DS-SCAL-1) (vague 3)
 - [x] 05.4-05-PLAN.md — ARCHITECTURE.md « État livré en v0.1 » verrouillé par test, marquage cible, README/n8n/AGENTS/CHANGELOG, gate complet (DS-MAINT-1) (vague 4)
+- [ ] 05.4-06-PLAN.md — Gap DS2-2 : renvoi minimal qui garde les marqueurs {path, truncated}, marqueur `mcp.call` {truncated, artifact: mcp_result}, contrat documenté (vague 1)
+- [ ] 05.4-07-PLAN.md — Gap DS-MAINT-1 : verrou doc étendu à tout ARCHITECTURE.md, trois cibles marquées (§3, §6, §8), gate complet (vague 2)
 
 ### Phase 05.3: corrections audit council 1 passe 2 : superviseur, refus MSIX de task install, messages et test doctor (INSERTED)
 
@@ -280,6 +282,15 @@ Plans:
 - [ ] TBD (promote with /gsd:review-backlog when ready)
 
 ### Phase 999.7: Diagnostic et doc : refus d'init documente, sonde MSIX indeterminee, progression perdue sous verrou, racine C:\BIM en dur (LIVR-N2-003, FIAB-N2-001, PER-N2-001) (BACKLOG)
+
+**Goal:** [Captured for future planning]
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd:review-backlog when ready)
+
+### Phase 999.8: Suites certification senior : NaN dans params de POST /jobs, lien de clonage AGENTS.md:38, rappel de purge et dossiers de tache (DS2-1, DS2-3, DS-MAINT-2, DS2-4, DS-SCAL-2) (BACKLOG)
 
 **Goal:** [Captured for future planning]
 **Requirements:** TBD
