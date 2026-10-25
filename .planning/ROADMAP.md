@@ -309,3 +309,12 @@ Plans:
 
 Plans:
 - [ ] TBD (promote with /gsd:review-backlog when ready)
+
+### Phase 999.10: Suites re-certification D5 : purge qui charge tout le texte des candidats, verrou long pendant la purge, truncated metier ifc.clash non signale dans n8n/README (DS4-1, DS4-2, DS4-3) (BACKLOG)
+
+**Goal:** [Captured for future planning]
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd:review-backlog when ready)
