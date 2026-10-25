@@ -135,28 +135,16 @@
       "condition_levee": "certification a la DoD (critere revu, palier 4 et recettes 5.1)"
     },
     {
-      "id": "DS-MAINT-1",
-      "type": "finding",
-      "titre": "ARCHITECTURE.md :157, :250-255, :306-307 presentent encore une cible comme livree (DS2-3)",
-      "gravite": "mineur",
-      "statut": "corrige_non_certifie",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-23",
-      "source": ".arthemis/reports/dev-senior-1-1.md",
-      "ref": "DS-MAINT-1",
-      "condition_levee": "re-certification 05.4-D4 par dev-senior"
-    },
-    {
       "id": "DS2-2",
       "type": "finding",
-      "titre": "Apres un 413, le renvoi minimal perd les marqueurs {path, truncated} de data et summary",
+      "titre": "Renvoi minimal apres 413 ferme ; marqueur mcp.call partiel : seuil 900 000 en caracteres, non ASCII > 1 Mio en echec (DS3-1)",
       "gravite": "mineur",
-      "statut": "corrige_non_certifie",
+      "statut": "ouvert",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-24",
       "source": ".arthemis/reports/dev-senior-1-2-certification.md",
       "ref": "DS2-2",
-      "condition_levee": "re-certification 05.4-D3 par dev-senior"
+      "condition_levee": "DS3-1 corrige et recertifie, ou renonciation consignee"
     }
   ],
   "livraisons": [],
@@ -214,6 +202,6 @@
   },
   "maj": {
     "le": "2026-10-25",
-    "commit": "1c542c7"
+    "commit": "c098246"
   }
 }
