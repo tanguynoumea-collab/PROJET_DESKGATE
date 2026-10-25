@@ -14,7 +14,17 @@ from deskgate.engine import Engine
 
 MINI = Path(__file__).resolve().parents[1] / "mcp_fake" / "mini_server.py"
 SECRET = "valeur-secrete-mcp-42"  # noqa: S105  valeur de test
-ALL_TOOLS = ("echo", "add", "sleep", "erreur", "spawn_orphan", "env", "read_file", "write_file")
+ALL_TOOLS = (
+    "echo",
+    "add",
+    "big",
+    "sleep",
+    "erreur",
+    "spawn_orphan",
+    "env",
+    "read_file",
+    "write_file",
+)
 
 
 def mcp_config(

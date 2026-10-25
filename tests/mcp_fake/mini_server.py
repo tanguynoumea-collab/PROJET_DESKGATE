@@ -1,4 +1,4 @@
-"""Serveur MCP de test (D-12) : echo, add, sleep, erreur, spawn_orphan, env, fichiers."""
+"""Serveur MCP de test (D-12) : echo, add, big, sleep, erreur, spawn_orphan, env, fichiers."""
 
 from __future__ import annotations
 
@@ -21,6 +21,11 @@ def echo(text: str) -> str:
 @mcp.tool()
 def add(a: int, b: int) -> int:
     return a + b
+
+
+@mcp.tool()
+def big(n: int) -> str:
+    return "x" * n
 
 
 @mcp.tool()

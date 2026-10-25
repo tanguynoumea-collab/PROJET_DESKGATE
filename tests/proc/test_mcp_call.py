@@ -54,6 +54,23 @@ def test_add(tmp_path: Path) -> None:
     assert "5" in _texts(result)
 
 
+@pytest.mark.timeout(90)
+def test_reponse_volumineuse_marqueur_artefact(tmp_path: Path) -> None:
+    row, result = _run(tmp_path, {"server": "mini", "tool": "big", "arguments": {"n": 950_000}})
+    assert row.status == "succeeded", row.error_message
+    assert result["data"] == {"truncated": True, "artifact": "mcp_result"}
+    artifacts = result["artifacts"]
+    assert isinstance(artifacts, list)
+    arts = [a for a in artifacts if a["kind"] == "mcp_result"]
+    assert len(arts) == 1
+    assert arts[0]["path"].startswith("/data/")
+    assert arts[0]["path"].endswith("/mcp-result.json")
+    assert row.work_dir is not None
+    contenu = json.loads((Path(row.work_dir) / "mcp-result.json").read_text(encoding="utf-8"))
+    assert "structured_content" in contenu
+    assert "content" in contenu
+
+
 @pytest.mark.timeout(60)
 def test_erreur_outil(tmp_path: Path) -> None:
     row, _ = _run(tmp_path, {"server": "mini", "tool": "erreur", "arguments": {}})
