@@ -68,12 +68,12 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 
 ### Socle ARTHEMIS
 
-- [ ] **SOC-01**: Le gate du profil (`profil.gate[]`) passe vert sur toutes les cibles, journal dans `.arthemis/reports/gate-<date>.log`
-- [ ] **SOC-02**: Les tests sont 100 % verts ; aucun test retiré ni ignoré sans décision datée dans `.arthemis/events.jsonl`
-- [ ] **SOC-03**: Chaque finding critique du cycle est corrigé et re-vérifié ; aucun item `corrige_non_certifie` dans `items_ouverts[]`
-- [ ] **AUD-01**: Le council du profil (saas-team-council) a tourné ; rapport dans `audits/` ; triage daté dans `checkpoints.triage`
-- [ ] **AUD-02**: Les findings reportés sont au backlog GSD ou dans `items_ouverts[]` ; aucun finding bloquant ni critique ouvert
-- [ ] **AUD-03**: dev-senior a relu le projet ; rapport dans `.arthemis/reports/dev-senior-1-<n>.md` ; zéro bloquant
+- [x] **SOC-01**: Le gate du profil (`profil.gate[]`) passe vert sur toutes les cibles, journal dans `.arthemis/reports/gate-<date>.log`
+- [x] **SOC-02**: Les tests sont 100 % verts ; aucun test retiré ni ignoré sans décision datée dans `.arthemis/events.jsonl`
+- [x] **SOC-03**: Chaque finding critique du cycle est corrigé et re-vérifié ; aucun item `corrige_non_certifie` dans `items_ouverts[]`
+- [x] **AUD-01**: Le council du profil (saas-team-council) a tourné ; rapport dans `audits/` ; triage daté dans `checkpoints.triage`
+- [x] **AUD-02**: Les findings reportés sont au backlog GSD ou dans `items_ouverts[]` ; aucun finding bloquant ni critique ouvert
+- [x] **AUD-03**: dev-senior a relu le projet ; rapport dans `.arthemis/reports/dev-senior-1-<n>.md` ; zéro bloquant
 - [ ] **PUB-01**: La version est bumpée dans `pyproject.toml` ; CHANGELOG généré depuis les SUMMARY du milestone
 - [ ] **PUB-02**: Le go publication est daté et commité dans `checkpoints.go_publication` ; aucun item `uat` ou `action_humaine` qui retient la publication n'est ouvert
 - [ ] **PUB-03**: Le tag `v0.1.0` est posé sur le commit livré, poussé, inscrit dans `livraisons[]` et dans la ligne `**Version produit :**` de MILESTONES.md
@@ -163,12 +163,12 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | INS-05 | Phase 5 | Complete |
 | ACC-01 | Phase 5 | Complete |
 | ACC-02 | Phase 5 | Complete |
-| SOC-01 | Phase 5 | Pending |
-| SOC-02 | Phase 5 | Pending |
-| SOC-03 | Phase 5 | Pending |
-| AUD-01 | Phase 5 | Pending |
-| AUD-02 | Phase 5 | Pending |
-| AUD-03 | Phase 5 | Pending |
+| SOC-01 | Phase 5 | Complete |
+| SOC-02 | Phase 5 | Complete |
+| SOC-03 | Phase 5 | Complete |
+| AUD-01 | Phase 5 | Complete |
+| AUD-02 | Phase 5 | Complete |
+| AUD-03 | Phase 5 | Complete |
 | PUB-01 | Phase 5 | Pending |
 | PUB-02 | Phase 5 | Pending |
 | PUB-03 | Phase 5 | Pending |
