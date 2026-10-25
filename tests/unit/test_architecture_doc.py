@@ -1,14 +1,20 @@
 """`ARCHITECTURE.md` sépare le livré v0.1 de la cible (DS-MAINT-1).
 
 Chaque référence `fichier:ligne` de la section livrée doit exister.
+Le reste du document est verrouillé aussi : exemples JSON validés contre le code,
+fonctionnalités absentes marquées « cible » (DS2-3).
 """
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
 import pytest
+
+from deskgate.core.jobspec import SubmitRequest
+from deskgate.core.payload import build_callback
 
 pytestmark = pytest.mark.unit
 
@@ -20,6 +26,16 @@ REF = re.compile(
     r"(?P<anchor> \(`(?P<sym>[^`]+)`\))?"
 )
 MARQUES_CIBLE = ("cible v0.2", "cible v0.3", "cible v0.4", "cible (non planifiée)")
+BLOC_JSON = re.compile(r"^```json\n(.*?)^```", re.MULTILINE | re.DOTALL)
+ABSENTS_V01: tuple[tuple[str, tuple[re.Pattern[str], ...]], ...] = (
+    ("keyring", (re.compile(r"\bkeyring\b", re.I),)),
+    ("gestionnaire d'identifiants", (re.compile(r"gestionnaire d.identifiants", re.I),)),
+    ("callback.headers", (re.compile(r'"headers"|callback\.headers', re.I),)),
+    (
+        "plafond de threads par variable d'environnement",
+        (re.compile(r"\bthreads?\b", re.I), re.compile(r"variables? d.environnement", re.I)),
+    ),
+)
 
 
 def _texte() -> str:
@@ -167,3 +183,79 @@ def test_contrat_marqueurs_documente() -> None:
     assert "DS2-2" in changelog
     for nom, texte in (("ARCHITECTURE.md", arch), ("CHANGELOG.md", changelog)):
         assert "le renvoi minimal marque" not in texte, f"{nom} : ancien contrat du renvoi minimal"
+
+
+def _blocs_json(text: str) -> list[str]:
+    return [m.group(1) for m in BLOC_JSON.finditer(text)]
+
+
+def _unites(text: str) -> list[str]:
+    """Découpe en unités : bloc de code, ligne de tableau, titre, puce, paragraphe."""
+    unites: list[str] = []
+    courante: list[str] = []
+    en_code = False
+    puce = re.compile(r"^(?:[-*] |\d+\. )")
+
+    def clore() -> None:
+        if courante:
+            unites.append("\n".join(courante))
+            courante.clear()
+
+    for ligne in text.splitlines():
+        if en_code:
+            courante.append(ligne)
+            if ligne.startswith("```"):
+                en_code = False
+                clore()
+            continue
+        if ligne.startswith("```"):
+            clore()
+            courante.append(ligne)
+            en_code = True
+        elif not ligne.strip():
+            clore()
+        elif ligne.startswith(("|", "#")):
+            clore()
+            unites.append(ligne)
+        elif puce.match(ligne):
+            clore()
+            courante.append(ligne)
+        else:
+            courante.append(ligne)
+    clore()
+    return unites
+
+
+def test_exemple_post_jobs_valide() -> None:
+    exemples = [b for b in _blocs_json(_texte()) if b.splitlines()[0].strip() == "POST /jobs"]
+    assert exemples, "aucun exemple « POST /jobs » dans ARCHITECTURE.md"
+    for bloc in exemples:
+        corps = json.loads("\n".join(bloc.splitlines()[1:]))
+        SubmitRequest.model_validate(corps)  # lève ValidationError si l'exemple ment
+
+
+def test_exemple_rappel_cles() -> None:
+    rappels = [b for b in _blocs_json(_texte()) if b.lstrip().startswith('{ "job_id"')]
+    assert len(rappels) == 1, "exemple de rappel introuvable ou multiple"
+    attendu = list(
+        build_callback(
+            job_id="j",
+            capability="c",
+            status="succeeded",
+            started_at=None,
+            finished_at=None,
+            result_json=None,
+            error_code=None,
+            error_message=None,
+        )
+    )
+    assert list(json.loads(rappels[0])) == attendu
+
+
+def test_fonctionnalites_absentes_marquees_cible() -> None:
+    fautes: list[str] = []
+    for unite in _unites(_texte()):
+        for nom, motifs in ABSENTS_V01:
+            if all(m.search(unite) for m in motifs) and "cible" not in unite.lower():
+                fautes.append(f"{nom} : {unite.splitlines()[0].strip()[:100]}")
+    assert not fautes, "cible présentée comme livrée :\n" + "\n".join(fautes)
