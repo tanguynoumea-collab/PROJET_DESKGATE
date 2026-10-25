@@ -80,3 +80,4 @@
 {"ts":"2026-10-25T20:00","type":"transition","ref":"retour GSD (gaps 5.4 DS3) -> AUDIT_SENIOR","commit":"9a7305c","note":"plans 08 et 09 executes, gate vert, verification 7/7 ; re-certification 05.4-D5 en file"}
 {"ts":"2026-10-26T09:00","type":"fermeture","ref":"DS2-2","commit":"42eca67","note":"recertifie FERME par dev-senior avec DS3-1 et DS3-2 (.arthemis/reports/dev-senior-1-4-recertification.md)"}
 {"ts":"2026-10-26T09:00","type":"rapport","ref":".arthemis/reports/dev-senior-1-4-recertification.md","commit":"42eca67","note":"D5 FERME ; candidats DS4-1 mineur (memoire purge), DS4-2 et DS4-3 info"}
+{"ts":"2026-10-26T10:00","type":"transition","ref":"AUDIT_SENIOR -> CLOTURE_MILESTONE","commit":"f017dc0","note":"findings du dev-senior tous certifies fermes ; DS4-1..3 au backlog 999.10 (choix utilisateur)"}

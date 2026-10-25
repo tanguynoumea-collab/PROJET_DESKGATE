@@ -19,7 +19,7 @@
     "roadmap_projet": "docs/passation/04-FEUILLE-DE-ROUTE.md"
   },
   "route": "full",
-  "phase": "AUDIT_SENIOR",
+  "phase": "CLOTURE_MILESTONE",
   "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
@@ -190,6 +190,6 @@
   },
   "maj": {
     "le": "2026-10-26",
-    "commit": "42eca67"
+    "commit": "f017dc0"
   }
 }
