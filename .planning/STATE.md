@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05.4-08-PLAN.md
-last_updated: "2026-10-25T17:13:25.648Z"
+stopped_at: Completed 05.4-09-PLAN.md
+last_updated: "2026-10-25T17:23:28.507Z"
 last_activity: 2026-10-25
 progress:
   total_phases: 18
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 72
-  completed_plans: 71
+  completed_plans: 72
   percent: 100
 ---
 
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-10-20)
 ## Current Position
 
 Phase: 05.4 (corrections audit senior 1 (écarts DS3)) — EXECUTING
-Plan: 2 of 9
-Status: Ready to execute
+Plan: 9 of 9
+Status: Phase complete — ready for verification
 Last activity: 2026-10-25
 
 Progress: [██████████] 100%
@@ -117,6 +117,7 @@ Progress: [██████████] 100%
 | Phase 05.4 P06 | 45min | 3 tasks | 11 files |
 | Phase 05.4 P07 | 40min | 3 tasks | 2 files |
 | Phase 05.4 P08 | 15min | 2 tasks | 5 files |
+| Phase 05.4 P09 | 30min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -189,6 +190,7 @@ Recent decisions affecting current work:
 - [Phase 05.4]: Marqueur mcp.call nomme l'artefact mcp_result; minimal conserve les marqueurs de repli (DS2-2)
 - [Phase 05.4]: Exemple POST /jobs de la doc validé par SubmitRequest ; cibles (keyring, callback.headers, plafond threads par env) marquées et verrouillées par test
 - [Phase 05.4]: Seuil de déport mcp.call mesuré en octets UTF-8 (DS3-1)
+- [Phase 05.4]: Purge: candidats en SQL, filtre is_marker en Python (règle unique, DS3-2)
 
 ### Roadmap Evolution
 
@@ -215,6 +217,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-25T17:13:25.641Z
-Stopped at: Completed 05.4-08-PLAN.md
+Last session: 2026-10-25T17:23:28.501Z
+Stopped at: Completed 05.4-09-PLAN.md
 Resume file: None

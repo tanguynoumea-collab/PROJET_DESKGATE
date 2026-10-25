@@ -145,7 +145,7 @@ Plans:
 **Goal:** Le `data` d'un plugin (dont la sortie de `mcp.call`) atteint n8n par le rappel et `GET /jobs/{id}`, avec repli `data.json` au-delà de 1 Mio ; un rappel empoisonné ne bloque plus les autres ni n'arrête le runner ; `NaN`/`Infinity` sont refusés à la frontière worker ; `data` est purgeable par `deskgate purge` sans migration ; `ARCHITECTURE.md` sépare le livré v0.1 de la cible. Ferme les cinq findings de `.arthemis/reports/dev-senior-1-1.md`.
 **Requirements**: aucun (findings DS-ARCH-1, DS-ARCH-2, DS-ARCH-3, DS-SCAL-1, DS-MAINT-1)
 **Depends on:** Phase 5
-**Plans:** 8/9 plans executed
+**Plans:** 9/9 plans complete
 
 Plans:
 - [x] 05.4-01-PLAN.md — Sender : échec d'un rappel isolé à sa ligne (`internal_error`), caractérisation d'abord (DS-ARCH-2) (vague 1)
@@ -156,7 +156,7 @@ Plans:
 - [x] 05.4-06-PLAN.md — Gap DS2-2 : renvoi minimal qui garde les marqueurs {path, truncated}, marqueur `mcp.call` {truncated, artifact: mcp_result}, contrat documenté (vague 1)
 - [x] 05.4-07-PLAN.md — Gap DS-MAINT-1 : verrou doc étendu à tout ARCHITECTURE.md, trois cibles marquées (§3, §6, §8), gate complet (vague 2)
 - [x] 05.4-08-PLAN.md — Gap DS3-1 : seuil de déport `mcp.call` mesuré en octets UTF-8, test réel multi-octets (vague 1)
-- [ ] 05.4-09-PLAN.md — Gap DS3-2 : purge filtrée par `payload.is_marker` (data métier `truncated` purgé), gate complet (vague 2)
+- [x] 05.4-09-PLAN.md — Gap DS3-2 : purge filtrée par `payload.is_marker` (data métier `truncated` purgé), gate complet (vague 2)
 
 ### Phase 05.3: corrections audit council 1 passe 2 : superviseur, refus MSIX de task install, messages et test doctor (INSERTED)
 
