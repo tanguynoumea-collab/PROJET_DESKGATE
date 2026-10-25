@@ -20,7 +20,7 @@
   },
   "route": "full",
   "phase": "AUDIT_SENIOR",
-  "phase_status": "retour_gsd",
+  "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -139,12 +139,12 @@
       "type": "finding",
       "titre": "Renvoi minimal apres 413 ferme ; marqueur mcp.call partiel : seuil 900 000 en caracteres, non ASCII > 1 Mio en echec (DS3-1)",
       "gravite": "mineur",
-      "statut": "ouvert",
+      "statut": "corrige_non_certifie",
       "proprietaire": "ia",
       "ouvert_le": "2026-10-24",
       "source": ".arthemis/reports/dev-senior-1-2-certification.md",
       "ref": "DS2-2",
-      "condition_levee": "plans 05.4-08 et 05.4-09 executes, recertification 05.4-D5"
+      "condition_levee": "re-certification 05.4-D5 par dev-senior"
     }
   ],
   "livraisons": [],
@@ -202,6 +202,6 @@
   },
   "maj": {
     "le": "2026-10-25",
-    "commit": "f71b68c"
+    "commit": "9a7305c"
   }
 }
