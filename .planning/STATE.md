@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
 status: executing
-stopped_at: Completed 05.4-07-PLAN.md
-last_updated: "2026-10-25T15:57:49.882Z"
+stopped_at: Completed 05.4-08-PLAN.md
+last_updated: "2026-10-25T17:13:25.648Z"
 last_activity: 2026-10-25
 progress:
-  total_phases: 17
-  completed_phases: 9
-  total_plans: 70
-  completed_plans: 70
+  total_phases: 18
+  completed_phases: 8
+  total_plans: 72
+  completed_plans: 71
   percent: 100
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-20)
 
 **Core value:** n8n délègue une tâche longue au PC Windows et reprend fiablement quand elle se termine, quel que soit le résultat (succès, échec, délai dépassé, annulation, redémarrage du runner).
-**Current focus:** Phase 05.4 — corrections audit senior 1 (écarts)
+**Current focus:** Phase 05.4 — corrections audit senior 1 (écarts DS3)
 
 ## Current Position
 
-Phase: 05.4 (corrections audit senior 1 (écarts)) — COMPLETE
-Plan: 7 of 7 (all plans done)
-Status: Phase complete, awaiting verification
+Phase: 05.4 (corrections audit senior 1 (écarts DS3)) — EXECUTING
+Plan: 2 of 9
+Status: Ready to execute
 Last activity: 2026-10-25
 
 Progress: [██████████] 100%
@@ -116,6 +116,7 @@ Progress: [██████████] 100%
 | Phase 05.4 P05 | 40min | 3 tasks | 7 files |
 | Phase 05.4 P06 | 45min | 3 tasks | 11 files |
 | Phase 05.4 P07 | 40min | 3 tasks | 2 files |
+| Phase 05.4 P08 | 15min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -187,6 +188,7 @@ Recent decisions affecting current work:
 - [Phase 05.4]: ARCHITECTURE.md : livré v0.1 séparé de la cible, références fichier:ligne verrouillées par test
 - [Phase 05.4]: Marqueur mcp.call nomme l'artefact mcp_result; minimal conserve les marqueurs de repli (DS2-2)
 - [Phase 05.4]: Exemple POST /jobs de la doc validé par SubmitRequest ; cibles (keyring, callback.headers, plafond threads par env) marquées et verrouillées par test
+- [Phase 05.4]: Seuil de déport mcp.call mesuré en octets UTF-8 (DS3-1)
 
 ### Roadmap Evolution
 
@@ -213,6 +215,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-25T15:57:49.874Z
-Stopped at: Completed 05.4-07-PLAN.md
+Last session: 2026-10-25T17:13:25.641Z
+Stopped at: Completed 05.4-08-PLAN.md
 Resume file: None
