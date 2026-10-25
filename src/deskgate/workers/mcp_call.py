@@ -119,7 +119,9 @@ async def _call(params: dict[str, Any], ctx: Any) -> dict[str, Any]:
         "structured_content": r.structured_content,
         "content": [_content(c) for c in r.content],
     }
-    if len(json.dumps(data, ensure_ascii=False, allow_nan=False)) > DATA_MAX_BYTES:
+    # Octets UTF-8, comme le plafond de result.json (DS3-1) : « € » compte 3, pas 1.
+    size = len(json.dumps(data, ensure_ascii=False, allow_nan=False).encode("utf-8"))
+    if size > DATA_MAX_BYTES:
         path = os.path.join(ctx.work_dir, "mcp-result.json")
         with open(path, "w", encoding="utf-8", newline="\n") as f:
             json.dump(data, f, ensure_ascii=False, allow_nan=False)

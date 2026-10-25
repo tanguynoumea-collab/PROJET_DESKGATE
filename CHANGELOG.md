@@ -30,6 +30,10 @@ par n8n sont signalés « Changement de comportement ».
 
 - **Rappel empoisonné isolé** (DS-ARCH-2) : une erreur propre à un rappel est un essai en échec `internal_error` de
   cette ligne ; les autres rappels partent et le runner ne s'arrête plus en code 6 pour cette cause.
+- **Seuil de déport de `mcp.call` en octets** (DS3-1) : le seuil de 900 000 se mesure en octets UTF-8, comme le
+  plafond de `result.json`. Une réponse non ASCII (texte accentué, « € »…) au-delà est déportée dans
+  `mcp-result.json` (`data` = `{"truncated": true, "artifact": "mcp_result"}`) au lieu de finir
+  `failed/result_too_large`.
 
 ### Documentation
 

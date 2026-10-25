@@ -48,7 +48,7 @@ références.
   remplace `summary` et `data` par `{"truncated": true}`, sauf une valeur déjà réduite à un marqueur de repli, transmise
   telle quelle avec son chemin (`src/deskgate/core/payload.py:62` (`def minimal`)). `mcp.call` déporte une réponse
   > 900 000 octets dans `mcp-result.json` ; `data` vaut alors `{"truncated": true, "artifact": "mcp_result"}` et le
-  chemin est celui de l'entrée `artifacts` de ce type (`src/deskgate/workers/mcp_call.py:128` (`"artifact": "mcp_result"`)).
+  chemin est celui de l'entrée `artifacts` de ce type (`src/deskgate/workers/mcp_call.py:130` (`"artifact": "mcp_result"`)).
   `data` n'est pas masqué. `GET /jobs/{id}` porte le même `data` (`src/deskgate/jobs.py:50` (`def job_view`)).
 - Sender : une erreur propre à un rappel (corps illisible…) est un essai en échec `internal_error` de cette ligne
   (`src/deskgate/sender.py:155` (`def _record_internal_error`)) ; seules les erreurs de base comptent pour l'arrêt du
