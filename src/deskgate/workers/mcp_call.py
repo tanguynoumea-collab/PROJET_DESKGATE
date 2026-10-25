@@ -124,7 +124,8 @@ async def _call(params: dict[str, Any], ctx: Any) -> dict[str, Any]:
         with open(path, "w", encoding="utf-8", newline="\n") as f:
             json.dump(data, f, ensure_ascii=False, allow_nan=False)
         ctx.artifact(path, "mcp_result")
-        data = {"truncated": True}
+        # Le worker ignore les chemins conteneur : n8n lit le chemin dans artifacts (mcp_result).
+        data = {"truncated": True, "artifact": "mcp_result"}
     return {"summary": {"server": name, "tool": tool, "is_error": False}, "data": data}
 
 
