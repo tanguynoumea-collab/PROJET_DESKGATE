@@ -19,6 +19,7 @@ from tests._support.sender_helpers import (
 from deskgate import store
 from deskgate.core.config import RunnerConfig
 from deskgate.core.jobspec import new_job_id
+from deskgate.core.payload import is_marker
 from deskgate.jobs import job_view
 
 pytestmark = pytest.mark.fs
@@ -132,6 +133,7 @@ def test_purge_ignore_non_terminal(tmp_path: Path) -> None:
         {"path": "/data/travail/x/data.json", "truncated": True},
         {"truncated": True},
         {"truncated": True, "error": "data_write_failed"},
+        {"truncated": True, "artifact": "mcp_result"},
     ],
 )
 def test_purge_ignore_vide_purge_et_repli(
@@ -142,6 +144,58 @@ def test_purge_ignore_vide_purge_et_repli(
     before = _result(db, job_id)
     assert _purge(db) == 0
     assert _result(db, job_id) == before
+
+
+CLASH_TRONQUE: dict[str, object] = {  # forme du data d'ifc.clash plafonné (pas d'import BIM)
+    "threshold": 0.01,
+    "counts": {"selection_a": 3, "selection_b": 4, "clashes": 12, "returned": 2, "groups": 1},
+    "truncated": True,
+    "pairs_omitted": False,
+    "groups_omitted": False,
+    "groups": [{"pairs": [["a", "b"], ["c", "d"]]}],
+}
+
+CAS: list[dict[str, object]] = [
+    # marqueurs de repli : conservés
+    {"path": "/data/travail/x/data.json", "truncated": True},
+    {"path": "/data/travail/x/summary.json", "truncated": True},
+    {"truncated": True, "artifact": "mcp_result"},
+    {"truncated": True, "error": "data_write_failed"},
+    {"truncated": True},
+    # données métier ou formes invalides : purgées
+    CLASH_TRONQUE,
+    {"truncated": True, "rows": list(range(100))},
+    {"truncated": False, "v": 1},
+    {"truncated": 1, "v": 1},
+    {"truncated": "true"},
+    {"truncated": True, "path": 5},
+    {"truncated": True, "artifact": None},
+    {"truncated": True, "path": "x" * 5000},
+    {"v": 1},
+]
+
+
+def test_purge_data_metier_truncated(env: tuple[Path, RunnerConfig, FakeWall]) -> None:
+    """DS3-2 : un champ métier truncated n'est pas un marqueur de repli."""
+    db, cfg, wall = env
+    job_id = _job(db, cfg, wall, data=CLASH_TRONQUE)
+    assert _purge(db) == 1
+    result = json.loads(str(_result(db, job_id)))
+    assert result["data"] == {"purged": True}
+    assert result["summary"] == {"n": 1}
+    assert result["artifacts"] == [{"kind": "k", "path": "p"}]
+
+
+def test_purge_suit_is_marker(env: tuple[Path, RunnerConfig, FakeWall]) -> None:
+    """Règle unique : purgé si et seulement si data n'est pas un marqueur (payload.is_marker)."""
+    db, cfg, wall = env
+    assert any(is_marker(c) for c in CAS) and not all(is_marker(c) for c in CAS)
+    ids = [_job(db, cfg, wall, data=c) for c in CAS]
+    assert _purge(db) == sum(1 for c in CAS if not is_marker(c))
+    for job_id, cas in zip(ids, CAS, strict=True):
+        data = json.loads(str(_result(db, job_id)))["data"]
+        attendu = cas if is_marker(cas) else {"purged": True}
+        assert data == attendu, f"cas {str(cas)[:80]}"
 
 
 def test_purge_ignore_sans_resultat(env: tuple[Path, RunnerConfig, FakeWall]) -> None:
