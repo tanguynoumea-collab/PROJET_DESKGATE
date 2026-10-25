@@ -3,8 +3,9 @@
 Module pur : stdlib seulement. Contrat (decision-ds-1, 2026-10-23) : le corps porte `summary`,
 `data` et `artifacts` du résultat du plugin, tels que l'engine les a figés dans `result_json` ;
 au-delà de `CALLBACK_MAX_BYTES` l'engine a déjà déporté `data` (puis `summary`) dans `data.json`
-(`summary.json`) et la clé porte `{"path": ..., "truncated": true}`. `data` n'est pas masqué :
-un plugin n'y met jamais de secret.
+(`summary.json`) et la clé porte `{"path": ..., "truncated": true}`. Le renvoi minimal (413 ou
+plafond défensif) conserve un marqueur déjà posé et réduit le reste à `{"truncated": true}`.
+`data` n'est pas masqué : un plugin n'y met jamais de secret.
 """
 
 from __future__ import annotations
@@ -12,9 +13,11 @@ from __future__ import annotations
 import json
 from collections.abc import Mapping
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 
 CALLBACK_MAX_BYTES = 1_048_576
+MARKER_KEYS = frozenset({"path", "truncated", "error", "artifact"})
+MARKER_MAX_CHARS = 4096
 
 
 def duration_s(started_at: str | None, finished_at: str | None) -> float | None:
@@ -38,9 +41,27 @@ def result_parts(result_json: str | None) -> tuple[dict[str, Any], dict[str, Any
     return result.get("summary", {}), result.get("data", {}), result.get("artifacts", [])
 
 
+def is_marker(value: object) -> bool:
+    """Vrai si value est un marqueur de repli (`truncated` vrai, path/error/artifact en chaînes)."""
+    if not isinstance(value, dict):
+        return False
+    fields = cast("dict[str, Any]", value)
+    if fields.get("truncated") is not True or not set(fields) <= MARKER_KEYS:
+        return False
+    return all(
+        isinstance(v, str) and len(v) <= MARKER_MAX_CHARS
+        for k, v in fields.items()
+        if k != "truncated"
+    )
+
+
+def _reduce(value: object) -> object:
+    return value if is_marker(value) else {"truncated": True}
+
+
 def minimal(body: Mapping[str, Any]) -> dict[str, Any]:
-    """Copie du corps dont summary et data sont remplacés par le marqueur de troncature."""
-    return {**body, "summary": {"truncated": True}, "data": {"truncated": True}}
+    """Copie du corps : summary et data réduits à {"truncated": true}, sauf marqueur déjà posé."""
+    return {**body, "summary": _reduce(body.get("summary")), "data": _reduce(body.get("data"))}
 
 
 def build_callback(
