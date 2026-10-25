@@ -121,18 +121,6 @@
       "source": "passation 2026-10-21T09:41",
       "ref": ".planning/STATE.md",
       "condition_levee": "reparation acceptee et faite, ou refus consigne"
-    },
-    {
-      "id": "acc01-duree",
-      "type": "decision",
-      "titre": "ACC-01 constate (critere revu) palier 4 complet ; certification a la DoD",
-      "gravite": "majeur",
-      "statut": "corrige_non_certifie",
-      "proprietaire": "ia",
-      "ouvert_le": "2026-10-21",
-      "source": "05-08-SUMMARY.md",
-      "ref": "ACC-01",
-      "condition_levee": "certification a la DoD (critere revu, palier 4 et recettes 5.1)"
     }
   ],
   "livraisons": [],
@@ -174,10 +162,10 @@
       "exploitation": {
         "dernier_deploiement": null,
         "plan_retour_arriere": {
-          "annulation_code": null,
-          "code_avant_compatible_base_apres": null,
-          "sort_des_donnees_ecrites": null,
-          "signal_de_declenchement": null
+          "annulation_code": "Premiere version, aucune anterieure : deskgate task end, deskgate task remove, puis uv tool uninstall deskgate",
+          "code_avant_compatible_base_apres": true,
+          "sort_des_donnees_ecrites": "Base %LOCALAPPDATA%Deskgate et dossiers C:BIM conserves, rien n est supprime ; workflows n8n inchanges",
+          "signal_de_declenchement": "Verification 11a en echec : runner non demarre par la tache, /health KO ou parcours n8n sans reprise"
         },
         "migrations_appliquees": [],
         "verification_11a": {
@@ -190,6 +178,6 @@
   },
   "maj": {
     "le": "2026-10-26",
-    "commit": "f017dc0"
+    "commit": "93f7d0c"
   }
 }

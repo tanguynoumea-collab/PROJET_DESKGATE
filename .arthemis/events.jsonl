@@ -81,3 +81,4 @@
 {"ts":"2026-10-26T09:00","type":"fermeture","ref":"DS2-2","commit":"42eca67","note":"recertifie FERME par dev-senior avec DS3-1 et DS3-2 (.arthemis/reports/dev-senior-1-4-recertification.md)"}
 {"ts":"2026-10-26T09:00","type":"rapport","ref":".arthemis/reports/dev-senior-1-4-recertification.md","commit":"42eca67","note":"D5 FERME ; candidats DS4-1 mineur (memoire purge), DS4-2 et DS4-3 info"}
 {"ts":"2026-10-26T10:00","type":"transition","ref":"AUDIT_SENIOR -> CLOTURE_MILESTONE","commit":"f017dc0","note":"findings du dev-senior tous certifies fermes ; DS4-1..3 au backlog 999.10 (choix utilisateur)"}
+{"ts":"2026-10-26T11:00","type":"fermeture","ref":"acc01-duree","commit":"93f7d0c","note":"ACC-01 certifie a la DoD : 05-ACCEPTANCE.md, job 1ec19b03b33d 486 s, critere revu du 2026-10-21"}
