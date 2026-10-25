@@ -155,3 +155,15 @@ def test_cible_reste_du_document() -> None:
 def test_readme_sans_ligne_de_commande() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     assert "ligne de commande, MCP" not in readme
+
+
+def test_contrat_marqueurs_documente() -> None:
+    arch = " ".join(_texte().split())
+    n8n = " ".join((ROOT / "n8n" / "README.md").read_text(encoding="utf-8").split())
+    changelog = " ".join((ROOT / "CHANGELOG.md").read_text(encoding="utf-8").split())
+    assert '"artifact": "mcp_result"' in arch
+    assert "sauf une valeur déjà réduite à un marqueur de repli" in arch
+    assert '"artifact": "mcp_result"' in n8n and "renvoi minimal" in n8n
+    assert "DS2-2" in changelog
+    for nom, texte in (("ARCHITECTURE.md", arch), ("CHANGELOG.md", changelog)):
+        assert "le renvoi minimal marque" not in texte, f"{nom} : ancien contrat du renvoi minimal"
