@@ -41,12 +41,15 @@ références.
 - Frontière worker en JSON strict : `NaN`, `Infinity` et `1e999` sont refusés, la tâche finit
   `failed/invalid_result` (`src/deskgate/core/worker_protocol.py:82` (`def _loads_strict`)).
 - Rappel : le corps porte `job_id`, `capability`, `status`, `duration_s`, `summary`, `data`, `artifacts` et `error`
-  (`src/deskgate/core/payload.py:35` (`def result_parts`), 
-  `src/deskgate/core/payload.py:46` (`def build_callback`)). Plafond de 1 Mio (`src/deskgate/core/payload.py:17` (`CALLBACK_MAX_BYTES`)) : au-delà,
+  (`src/deskgate/core/payload.py:38` (`def result_parts`),
+  `src/deskgate/core/payload.py:67` (`def build_callback`)). Plafond de 1 Mio (`src/deskgate/core/payload.py:18` (`CALLBACK_MAX_BYTES`)) : au-delà,
   `data` puis `summary` sont déportés dans `data.json` puis `summary.json` du dossier de la tâche, la clé valant
   `{"path": "…", "truncated": true}` (`src/deskgate/engine.py:555` (`def _cap_result`)). Après un 413, le renvoi minimal
-  marque `summary` et `data` `{"truncated": true}` (`src/deskgate/core/payload.py:41` (`def minimal`)). `data` n'est pas
-  masqué. `GET /jobs/{id}` porte le même `data` (`src/deskgate/jobs.py:50` (`def job_view`)).
+  remplace `summary` et `data` par `{"truncated": true}`, sauf une valeur déjà réduite à un marqueur de repli, transmise
+  telle quelle avec son chemin (`src/deskgate/core/payload.py:62` (`def minimal`)). `mcp.call` déporte une réponse
+  > 900 000 octets dans `mcp-result.json` ; `data` vaut alors `{"truncated": true, "artifact": "mcp_result"}` et le
+  chemin est celui de l'entrée `artifacts` de ce type (`src/deskgate/workers/mcp_call.py:128` (`"artifact": "mcp_result"`)).
+  `data` n'est pas masqué. `GET /jobs/{id}` porte le même `data` (`src/deskgate/jobs.py:50` (`def job_view`)).
 - Sender : une erreur propre à un rappel (corps illisible…) est un essai en échec `internal_error` de cette ligne
   (`src/deskgate/sender.py:155` (`def _record_internal_error`)) ; seules les erreurs de base comptent pour l'arrêt du
   thread (`src/deskgate/sender.py:53` (`MAX_CONSECUTIVE_ERRORS`)).
@@ -192,8 +195,9 @@ déjà convertis au format Windows et validés contre les racines autorisées.
 
 `data` est transmis à n8n (rappel) et à `GET /jobs/{id}` tel quel, sans masquage : un plugin n'y met jamais de
 secret. `output_schema` : cible v0.2. Les valeurs `NaN`, `Infinity` et les flottants hors limites sont refusés
-(tâche `failed/invalid_result`). `mcp.call` déporte déjà une réponse > 900 000 octets dans l'artefact
-`mcp-result.json` ; l'engine applique ensuite son propre repli (`data.json`) : deux mécanismes coexistent.
+(tâche `failed/invalid_result`). `mcp.call` déporte une réponse > 900 000 octets dans l'artefact
+`mcp_result` (`mcp-result.json`) et `data` vaut `{"truncated": true, "artifact": "mcp_result"}` : le chemin se lit dans
+l'entrée `artifacts` de ce type. Au-delà de 1 Mio de corps, l'engine applique son propre repli (`data.json`).
 
 ## 5. Manifeste `plugin.yaml` (cible v0.2)
 
@@ -267,8 +271,13 @@ POST /jobs
   jamais la reconstruire (sinon 401), et la **masque** dans l'audit et les journaux.
 - n8n accepte 16 Mio par défaut (`N8N_PAYLOAD_SIZE_MAX`). Le runner plafonne le rappel à **1 Mio** : au-delà,
   `data` est écrit dans `data.json` du dossier de la tâche et la clé vaut `{"path": "…/data.json", "truncated": true}` ;
-  si le corps dépasse encore, `summary` suit le même chemin (`summary.json`). Après un 413, le renvoi minimal marque
-  `summary` et `data` `{"truncated": true}`.
+  si le corps dépasse encore, `summary` suit le même chemin (`summary.json`). Après un 413, le renvoi minimal remplace
+  `summary` et `data` par `{"truncated": true}`, sauf une valeur déjà réduite à un marqueur de repli, transmise telle
+  quelle : n8n garde le chemin de `data.json` / `summary.json`.
+- Marqueurs `truncated` : `{"path": "…", "truncated": true}` (fichier `data.json` ou `summary.json` écrit par l'engine) ;
+  `{"truncated": true, "artifact": "mcp_result"}` (réponse `mcp.call`, chemin dans `artifacts`) ;
+  `{"truncated": true, "error": "data_write_failed"}` ou `"summary_write_failed"` (écriture impossible, rien à lire) ;
+  `{"truncated": true}` seul (renvoi minimal d'une valeur non déportée : lire `GET /jobs/{id}`).
 - Une erreur propre à un rappel (corps illisible…) est un essai en échec de cette ligne (`internal_error`) : elle ne
   bloque pas les autres rappels.
 - Rétention : `deskgate purge --older-than-days N` remplace `data` par `{"purged": true}` pour les tâches au rappel

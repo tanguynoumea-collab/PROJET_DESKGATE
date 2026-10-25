@@ -57,7 +57,10 @@ n'est fourni dans cette phase.
   `/data/travail/<job_id>/conflits.bcf`.
 - Corps du rappel : `$json.body.summary`, `$json.body.data` (sortie du plugin, par exemple `structured_content`
   pour `mcp.call`), `$json.body.artifacts`. Si `data` vaut `{"path": "…/data.json", "truncated": true}`, lire le
-  fichier à ce chemin (`/data/travail/<job_id>/`) ; `{"purged": true}` signifie que `deskgate purge` l'a retiré de
+  fichier à ce chemin (`/data/travail/<job_id>/`). Si `data` vaut `{"truncated": true, "artifact": "mcp_result"}`
+  (réponse `mcp.call` volumineuse), lire le chemin de l'entrée de `$json.body.artifacts` dont `kind` vaut `mcp_result`.
+  Après un 413, le renvoi minimal garde ces marqueurs ; seul `{"truncated": true}` sans autre clé oblige à lire
+  `GET /jobs/{id}` ; `{"purged": true}` signifie que `deskgate purge` l'a retiré de
   la base.
 - Branche « Echec ou delai » : `failed`, `timeout`, `cancelled`, `interrupted`, ou échéance du Wait
   sans rappel (`delai_depasse_sans_rappel`).
