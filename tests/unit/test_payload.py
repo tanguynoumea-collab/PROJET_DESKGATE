@@ -11,6 +11,7 @@ from deskgate.core.payload import (
     build_callback,
     duration_s,
     encode,
+    is_marker,
     minimal,
     result_parts,
 )
@@ -20,6 +21,8 @@ pytestmark = pytest.mark.unit
 CLES = ["job_id", "capability", "status", "duration_s", "summary", "data", "artifacts", "error"]
 DEBUT = "2026-10-20T12:00:00.000Z"
 FIN = "2026-10-20T12:00:01.234Z"
+MARQUEUR_DATA = {"path": "/data/travail/abc/data.json", "truncated": True}
+MARQUEUR_SUMMARY = {"path": "/data/travail/abc/summary.json", "truncated": True}
 RESULTAT = (
     '{"summary":{"n":1},"data":{"valeur":"D"},"artifacts":[{"kind":"file","path":"/data/x.txt"}]}'
 )
@@ -123,3 +126,60 @@ def test_encode_refuse_non_fini() -> None:
         encode({"summary": {"d": float("nan")}})
     with pytest.raises(ValueError):
         encode({"x": float("inf")})
+
+
+def test_minimal_garde_marqueur_chemin() -> None:
+    body = _corps(
+        result_json=json.dumps(
+            {"summary": MARQUEUR_SUMMARY, "data": MARQUEUR_DATA, "artifacts": []}
+        )
+    )
+    petit = minimal(body)
+    assert petit["summary"] == MARQUEUR_SUMMARY
+    assert petit["data"] == MARQUEUR_DATA
+
+
+def test_minimal_garde_marqueur_erreur_et_artefact() -> None:
+    summary = {"truncated": True, "error": "summary_write_failed"}
+    data = {"truncated": True, "artifact": "mcp_result"}
+    body = _corps(result_json=json.dumps({"summary": summary, "data": data}))
+    petit = minimal(body)
+    assert petit["summary"] == summary
+    assert petit["data"] == data
+
+
+@pytest.mark.parametrize(
+    "valeur",
+    [
+        {"n": 1},
+        {"truncated": True, "path": "x", "rows": [1]},
+        {"truncated": True, "path": "a" * 5000},
+        {"truncated": "yes", "path": "x"},
+        {"truncated": True, "path": 3},
+        [1, 2],
+    ],
+)
+def test_minimal_reduit_ce_qui_n_est_pas_un_marqueur(valeur: object) -> None:
+    body = _corps(result_json=json.dumps({"summary": valeur, "data": valeur}))
+    petit = minimal(body)
+    assert petit["summary"] == {"truncated": True}
+    assert petit["data"] == {"truncated": True}
+
+
+def test_is_marker() -> None:
+    assert is_marker(MARQUEUR_DATA)
+    assert is_marker({"truncated": True})
+    assert is_marker({"truncated": True, "error": "data_write_failed"})
+    assert is_marker({"truncated": True, "artifact": "mcp_result"})
+    assert not is_marker({})
+    assert not is_marker({"purged": True})
+    assert not is_marker(None)
+    assert not is_marker("x")
+
+
+def test_plafond_defensif_garde_marqueur() -> None:
+    result = json.dumps({"summary": {"x": "a" * 5000}, "data": MARQUEUR_DATA})
+    body = _corps(result_json=result, max_bytes=1000)
+    assert body["data"] == MARQUEUR_DATA
+    assert body["summary"] == {"truncated": True}
+    assert len(encode(body)) <= 1000

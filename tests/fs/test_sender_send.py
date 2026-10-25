@@ -97,6 +97,26 @@ def test_413_puis_renvoi_minimal(tmp_path: Path, fake_n8n: FakeN8n) -> None:
     assert callback_row(db, job_id)["state"] == "delivered"
 
 
+def test_413_garde_les_chemins(tmp_path: Path, fake_n8n: FakeN8n) -> None:
+    db = tmp_path / "d.db"
+    cfg = callback_config(make_config(tmp_path))
+    wall = FakeWall()
+    marqueur_data = {"path": "/data/travail/x/data.json", "truncated": True}
+    marqueur_summary = {"path": "/data/travail/x/summary.json", "truncated": True}
+    result = json.dumps({"summary": marqueur_summary, "data": marqueur_data, "artifacts": []})
+    job_id = make_terminal(db, cfg, "succeeded", url=fake_n8n.url(), wall=wall, result_json=result)
+    fake_n8n.script(Step(413, b"{}"))
+    sender = make_sender(db, cfg, wall)
+    wall.advance(2)
+    assert sender.tick() is True
+    advance_to_next(wall, db, job_id)
+    assert sender.tick() is True
+    renvoi = json.loads(fake_n8n.requests[1].body)
+    assert renvoi["data"] == marqueur_data
+    assert renvoi["summary"] == marqueur_summary
+    assert callback_row(db, job_id)["state"] == "delivered"
+
+
 def test_hote_reverifie_a_l_envoi(tmp_path: Path, fake_n8n: FakeN8n) -> None:
     db = tmp_path / "d.db"
     cfg = callback_config(make_config(tmp_path))
