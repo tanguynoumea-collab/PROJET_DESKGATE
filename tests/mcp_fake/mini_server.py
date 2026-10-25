@@ -24,8 +24,8 @@ def add(a: int, b: int) -> int:
 
 
 @mcp.tool()
-def big(n: int) -> str:
-    return "x" * n
+def big(n: int, char: str = "x") -> str:
+    return char * n
 
 
 @mcp.tool()

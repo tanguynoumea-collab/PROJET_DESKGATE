@@ -71,6 +71,41 @@ def test_reponse_volumineuse_marqueur_artefact(tmp_path: Path) -> None:
     assert "content" in contenu
 
 
+SEUIL = 900_000  # DATA_MAX_BYTES de workers/mcp_call.py, en octets UTF-8
+
+
+@pytest.mark.timeout(120)
+def test_reponse_multioctet_deportee(tmp_path: Path) -> None:
+    """DS3-1 : « € » = 3 octets ; moins de caractères que le seuil, plus d'octets."""
+    row, result = _run(
+        tmp_path, {"server": "mini", "tool": "big", "arguments": {"n": 350_000, "char": "€"}}
+    )
+    assert row.status == "succeeded", (row.error_code, row.error_message)
+    assert result["data"] == {"truncated": True, "artifact": "mcp_result"}
+    artifacts = result["artifacts"]
+    assert isinstance(artifacts, list)
+    assert [a["kind"] for a in artifacts].count("mcp_result") == 1
+    assert row.work_dir is not None
+    contenu = json.loads((Path(row.work_dir) / "mcp-result.json").read_text(encoding="utf-8"))
+    texte = json.dumps(contenu, ensure_ascii=False, allow_nan=False)
+    assert len(texte) <= SEUIL < len(texte.encode("utf-8"))
+
+
+@pytest.mark.timeout(90)
+def test_reponse_multioctet_sous_seuil_en_ligne(tmp_path: Path) -> None:
+    row, result = _run(
+        tmp_path, {"server": "mini", "tool": "big", "arguments": {"n": 100_000, "char": "€"}}
+    )
+    assert row.status == "succeeded", (row.error_code, row.error_message)
+    data = result["data"]
+    assert isinstance(data, dict)
+    assert "structured_content" in data and "content" in data
+    assert "€" * 1000 in _texts(result)
+    artifacts = result["artifacts"]
+    assert isinstance(artifacts, list)
+    assert all(a["kind"] != "mcp_result" for a in artifacts)
+
+
 @pytest.mark.timeout(60)
 def test_erreur_outil(tmp_path: Path) -> None:
     row, _ = _run(tmp_path, {"server": "mini", "tool": "erreur", "arguments": {}})
