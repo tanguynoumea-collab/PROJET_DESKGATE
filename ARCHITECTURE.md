@@ -287,7 +287,8 @@ POST /jobs
 - Une erreur propre à un rappel (corps illisible…) est un essai en échec de cette ligne (`internal_error`) : elle ne
   bloque pas les autres rappels.
 - Rétention : `deskgate purge --older-than-days N` remplace `data` par `{"purged": true}` pour les tâches au rappel
-  final ; le fichier de base ne rétrécit pas.
+  final ; le fichier de base ne rétrécit pas ; les marqueurs de repli (liste ci-dessus) sont conservés, un `data` de
+  plugin qui porte un champ métier `truncated` (`ifc.clash`) est purgé.
 - Réessais avec délai croissant si n8n ne répond pas ; abandon tracé dans l'audit.
 
 ## 7. Chemins et dossier partagé

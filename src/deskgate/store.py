@@ -15,7 +15,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from deskgate.core.payload import duration_s
+from deskgate.core.payload import duration_s, is_marker
 from deskgate.core.redact import redact_params, redact_signature
 
 SCHEMA_VERSION = 2
@@ -646,8 +646,9 @@ def purge_data(
     """Remplace `$.data` par {"purged": true} (DS-SCAL-1) ; renvoie le nombre de tâches purgées.
 
     Seulement : tâche terminale, terminée avant `older_than`, rappel final, `data` objet
-    non vide, ni déjà purgé ni marqueur de repli (`truncated`, qui pointe `data.json`). Une ligne au
-    JSON invalide est ignorée. `summary`, `artifacts`, `callbacks` et l'audit existant ne sont pas
+    non vide, ni déjà purgé ni marqueur de repli au sens de `payload.is_marker` (un champ
+    métier `truncated`, comme celui d'`ifc.clash`, n'en est pas un). Une ligne au JSON
+    invalide est ignorée. `summary`, `artifacts`, `callbacks` et l'audit existant ne sont pas
     touchés ; un événement `data.purged` est ajouté si au moins une tâche est purgée. Aucune
     migration : le fichier ne rétrécit pas (pas de VACUUM).
     """
@@ -656,19 +657,30 @@ def purge_data(
     moment = _now(now)
     cutoff = iso(older_than)
     with tx(conn):
-        cur = conn.execute(
-            "UPDATE jobs SET result_json = json_set(result_json, '$.data', json(?)) "  # noqa: S608
+        # Candidats en SQL ; le texte de data n'est lu que si truncated vaut true, condition
+        # nécessaire de is_marker. Le filtre lui-même est is_marker : règle unique (DS3-2).
+        rows = conn.execute(
+            "SELECT id, CASE WHEN json_type(result_json, '$.data.truncated') = 'true' "  # noqa: S608
+            "THEN json_extract(result_json, '$.data') END AS flagged FROM jobs "
             "WHERE result_json IS NOT NULL AND finished_at IS NOT NULL AND finished_at < ? "
             "AND status IN ('succeeded','failed','timeout','cancelled','interrupted') "
             f"AND id IN (SELECT job_id FROM callbacks WHERE state IN ({marks})) "
             "AND CASE WHEN json_valid(result_json) THEN "
             "json_type(result_json, '$.data') = 'object' "
             "AND json_extract(result_json, '$.data') NOT IN ('{}', ?) "
-            "AND json_type(result_json, '$.data.truncated') IS NOT 'true' "
             "ELSE 0 END",
-            (_PURGED_DATA, cutoff, *finals, _PURGED_DATA),
+            (cutoff, *finals, _PURGED_DATA),
+        ).fetchall()
+        ids = [
+            row["id"]
+            for row in rows
+            if row["flagged"] is None or not is_marker(json.loads(row["flagged"]))
+        ]
+        conn.executemany(
+            "UPDATE jobs SET result_json = json_set(result_json, '$.data', json(?)) WHERE id=?",
+            [(_PURGED_DATA, job_id) for job_id in ids],
         )
-        count = cur.rowcount
+        count = len(ids)
         if count > 0:
             _audit(conn, "data.purged", None, {"count": count, "older_than": cutoff}, moment)
     return count

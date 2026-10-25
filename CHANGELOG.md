@@ -34,6 +34,9 @@ par n8n sont signalés « Changement de comportement ».
   plafond de `result.json`. Une réponse non ASCII (texte accentué, « € »…) au-delà est déportée dans
   `mcp-result.json` (`data` = `{"truncated": true, "artifact": "mcp_result"}`) au lieu de finir
   `failed/result_too_large`.
+- **Purge et champ métier `truncated`** (DS3-2) : `deskgate purge` ne conserve que les vrais marqueurs de repli,
+  reconnus par la même règle que le renvoi minimal ; un `data` d'`ifc.clash` plafonné par `max_clashes`
+  (`"truncated": true` parmi ses champs) est désormais purgé.
 
 ### Documentation
 
