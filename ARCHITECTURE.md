@@ -157,7 +157,10 @@ reste le plan B.
   `gui-session` = 1, `cpu-heavy` = 1 (défaut), `light` = N. En v0.1 : une tâche à la fois.
 - **Idempotence** : en v0.1, une clé est refusée (409) tant qu'une tâche `queued`/`running` la porte. Cible v0.2 :
   renvoi du résultat d'une tâche réussie sans recalcul (désactivable par le client).
-- Plafond de mémoire et de threads transmis aux plugins par variables d'environnement.
+- Plafonds : la mémoire d'une tâche est plafonnée par son Job Object (`memory_mb` de la capacité dans
+  `runner.toml`) ; le nombre de threads est un réglage du plugin (`settings.threads` de la capacité, lu par
+  `ifc.clash`). Plafond transmis aux plugins par variables d'environnement (`OMP_NUM_THREADS`…) : cible (non
+  planifiée).
 
 ## 4. Exécution des plugins
 
@@ -254,10 +257,13 @@ Toutes les routes sauf `/health` exigent `Authorization: Bearer <jeton>`. OpenAP
 POST /jobs
 { "capability": "ifc.clash",
   "params": { "ifc_a": "/data/depot/CVC_S42.ifc", "selector_a": "IfcFlowSegment" },
-  "callback": { "url": "<resumeUrl n8n>", "headers": {} },
+  "callback": { "url": "http://host.docker.internal:5678/webhook-waiting/123?signature=…" },
   "idempotency_key": "...",
   "timeout": 1800 }
 ```
+
+`callback.url` reçoit `{{ $execution.resumeUrl }}` tel quel ; `callback` n'accepte que `url` (toute autre clé :
+422). En-têtes personnalisés du rappel (`callback.headers`) : cible (non planifiée).
 
 ### Rappel
 
@@ -312,8 +318,9 @@ reçoit un chemin hôte absolu ; un lien créé ensuite sous la racine reste hor
 - **Journal d'audit** : client, plugin, paramètres (sans secrets ni signature de rappel), début,
   fin, statut, durée, refus.
 - **Aucune commande libre** : seules les capacités déclarées sont appelables.
-- Secrets des plugins dans le gestionnaire d'identifiants Windows ou des variables
-  d'environnement, jamais dans les manifestes ni les journaux.
+- Secrets : en v0.1, les valeurs `env` d'un serveur MCP sont lues dans `runner.toml` et passées au worker par
+  variables d'environnement (`DESKGATE_MCPENV__<SERVEUR>__<CLÉ>`), jamais par `input.json`, les journaux ni
+  l'audit. Gestionnaire d'identifiants Windows (`keyring`) pour les secrets des plugins : cible v0.2.
 - Un plugin s'installe uniquement sur action explicite (`deskgate plugin add`, cible v0.2).
 
 ## 9. Intégration n8n
