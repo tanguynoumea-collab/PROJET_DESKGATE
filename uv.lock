@@ -414,7 +414,7 @@ wheels = [
 
 [[package]]
 name = "deskgate"
-version = "0.1.0.dev0"
+version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
@@ -457,7 +457,7 @@ dev = [
 
 [[package]]
 name = "deskgate-bcf"
-version = "0.1.0.dev0"
+version = "0.1.0"
 source = { editable = "plugins/bim/bcf" }
 dependencies = [
     { name = "bcf-client" },
@@ -474,7 +474,7 @@ requires-dist = [
 
 [[package]]
 name = "deskgate-bim"
-version = "0.1.0.dev0"
+version = "0.1.0"
 source = { editable = "plugins/bim" }
 dependencies = [
     { name = "ifcclash" },

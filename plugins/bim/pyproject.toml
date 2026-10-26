@@ -1,6 +1,6 @@
 [project]
 name = "deskgate-bim"
-version = "0.1.0.dev0"
+version = "0.1.0"
 description = "Capacités BIM de Deskgate (ifc.clash)"
 requires-python = ">=3.11"
 license = "MIT"

@@ -1,6 +1,6 @@
 [project]
 name = "deskgate-bcf"
-version = "0.1.0.dev0"
+version = "0.1.0"
 description = "Écriture BCF 2.1 pour Deskgate à partir d'un JSON versionné (GPL-3.0-or-later)"
 requires-python = ">=3.11"
 license = "GPL-3.0-or-later"
