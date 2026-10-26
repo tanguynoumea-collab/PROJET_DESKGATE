@@ -72,9 +72,9 @@
 - [x] **AUD-01** : saas-team-council passé, triage daté (preuve: audits/saas-council-2026-10-22.md, checkpoints.triage du 2026-10-22)
 - [x] **AUD-02** : findings reportés au backlog, aucun bloquant ouvert (preuve: backlog 999.1 à 999.10 du ROADMAP ; aucun bloquant ouvert dans state.json)
 - [x] **AUD-03** : dev-senior a relu, zéro bloquant (preuve: .arthemis/reports/dev-senior-1-1.md, findings certifiés fermés (dev-senior-1-4-recertification.md))
-- [ ] **PUB-01** : version bumpée dans pyproject.toml, CHANGELOG depuis les SUMMARY (preuve: <sha>)
+- [x] **PUB-01** : version bumpée dans pyproject.toml, CHANGELOG depuis les SUMMARY (preuve: 3de963e release(v0.1.0) ; CHANGELOG rédigé depuis REQUIREMENTS, ROADMAP et entrées existantes, one_liner des SUMMARY inexploitables)
 - [x] **PUB-02** : go publication daté dans checkpoints.go_publication (preuve: go du 2026-10-26 sur f97db9e, citation dans state.json)
-- [ ] **PUB-03** : tag v0.1.0 posé, poussé, inscrit dans livraisons[] (preuve: <sha>)
+- [x] **PUB-03** : tag v0.1.0 posé, poussé, inscrit dans livraisons[] (preuve: tag 4df3266 sur 3de963e, git ls-remote, state.json livraisons[0])
 - [ ] **PUB-04** : vérification 11a sur la machine cible : runner démarré par la tâche planifiée, /health, parcours n8n (preuve: <rapport>)
 - [x] **PUB-05** : plan de retour arrière écrit avant le go (preuve: state.json extension.web_saas.exploitation.plan_retour_arriere, 2026-10-26)
 

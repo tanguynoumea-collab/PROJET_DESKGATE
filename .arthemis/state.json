@@ -14,12 +14,14 @@
     ],
     "dir_audits": "audits/",
     "fichiers_version": [
-      "pyproject.toml"
+      "pyproject.toml",
+      "plugins/bim/pyproject.toml",
+      "plugins/bim/bcf/pyproject.toml"
     ],
     "roadmap_projet": "docs/passation/04-FEUILLE-DE-ROUTE.md"
   },
   "route": "full",
-  "phase": "CLOTURE_MILESTONE",
+  "phase": "PUBLICATION",
   "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
@@ -135,7 +137,18 @@
       "condition_levee": "verification 11a : deconnexion puis reconnexion, runner lance par la tache"
     }
   ],
-  "livraisons": [],
+  "livraisons": [
+    {
+      "version": "0.1.0",
+      "tag": "v0.1.0",
+      "date": "2026-10-26",
+      "commit": "3de963e",
+      "milestone_gsd": "v0.1",
+      "quick_id": null,
+      "preuve": "tag annote v0.1.0 sur 3de963e, pousse (git ls-remote --tags origin v0.1.0)",
+      "deploiement": null
+    }
+  ],
   "dod": ".arthemis/dod/cycle-1.md",
   "phases_sautees": [
     {
@@ -190,6 +203,6 @@
   },
   "maj": {
     "le": "2026-10-26",
-    "commit": "f97db9e"
+    "commit": "3de963e"
   }
 }
