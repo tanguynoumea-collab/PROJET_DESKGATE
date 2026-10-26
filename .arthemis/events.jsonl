@@ -87,3 +87,4 @@
 {"ts":"2026-10-26T13:00","type":"checkpoint","ref":"go_publication","commit":"f97db9e","note":"go v0.1.0 donné par Tanguy (version, CHANGELOG, audits, 05-D1 en file ouverte, plan de retour arrière)"}
 {"ts":"2026-10-26T13:20","type":"tag","ref":"v0.1.0","commit":"3de963e","note":"release(v0.1.0) : runner, deskgate-bim et deskgate-bcf en 0.1.0 ; tag annote pousse"}
 {"ts":"2026-10-26T13:20","type":"transition","ref":"CLOTURE_MILESTONE -> PUBLICATION","commit":"3de963e","note":"tag v0.1.0 pose et pousse"}
+{"ts":"2026-10-26T14:00","type":"reprise","ref":"verif-11a","commit":"7625b9d","note":"v0.1.0 installee ; 11a et 05-D1 attendent le redemarrage du PC par Tanguy (a distance) ; runner arrete apres task end"}

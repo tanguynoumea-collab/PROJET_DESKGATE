@@ -22,7 +22,7 @@
   },
   "route": "full",
   "phase": "PUBLICATION",
-  "phase_status": "en_cours",
+  "phase_status": "attente_humaine",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -135,6 +135,18 @@
       "source": ".planning/phases/05-installation-et-int-gration-n8n/05-HUMAN-UAT.md",
       "ref": "05-D1",
       "condition_levee": "verification 11a : deconnexion puis reconnexion, runner lance par la tache"
+    },
+    {
+      "id": "verif-11a",
+      "type": "action_humaine",
+      "titre": "Verification 11a de v0.1.0 : redemarrer le PC, runner lance par la tache, /health, parcours n8n (avec 05-D1)",
+      "gravite": "majeur",
+      "statut": "ouvert",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-26",
+      "source": "references/publication.md §3.4",
+      "ref": "PUB-04",
+      "condition_levee": "redemarrage fait, 11a constatee ok"
     }
   ],
   "livraisons": [
@@ -203,6 +215,6 @@
   },
   "maj": {
     "le": "2026-10-26",
-    "commit": "3de963e"
+    "commit": "7625b9d"
   }
 }
