@@ -8,8 +8,8 @@
 
 ## Socle commun
 
-- [ ] Toutes les phases 1 à 5 ont un SUMMARY par PLAN, VERIFICATION `passed` ou `human_needed` soldé, aucun UAT pending (preuve : liste des SUMMARY et statuts)
-- [ ] Aucun `*-UAT.md` ni `*-HUMAN-UAT.md` en `testing`, `partial` ou `diagnosed` ; aucun `result: pending` (preuve : grep collé)
+- [x] Toutes les phases 1 à 5 ont un SUMMARY par PLAN, VERIFICATION `passed` ou `human_needed` soldé, aucun UAT pending (preuve: 72 PLAN / 72 SUMMARY ; human_needed soldés par 53f8da1 et 86ac5f4 ; seule exception 05-D1, publié avec file ouverte, décision du 2026-10-26 dans events.jsonl et STATE.md)
+- [x] Aucun `*-UAT.md` ni `*-HUMAN-UAT.md` en `testing`, `partial` ou `diagnosed` ; aucun `result: pending` (preuve: grep du 2026-10-26 : seul 05-HUMAN-UAT.md partial, item 05-D1 blocks none, publié avec file ouverte par décision du 2026-10-26)
 - [x] Aucune VERIFICATION en `gaps_found` sans phase de gaps exécutée (preuve: aucune VERIFICATION en gaps_found ; écarts de 5.4 fermés par les plans 06 à 09, 9a7305c)
 - [x] Gate du profil vert : chaque commande de `profil.gate[]` exécutée, code 0, journal dans `.arthemis/reports/gate-1-<phase>.log` (preuve: .arthemis/reports/gate-1-05.4.log, 93f7d0c)
 - [x] Tests 100 % verts ; aucun test retiré ou ignoré sans décision datée (les skip explicites de liens symboliques sans mode développeur sont déclarés) (preuve: .arthemis/reports/gate-1-05.4.log, 1053 passés, 2 skips de liens symboliques déclarés, 33 e2e)

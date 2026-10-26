@@ -121,6 +121,18 @@
       "source": "passation 2026-10-21T09:41",
       "ref": ".planning/STATE.md",
       "condition_levee": "reparation acceptee et faite, ou refus consigne"
+    },
+    {
+      "id": "05-D1",
+      "type": "uat",
+      "titre": "Runner demarre seul a l ouverture de session Windows : reporte, a verifier avec la 11a apres le tag",
+      "gravite": "mineur",
+      "statut": "ouvert",
+      "proprietaire": "humain",
+      "ouvert_le": "2026-10-26",
+      "source": ".planning/phases/05-installation-et-int-gration-n8n/05-HUMAN-UAT.md",
+      "ref": "05-D1",
+      "condition_levee": "verification 11a : deconnexion puis reconnexion, runner lance par la tache"
     }
   ],
   "livraisons": [],
@@ -178,6 +190,6 @@
   },
   "maj": {
     "le": "2026-10-26",
-    "commit": "93f7d0c"
+    "commit": "4686016"
   }
 }
