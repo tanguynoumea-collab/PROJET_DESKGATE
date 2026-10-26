@@ -83,10 +83,10 @@
       "differe": false
     },
     "go_publication": {
-      "valide": false,
-      "le": null,
-      "commit": null,
-      "preuve": null,
+      "valide": true,
+      "le": "2026-10-26",
+      "commit": "f97db9e",
+      "preuve": "Tanguy : « Go publication v0.1.0 : je valide la version, le CHANGELOG, les verdicts des audits, 05-D1 en file ouverte et le plan de retour arrière »",
       "differe": false
     },
     "roadmap": {
@@ -190,6 +190,6 @@
   },
   "maj": {
     "le": "2026-10-26",
-    "commit": "4686016"
+    "commit": "f97db9e"
   }
 }
