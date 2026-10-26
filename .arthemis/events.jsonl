@@ -83,3 +83,4 @@
 {"ts":"2026-10-26T10:00","type":"transition","ref":"AUDIT_SENIOR -> CLOTURE_MILESTONE","commit":"f017dc0","note":"findings du dev-senior tous certifies fermes ; DS4-1..3 au backlog 999.10 (choix utilisateur)"}
 {"ts":"2026-10-26T11:00","type":"fermeture","ref":"acc01-duree","commit":"93f7d0c","note":"ACC-01 certifie a la DoD : 05-ACCEPTANCE.md, job 1ec19b03b33d 486 s, critere revu du 2026-10-21"}
 {"ts":"2026-10-26T11:30","type":"checkpoint","ref":"file_ouverte","commit":"4686016","note":"publié avec file ouverte : 05-D1 (Tanguy : « je la ferai avec la vérification 11a après le tag »)"}
+{"ts":"2026-10-26T12:00","type":"rapport","ref":".planning/v0.1-MILESTONE-AUDIT.md","commit":"be2a74f","note":"audit milestone v0.1 : tech_debt, aucun bloquant, 44/49 (PUB a la publication), 5/5 parcours"}
