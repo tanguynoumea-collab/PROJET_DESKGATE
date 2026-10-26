@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
-status: executing
+status: verifying
 stopped_at: Completed 05.4-09-PLAN.md
-last_updated: "2026-10-25T17:23:28.507Z"
+last_updated: "2026-10-26T09:38:43.084Z"
 last_activity: 2026-10-25
 progress:
-  total_phases: 18
+  total_phases: 19
   completed_phases: 9
   total_plans: 72
   completed_plans: 72
@@ -191,6 +191,7 @@ Recent decisions affecting current work:
 - [Phase 05.4]: Exemple POST /jobs de la doc validé par SubmitRequest ; cibles (keyring, callback.headers, plafond threads par env) marquées et verrouillées par test
 - [Phase 05.4]: Seuil de déport mcp.call mesuré en octets UTF-8 (DS3-1)
 - [Phase 05.4]: Purge: candidats en SQL, filtre is_marker en Python (règle unique, DS3-2)
+- [Clôture v0.1]: 05-D1 (démarrage du runner à l'ouverture de session) reporté : publié avec file ouverte, vérifié avec la 11a après le tag v0.1.0
 
 ### Roadmap Evolution
 
