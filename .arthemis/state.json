@@ -21,30 +21,13 @@
     "roadmap_projet": "docs/passation/04-FEUILLE-DE-ROUTE.md"
   },
   "route": "full",
-  "phase": "RETOUR_ROADMAP",
-  "phase_status": "en_cours",
-  "cycle": {
-    "numero": 1,
-    "demarre_le": "2026-10-20",
-    "version_cible": "0.1.0",
-    "impact_ui": false,
-    "mode_design": null,
-    "branche": null
-  },
+  "phase": "IDLE",
+  "phase_status": "terminee",
+  "cycle": null,
   "gsd": {
     "planning_dir": ".planning",
-    "milestone": "v0.1",
-    "phases": [
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "5.1",
-      "5.2",
-      "5.3",
-      "5.4"
-    ],
+    "milestone": null,
+    "phases": [],
     "quick_ids": [
       "261021-e6p",
       "261022-iea"
@@ -57,17 +40,17 @@
     }
   },
   "iterations": {
-    "cadrage_tours": 1,
+    "cadrage_tours": 0,
     "design_review": 0,
-    "audit_council": 2,
+    "audit_council": 0,
     "max": 3
   },
   "checkpoints": {
     "cadrage": {
-      "valide": true,
-      "le": "2026-10-20",
-      "commit": "8ffd7dc",
-      "preuve": ".arthemis/reports/cadrage-1.md",
+      "valide": false,
+      "le": null,
+      "commit": null,
+      "preuve": null,
       "differe": false
     },
     "plan_design": {
@@ -78,17 +61,17 @@
       "differe": false
     },
     "triage": {
-      "valide": true,
-      "le": "2026-10-22",
-      "commit": "9c397bb",
-      "preuve": ".arthemis/events.jsonl (checkpoint triage N2, citation utilisateur)",
+      "valide": false,
+      "le": null,
+      "commit": null,
+      "preuve": null,
       "differe": false
     },
     "go_publication": {
-      "valide": true,
-      "le": "2026-10-26",
-      "commit": "f97db9e",
-      "preuve": "Tanguy : « Go publication v0.1.0 : je valide la version, le CHANGELOG, les verdicts des audits, 05-D1 en file ouverte et le plan de retour arrière »",
+      "valide": false,
+      "le": null,
+      "commit": null,
+      "preuve": null,
       "differe": false
     },
     "roadmap": {
@@ -96,7 +79,7 @@
       "le": null,
       "commit": null,
       "preuve": null,
-      "differe": true
+      "differe": false
     }
   },
   "items_ouverts": [
@@ -218,12 +201,12 @@
           "le": "2026-10-27",
           "resultat": "ok"
         },
-        "collecte_due": false
+        "collecte_due": true
       }
     }
   },
   "maj": {
     "le": "2026-10-27",
-    "commit": "15329d0"
+    "commit": "e3d1465"
   }
 }

@@ -93,3 +93,4 @@
 {"ts":"2026-10-27T15:00","type":"transition","ref":"PUBLICATION -> EXPLOITATION","commit":"42f7a4e","note":"complete-milestone v0.1 fait (6fe8f0b), tag GSD v0.1 pousse, Version produit 0.1.0 dans MILESTONES.md"}
 {"ts":"2026-10-27T15:00","type":"transition","ref":"EXPLOITATION -> RETOUR_ROADMAP","commit":"42f7a4e","note":"11a ok le 2026-10-27, 11b differee au cycle suivant"}
 {"ts":"2026-10-27T15:30","type":"checkpoint","ref":"roadmap","commit":"15329d0","note":"checkpoint roadmap differe par Tanguy ; liste consignee (item roadmap-cycle-1)"}
+{"ts":"2026-10-27T16:00","type":"cycle_clos","ref":"cycle 1","commit":"e3d1465","note":"cycle 1 clos : v0.1.0 publiee, milestone v0.1 archive ; restent ouverts roadmap-cycle-1, sqlite-verrou-repos, uv-pythons, odm-backlog ; collecte 11b due"}
