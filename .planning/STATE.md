@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Runner minimal
-status: verifying
-stopped_at: Completed 05.4-09-PLAN.md
-last_updated: "2026-10-26T09:38:43.084Z"
-last_activity: 2026-10-25
+status: milestone_complete
+stopped_at: Milestone v0.1 archivé, version produit 0.1.0
+last_updated: "2026-10-27T13:06:37.912Z"
+last_activity: 2026-10-27
 progress:
   total_phases: 19
   completed_phases: 9
@@ -18,17 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-10-20)
+See: .planning/PROJECT.md (updated 2026-10-27)
 
 **Core value:** n8n délègue une tâche longue au PC Windows et reprend fiablement quand elle se termine, quel que soit le résultat (succès, échec, délai dépassé, annulation, redémarrage du runner).
-**Current focus:** Phase 05.4 — corrections audit senior 1 (écarts DS3)
+**Current focus:** Planification du prochain milestone (v0.1 livré, 0.1.0)
 
 ## Current Position
 
-Phase: 05.4 (corrections audit senior 1 (écarts DS3)) — EXECUTING
-Plan: 9 of 9
-Status: Phase complete — ready for verification
-Last activity: 2026-10-25
+Phase: aucune (milestone v0.1 terminé)
+Plan: —
+Status: Milestone v0.1 archivé ; prochain : /gsd:new-milestone
+Last activity: 2026-10-27
 
 Progress: [██████████] 100%
 
