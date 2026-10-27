@@ -88,3 +88,5 @@
 {"ts":"2026-10-26T13:20","type":"tag","ref":"v0.1.0","commit":"3de963e","note":"release(v0.1.0) : runner, deskgate-bim et deskgate-bcf en 0.1.0 ; tag annote pousse"}
 {"ts":"2026-10-26T13:20","type":"transition","ref":"CLOTURE_MILESTONE -> PUBLICATION","commit":"3de963e","note":"tag v0.1.0 pose et pousse"}
 {"ts":"2026-10-26T14:00","type":"reprise","ref":"verif-11a","commit":"7625b9d","note":"v0.1.0 installee ; 11a et 05-D1 attendent le redemarrage du PC par Tanguy (a distance) ; runner arrete apres task end"}
+{"ts":"2026-10-27T14:10","type":"fermeture","ref":"05-D1","commit":"b10113b","note":"runner lance par la tache a l ouverture de session apres redemarrage (13:34:21)"}
+{"ts":"2026-10-27T14:10","type":"publication","ref":"v0.1.0","commit":"3de963e","note":"11a ok avec reserve : 9 database is locked au repos, finding sqlite-verrou-repos ; Docker Desktop non demarre apres reboot"}

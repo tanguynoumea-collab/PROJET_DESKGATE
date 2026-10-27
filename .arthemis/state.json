@@ -22,7 +22,7 @@
   },
   "route": "full",
   "phase": "PUBLICATION",
-  "phase_status": "attente_humaine",
+  "phase_status": "en_cours",
   "cycle": {
     "numero": 1,
     "demarre_le": "2026-10-20",
@@ -125,28 +125,16 @@
       "condition_levee": "reparation acceptee et faite, ou refus consigne"
     },
     {
-      "id": "05-D1",
-      "type": "uat",
-      "titre": "Runner demarre seul a l ouverture de session Windows : reporte, a verifier avec la 11a apres le tag",
-      "gravite": "mineur",
-      "statut": "ouvert",
-      "proprietaire": "humain",
-      "ouvert_le": "2026-10-26",
-      "source": ".planning/phases/05-installation-et-int-gration-n8n/05-HUMAN-UAT.md",
-      "ref": "05-D1",
-      "condition_levee": "verification 11a : deconnexion puis reconnexion, runner lance par la tache"
-    },
-    {
-      "id": "verif-11a",
-      "type": "action_humaine",
-      "titre": "Verification 11a de v0.1.0 : redemarrer le PC, runner lance par la tache, /health, parcours n8n (avec 05-D1)",
+      "id": "sqlite-verrou-repos",
+      "type": "finding",
+      "titre": "9 database is locked au repos sous 0.1.0 (sender recree, engine 1/5), sans veille ni tache ; cause inconnue",
       "gravite": "majeur",
       "statut": "ouvert",
-      "proprietaire": "humain",
-      "ouvert_le": "2026-10-26",
-      "source": "references/publication.md §3.4",
-      "ref": "PUB-04",
-      "condition_levee": "redemarrage fait, 11a constatee ok"
+      "proprietaire": "ia",
+      "ouvert_le": "2026-10-27",
+      "source": "runner.log 2026-10-26 21:43 a 2026-10-27 13:17",
+      "ref": "11a",
+      "condition_levee": "cause identifiee et corrigee, ou renonciation consignee"
     }
   ],
   "livraisons": [
@@ -157,8 +145,12 @@
       "commit": "3de963e",
       "milestone_gsd": "v0.1",
       "quick_id": null,
-      "preuve": "tag annote v0.1.0 sur 3de963e, pousse (git ls-remote --tags origin v0.1.0)",
-      "deploiement": null
+      "preuve": ".arthemis/reports/publication-0.1.0.md",
+      "deploiement": {
+        "cible": "PC local, uv tool install du tag v0.1.0",
+        "le": "2026-10-27",
+        "resultat": "ok"
+      }
     }
   ],
   "dod": ".arthemis/dod/cycle-1.md",
@@ -197,7 +189,12 @@
       },
       "environnements": [],
       "exploitation": {
-        "dernier_deploiement": null,
+        "dernier_deploiement": {
+          "cible": "PC local, uv tool install du tag v0.1.0, tache Deskgate",
+          "le": "2026-10-27",
+          "commit": "3de963e",
+          "resultat": "ok"
+        },
         "plan_retour_arriere": {
           "annulation_code": "Premiere version, aucune anterieure : deskgate task end, deskgate task remove, puis uv tool uninstall deskgate",
           "code_avant_compatible_base_apres": true,
@@ -206,15 +203,15 @@
         },
         "migrations_appliquees": [],
         "verification_11a": {
-          "le": null,
-          "resultat": null
+          "le": "2026-10-27",
+          "resultat": "ok"
         },
         "collecte_due": false
       }
     }
   },
   "maj": {
-    "le": "2026-10-26",
-    "commit": "7625b9d"
+    "le": "2026-10-27",
+    "commit": "b10113b"
   }
 }

@@ -15,7 +15,7 @@
 - [x] Tests 100 % verts ; aucun test retiré ou ignoré sans décision datée (les skip explicites de liens symboliques sans mode développeur sont déclarés) (preuve: .arthemis/reports/gate-1-05.4.log, 1053 passés, 2 skips de liens symboliques déclarés, 33 e2e)
 - [x] Aucun secret introduit dans le code ou le dépôt (preuve: git grep des motifs de clés privées, jetons ghp_/sk-/AKIA et mots de passe en clair : aucun résultat (2026-10-26))
 - [x] Aucun item `finding` en `corrige_non_certifie` (preuve: state.json du 2026-10-26, items_ouverts sans finding)
-- [ ] REQUIREMENTS.md : chaque exigence du milestone `[x]` ou Dropped daté (preuve : table Traceability)
+- [x] REQUIREMENTS.md : chaque exigence du milestone `[x]` ou Dropped daté (preuve: table Traceability, 49/49 Complete le 2026-10-27, b10113b)
 
 ## Socle web_saas (adapté : runner local mono-tenant)
 
@@ -75,7 +75,7 @@
 - [x] **PUB-01** : version bumpée dans pyproject.toml, CHANGELOG depuis les SUMMARY (preuve: 3de963e release(v0.1.0) ; CHANGELOG rédigé depuis REQUIREMENTS, ROADMAP et entrées existantes, one_liner des SUMMARY inexploitables)
 - [x] **PUB-02** : go publication daté dans checkpoints.go_publication (preuve: go du 2026-10-26 sur f97db9e, citation dans state.json)
 - [x] **PUB-03** : tag v0.1.0 posé, poussé, inscrit dans livraisons[] (preuve: tag 4df3266 sur 3de963e, git ls-remote, state.json livraisons[0])
-- [ ] **PUB-04** : vérification 11a sur la machine cible : runner démarré par la tâche planifiée, /health, parcours n8n (preuve: <rapport>)
+- [x] **PUB-04** : vérification 11a sur la machine cible : runner démarré par la tâche planifiée, /health, parcours n8n (preuve: .arthemis/reports/publication-0.1.0.md, ok avec réserve sqlite-verrou-repos)
 - [x] **PUB-05** : plan de retour arrière écrit avant le go (preuve: state.json extension.web_saas.exploitation.plan_retour_arriere, 2026-10-26)
 
 ## Clôture
