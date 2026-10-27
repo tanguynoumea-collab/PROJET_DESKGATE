@@ -77,7 +77,7 @@ Milestone v0.1 : runner minimal prouvé sur une détection de conflits réelle. 
 - [x] **PUB-01**: La version est bumpée dans `pyproject.toml` ; CHANGELOG généré depuis les SUMMARY du milestone
 - [x] **PUB-02**: Le go publication est daté et commité dans `checkpoints.go_publication` ; aucun item `uat` ou `action_humaine` qui retient la publication n'est ouvert
 - [x] **PUB-03**: Le tag `v0.1.0` est posé sur le commit livré, poussé, inscrit dans `livraisons[]` et dans la ligne `**Version produit :**` de MILESTONES.md
-- [ ] **PUB-04**: Vérification 11a sur la machine cible : runner démarré par la tâche planifiée, `/health` répond, parcours n8n de bout en bout passe ; `exploitation.verification_11a` renseigné
+- [x] **PUB-04**: Vérification 11a sur la machine cible : runner démarré par la tâche planifiée, `/health` répond, parcours n8n de bout en bout passe ; `exploitation.verification_11a` renseigné
 - [x] **PUB-05**: Plan de retour arrière écrit dans `exploitation.plan_retour_arriere` avant le go (désinstallation, sort de la base, retrait de la tâche planifiée)
 
 ## v2 Requirements
@@ -172,7 +172,7 @@ Milestones ultérieurs (voir `ROADMAP.md` à la racine). Non planifiés dans ce 
 | PUB-01 | Phase 5 | Complete |
 | PUB-02 | Phase 5 | Complete |
 | PUB-03 | Phase 5 | Complete |
-| PUB-04 | Phase 5 | Pending |
+| PUB-04 | Phase 5 | Complete |
 | PUB-05 | Phase 5 | Complete |
 
 **Coverage:**
