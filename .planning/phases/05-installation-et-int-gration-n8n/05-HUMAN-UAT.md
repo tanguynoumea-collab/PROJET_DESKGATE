@@ -1,9 +1,9 @@
 ---
-status: partial
+status: complete
 phase: 05-installation-et-int-gration-n8n
 source: [05-VERIFICATION.md, 05-08-PLAN.md]
 started: 2026-10-21T12:45:00Z
-updated: 2026-10-26T10:30:00Z
+updated: 2026-10-27T14:00:00Z
 queue: deferred
 horizon: none
 overrides_bloquant: []
@@ -11,13 +11,14 @@ overrides_bloquant: []
 
 ## Current Test
 
-[en attente de vérification humaine]
+[testing complete]
 
 ## Tests
 
 ### 1. Le runner démarre seul à l'ouverture de session Windows
 expected: Après fermeture puis réouverture de la session, `deskgate doctor` affiche le port « runner joignable » et `/health` répond, sans lancement manuel
-result: pending
+result: pass
+evidence: 2026-10-27, redemarrage du PC : ouverture de session 13:34:21, runner 0.1.0 lance a 13:34:21 par la tache (pythonw sous svchost), /health ok
 id: 05-D1
 kind: verify
 source: 05-06/T1
@@ -41,9 +42,9 @@ if_fail: gap, /gsd:plan-phase 5 --gaps
 ## Summary
 
 total: 2
-passed: 1
+passed: 2
 issues: 0
-pending: 1
+pending: 0
 skipped: 0
 blocked: 0
 
