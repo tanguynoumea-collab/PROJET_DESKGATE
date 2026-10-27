@@ -41,6 +41,7 @@ Plans:
 ### Phase 999.2: Base : retention et purge, sauvegarde avant migration (DON-001, DON-003) (BACKLOG)
 
 **Goal:** [Captured for future planning]
+**Note:** Revue 2026-10-27 : DON-001 en partie couvert par `deskgate purge` (v0.1.0, DS-SCAL-1) ; restent la purge des dossiers de tâche et la sauvegarde avant migration.
 **Requirements:** TBD
 **Plans:** 0 plans
 
@@ -50,6 +51,7 @@ Plans:
 ### Phase 999.3: Installation et CI : contraintes du lock, versions des plugins, test obligatoire saute (LIV-002, LIV-004, TST-001) (BACKLOG)
 
 **Goal:** [Captured for future planning]
+**Note:** Revue 2026-10-27 : LIV-004 fermé en v0.1 (plugins bumpés en 0.1.0, ajoutés à `fichiers_version`).
 **Requirements:** TBD
 **Plans:** 0 plans
 
@@ -68,6 +70,7 @@ Plans:
 ### Phase 999.5: Noyau : test AST, champ data, mcp_call, typage doctor, events.jsonl (ARC-002, ARC-004, MNT-006, MNT-008, FIA-004) (BACKLOG)
 
 **Goal:** [Captured for future planning]
+**Note:** Revue 2026-10-27 : ARC-004 fermé en v0.1 (`data` exposé dans le rappel et GET, DS-ARCH-1).
 **Requirements:** TBD
 **Plans:** 0 plans
 
@@ -77,6 +80,7 @@ Plans:
 ### Phase 999.6: Docs et perimetre : ARCHITECTURE, ROADMAP et README, contrat bcf v1, hotes de rappel (PER-003, PER-004, PER-005, SEC-003) (BACKLOG)
 
 **Goal:** [Captured for future planning]
+**Note:** Revue 2026-10-27 : PER-003 et PER-004 fermés en v0.1 (`ARCHITECTURE.md` « État livré » et marquage cible, DS-MAINT-1).
 **Requirements:** TBD
 **Plans:** 0 plans
 
